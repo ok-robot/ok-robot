@@ -1,0 +1,3 @@
+[submodule "clip-fields"]
+	path = clip-fields
+	url = https://github.com/leo20021210/clip-fields
