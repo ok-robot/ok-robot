@@ -1,3 +1,6 @@
 [submodule "clip-fields"]
 	path = clip-fields
 	url = https://github.com/leo20021210/clip-fields
+[submodule "usa"]
+	path = usa
+	url = https://github.com/leo20021210/usa
