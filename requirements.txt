@@ -1,0 +1,46 @@
+#clip fields
+timm
+hydra-core
+git+https://github.com/openai/CLIP.git
+ftfy
+tqdm
+regex
+point-transformer-pytorch
+numpy-quaternion
+git+https://github.com/facebookresearch/detectron2.git
+pandas
+pyntcloud
+hydra-submitit-launcher
+torch-encoding
+torchmetrics
+sentence-transformers
+opencv-python
+imageio
+altair
+streamlit
+protobuf
+matplotlib
+test-tube
+wandb
+omegaconf
+numpy
+einops
+pytorch-lightning
+pyquaternion
+pyliblzfse
+open3d
+supervision
+git+https://github.com/facebookresearch/segment-anything
+transformers==4.30.2
+ffmpeg-python
+
+# usa
+jupyter
+ml-starter==0.0.44
+more_itertools
+seaborn
+
+# lerf
+ninja 
+git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
+nerfstudio
