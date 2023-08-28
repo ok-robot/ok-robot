@@ -33,6 +33,7 @@ supervision
 git+https://github.com/facebookresearch/segment-anything
 transformers==4.30.2
 ffmpeg-python
+git+https://github.com/zhanghang1989/PyTorch-Encoding/
 
 # usa
 jupyter
@@ -44,3 +45,4 @@ seaborn
 ninja 
 git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 nerfstudio
+torchtyping

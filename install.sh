@@ -7,6 +7,7 @@ python setup.py install
 cd ../..
 cd lerf
 python -m pip install -e .
+ns-install-cli
 cd ..
 cd usa
 pip install -e .
