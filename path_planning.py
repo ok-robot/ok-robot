@@ -20,6 +20,9 @@ import ml.api as ml  # Source: https://github.com/codekansas/ml-starter
 
 ml.configure_logging()
 
+import sys
+sys.path.append('usa')
+import hydra
 # Imports these files to add them to the model and task registry.
 from usa.models.point2emb import Point2EmbModel, Point2EmbModelConfig
 from usa.tasks.clip_sdf import ClipSdfTask
@@ -50,13 +53,13 @@ import zmq
 from matplotlib import pyplot as plt
 
 # Using the default config, but overriding the dataset.
-config = OmegaConf.load("notebooks/config.yaml")
-#config.task.dataset = "r3d"
-config.task.dataset = "/data/peiqi/home_engine/usa/Kitchen.r3d"
+config = OmegaConf.load("usa/configs/train.yaml")
+config.task.dataset = "r3d"
+config.task.dataset_path = "clip-fields/Kitchen.r3d"
 
 # We still need to explicitly set these variables.
 config.trainer.exp_name = "4_256_no"
-config.trainer.base_run_dir = "nyu_kitchen"
+config.trainer.base_run_dir = "usa/notebooks/nyu_kitchen"
 config.trainer.run_id = 0
 
 # Only use stdout logger.
@@ -127,30 +130,45 @@ def recv_array(socket, flags=0, copy=True, track=False):
     A = np.frombuffer(msg, dtype=md['dtype'])
     return A.reshape(md['shape'])
 
-while True:
-    start_xyt = recv_array(socket)
-    print(start_xyt)
-    socket.send_string('start_xyt received')
-    end_xy = recv_array(socket)
-    print(end_xy)
-    socket.send_string('end_xy received')
-    paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy=end_xy)
-    print(socket.recv_string())
-    send_array(socket, paths)
-    print(paths)
-    fig, axes = plt.subplots(2, 1, figsize=(8, 8))
-    minx, miny = grid_planner.occ_map.origin
-    (ycells, xcells), resolution = grid_planner.occ_map.grid.shape, grid_planner.occ_map.resolution
-    maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
-    xs, ys, thetas = zip(*paths)
-    axes[0].imshow(grid_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
-    axes[0].plot(xs, ys, c='r')
-    axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
-    axes[0].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
-    axes[0].scatter(xs, ys, c = 'cyan', s = 10)
-    axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-1, 0))[::-1], extent=(minx, maxx, miny, maxy))
-    axes[1].plot(xs, ys, c='r')
-    axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
-    axes[1].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
-    axes[1].scatter(xs, ys, c = 'cyan', s = 10)
-    fig.savefig('output.jpg')
+@hydra.main(version_base="1.2", config_path=".", config_name="path.yaml")
+def main(cfg):
+    while True:
+        start_xyt = recv_array(socket)
+        print(start_xyt)
+        socket.send_string('start_xyt received')
+        if cfg.debug:
+            print('receive end xy')
+            end_xy = recv_array(socket)
+            print(end_xy)
+            socket.send_string('end_xy received')
+            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy=end_xy)
+        else:
+            print('receive text query')
+            end_goal_A = socket.recv_string()
+            socket.send_string('A received')
+            end_goal_B = socket.recv_string()
+            socket.send_string('B received')
+            paths = grid_planner.plan(start_xy=start_xyt[:2], end_goal=end_goal_A)
+        print(socket.recv_string())
+        send_array(socket, paths)
+        print(paths)
+        fig, axes = plt.subplots(2, 1, figsize=(8, 8))
+        minx, miny = grid_planner.occ_map.origin
+        (ycells, xcells), resolution = grid_planner.occ_map.grid.shape, grid_planner.occ_map.resolution
+        maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
+        xs, ys, thetas = zip(*paths)
+        axes[0].imshow(grid_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
+        axes[0].plot(xs, ys, c='r')
+        axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
+        axes[0].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
+        axes[0].scatter(xs, ys, c = 'cyan', s = 10)
+        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-1, 0))[::-1], extent=(minx, maxx, miny, maxy))
+        axes[1].plot(xs, ys, c='r')
+        axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
+        axes[1].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
+        axes[1].scatter(xs, ys, c = 'cyan', s = 10)
+        fig.savefig('output.jpg')
+
+
+if __name__ == "__main__":
+    main()
