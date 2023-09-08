@@ -162,7 +162,7 @@ def main(cfg):
         axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
         axes[0].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
         axes[0].scatter(xs, ys, c = 'cyan', s = 10)
-        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-1, 0))[::-1], extent=(minx, maxx, miny, maxy))
+        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-1, 0))[::-1], extent=(minx, maxx, miny, maxy).grid)
         axes[1].plot(xs, ys, c='r')
         axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
         axes[1].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
