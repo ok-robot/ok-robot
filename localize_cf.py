@@ -181,7 +181,7 @@ def find_alignment_over_model(label_model, queries, dataloader,
 # Keep in mind that the objective is picking up A from B
 def find_alignment_for_B(label_model, B, dataloader, 
             # for this function only, how many points do you want to considered as relevant to B
-            threshold_precentile = 0.05,
+            threshold_precentile = 0.01,
             # for clip-fields
             vision_weight = 10.0, text_weight = 10.0, linguistic = 'owl'):
     assert threshold_precentile > 0 and threshold_precentile <= 1, 'invalid threshold_precentile'
@@ -204,33 +204,57 @@ def find_alignment_for_A(label_model, A, dataloader,
 # Note that even though we cannot localize many queries with LERF at the same time,
 # we can actually select lerf scales for many queries at the same time.
 
-MODEL_TYPE = 'owl'
-DATASET_PATH = 'clip-fields/detic_labeled_dataset.pt'
-if MODEL_TYPE != 'owl':
-    MODEL_NAME = 'ViT-B/32'
-else:
-    MODEL_NAME = 'google/owlvit-base-patch32'
-WEIGHT_PATH = 'clip-fields/kitchen_owl1/implicit_scene_label_model_latest.pt'
-CONFIG_PATH = 'clip-fields/configs/train.yaml'
-load_pretrained(model_type = MODEL_TYPE , model_name = MODEL_NAME)
-points_dataloader = get_dataloader(cf_path = DATASET_PATH)
-max_coords, _ = points_dataloader.dataset.max(dim=0)
-min_coords, _ = points_dataloader.dataset.min(dim=0)
-label_model = load_field(config_path = CONFIG_PATH, model_weights_path = WEIGHT_PATH, max_coords = max_coords, min_coords = min_coords)
-print(label_model)
+def localize_pickupAfromB(A, B, config_path, vision_weight = 10.0, text_weight = 10.0):
+    config = OmegaConf.load(config_path)
+    model_type = config.web_models.segmentation
+    dataset_path = os.path.join('clip-fields', config.saved_dataset_path)
+    if model_type != 'owl':
+        model_name = 'ViT-B/32'
+    else:
+        model_name = 'google/owlvit-base-patch32'
+    weight_path = os.path.join('clip-fields', config.save_directory, 'implicit_scene_label_model_latest.pt')
+    load_pretrained(model_type = model_type , model_name = model_name)
+    points_dataloader = get_dataloader(cf_path = dataset_path)
+    max_coords, _ = points_dataloader.dataset.max(dim=0)
+    min_coords, _ = points_dataloader.dataset.min(dim=0)
+    label_model = load_field(
+        config_path = config_path, model_weights_path = weight_path, max_coords = max_coords, min_coords = min_coords)
+    B_dataloader = find_alignment_for_B(
+        label_model, B, points_dataloader, linguistic = model_type, vision_weight = vision_weight, text_weight = text_weight)
+    final_point = find_alignment_for_A(
+        label_model, A, B_dataloader, linguistic = model_type, vision_weight = vision_weight, text_weight = text_weight)
+    print(final_point)
+    final_point[:, -1] = -final_point[:, -1]
+    return final_point[:, [0, 2, 1]]
 
-eval_data = pd.read_csv('clip-fields/kitchen.csv')
-queries = list(eval_data['query'])
+print(localize_pickupAfromB('yellow cube', 'table', 'clip-fields/configs/train.yaml', vision_weight = 10.0, text_weight = 10.0))
+#MODEL_TYPE = 'owl'
+#DATASET_PATH = 'clip-fields/detic_labeled_dataset.pt'
+#if MODEL_TYPE != 'owl':
+#    MODEL_NAME = 'ViT-B/32'
+#else:
+#    MODEL_NAME = 'google/owlvit-base-patch32'
+#WEIGHT_PATH = 'clip-fields/kitchen_owl1/implicit_scene_label_model_latest.pt'
+#CONFIG_PATH = 'clip-fields/configs/train.yaml'
+#load_pretrained(model_type = MODEL_TYPE , model_name = MODEL_NAME)
+#points_dataloader = get_dataloader(cf_path = DATASET_PATH)
+#max_coords, _ = points_dataloader.dataset.max(dim=0)
+#min_coords, _ = points_dataloader.dataset.min(dim=0)
+#label_model = load_field(config_path = CONFIG_PATH, model_weights_path = WEIGHT_PATH, max_coords = max_coords, min_coords = min_coords)
+#print(label_model)
 
-xs, ys, zs, affords = list(eval_data['x']), list(eval_data['y']), list(eval_data['z']), list(eval_data['affordance'])
-xyzs = torch.stack([torch.tensor(xs), torch.tensor(ys), torch.tensor(zs)], dim = 1)
-max_points = find_alignment_for_A(label_model, queries, points_dataloader, 
-            vision_weight = 1.0, text_weight = 10.0, linguistic = MODEL_TYPE)
-print(max_points.shape)
-for max_point, query in zip(max_points, queries):
-    print(max_point, query)
+#eval_data = pd.read_csv('clip-fields/kitchen.csv')
+#queries = list(eval_data['query'])
 
-correctness = torch.linalg.norm((max_points[:, [0, 2]] - xyzs[:, [0, 2]]), dim = -1) <= torch.tensor(affords)
-print(np.array(queries)[torch.where(correctness)[0].numpy()], 
-    np.array(queries)[torch.where(~correctness)[0].numpy()], 
-    len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
+#xs, ys, zs, affords = list(eval_data['x']), list(eval_data['y']), list(eval_data['z']), list(eval_data['affordance'])
+#xyzs = torch.stack([torch.tensor(xs), torch.tensor(ys), torch.tensor(zs)], dim = 1)
+#max_points = find_alignment_for_A(label_model, queries, points_dataloader, 
+#            vision_weight = 1.0, text_weight = 10.0, linguistic = MODEL_TYPE)
+#print(max_points.shape)
+#for max_point, query in zip(max_points, queries):
+#    print(max_point, query)
+
+#correctness = torch.linalg.norm((max_points[:, [0, 2]] - xyzs[:, [0, 2]]), dim = -1) <= torch.tensor(affords)
+#print(np.array(queries)[torch.where(correctness)[0].numpy()], 
+#    np.array(queries)[torch.where(~correctness)[0].numpy()], 
+#    len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
