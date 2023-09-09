@@ -40,8 +40,9 @@ from omegaconf import OmegaConf
 
 import ml.api as ml
 import usa
-from usa.tasks.datasets.posed_rgbd import get_posed_rgbd_dataset, iter_xyz
+from usa.tasks.datasets.posed_rgbd import get_posed_rgbd_dataset, iter_xyz, get_bounds, Bounds
 from usa.models.point2emb import Point2EmbModel, Point2EmbModelConfig
+from usa.planners.base import get_ground_truth_map_from_dataset
 from usa.tasks.clip_sdf import ClipSdfTask
 
 # These environment variables control where training and eval logs are written.
@@ -61,10 +62,13 @@ from lerf.lerf import LERFModelConfig, LERFModel
 from lerf.lerf_field import LERFField
 import open_clip
 
+torch.manual_seed(10000)
+
 model = None
 preprocessor = None
 sentence_model = None
 lerf_model = None
+bounds = None
 
 def pseudo_lerf(lerf_model, points, scale = 0.5):
     #global lerf_model
@@ -105,7 +109,9 @@ def load_field(
     model_weights_path, 
     config_path = None, 
     image_rep_size = 512, 
-    text_rep_size=768
+    text_rep_size=768,
+    max_coords = None,
+    min_coords = None
 ):
     global DEVICE, lerf_model
     if config_path:
@@ -120,6 +126,8 @@ def load_field(
             num_levels = config.num_grid_levels,
             level_dim = config.level_dim,
             per_level_scale = config.per_level_scale,
+            max_coords = max_coords,
+            min_coords = min_coords
         ).to(DEVICE)
         model_weights = torch.load(model_weights_path, map_location=DEVICE)
         model.load_state_dict(model_weights["model"])
@@ -147,19 +155,31 @@ def load_field(
 def get_dataloader(r3d_path = None, cf_path = None):
     # For this part, you can either choose to load clip fields training data
     # or a r3d file to get an USA-Net styled data
+    # bounds is needed to test LERF, so if you choose to load dataloader from cf_path, you should not
+    # be able to test LERF
+    global bounds
     assert r3d_path or cf_path, 'you must provide a path to either your r3d file or loaded cf dataset'
     if cf_path:
         training_data = torch.load(cf_path)
         data_xyzs = training_data._label_xyz
     else:
         ds = get_posed_rgbd_dataset(key = 'r3d', path = r3d_path)
+        bounds = get_bounds(ds)
+        #map = get_ground_truth_map_from_dataset(ds, 0.05, (-1, 0))
+        #points = []
+        #for i in range(map.grid.shape[0]):
+        #    for j in range(map.grid.shape[1]):
+        #        if map.grid[i, j]:
+        #            points.append(torch.tensor(map.to_xy((i, j))))
+        #z_values = torch.arange(bounds.zmin + 0.5, bounds.zmax - 0.5, 0.2).unsqueeze(1)
+        #data_xyzs = torch.cat((torch.stack(points).repeat(len(z_values), 1), z_values.repeat(len(points), 1)), dim=1)
         data_xyzs = []
         for xyz, mask_tensor in iter_xyz(ds, 'data'):
             data = xyz[~mask_tensor]
             data = data[torch.randperm(len(data))[:int(len(data) * 0.01)]]
             data_xyzs.append(data)
         data_xyzs = torch.vstack(data_xyzs)
-    batch_size = 300_000
+    batch_size = 30_000
     points_dataloader = DataLoader(
         data_xyzs.detach().cpu(), batch_size=batch_size, num_workers=10,
     )
@@ -201,7 +221,7 @@ def find_alignment_over_model(label_model, queries, dataloader, model_type,
             relevancy = False,
             # for lerf specifically
             lerf_scale = 0.5):
-    global lerf_model, DEVICE
+    global lerf_model, DEVICE, bounds
     clip_text_tokens, st_text_tokens = calculate_clip_and_st_embeddings_for_queries(
         queries, linguistic, True if model_type == 'cf' else False)
     if relevancy:
@@ -215,12 +235,19 @@ def find_alignment_over_model(label_model, queries, dataloader, model_type,
         for data in tqdm.tqdm(dataloader, total = len(dataloader)):
             # Find alignmnents with the vectors
             if model_type == 'cf':
-                predicted_label_latents, predicted_image_latents = label_model(data[:, [0, 2, 1]].to(DEVICE))
+                # We assume clip-fields models will be run on clip-fields dataset
+                # If you run it on USA-Net dataset, uncomment these two lines of codes
+                data = data[:, [0, 2, 1]]
+                data[:, 2] = -data[:, 2]
+                predicted_label_latents, predicted_image_latents = label_model(data.to(DEVICE))
             elif model_type == 'usa':
                 predicted_image_latents = label_model(data.to(DEVICE))[:, :-1]
             else:
-                data = data[:, [0, 2, 1]]
-                data[:, 1] = -data[:, 1]
+                #data = data[:, [0, 2, 1]]
+                #data[:, 1] = -data[:, 1]
+                data[:, 0] = (data[:, 0] - bounds.xmin) / (bounds.xmax - bounds.xmin) 
+                data[:, 1] = (data[:, 1] - bounds.ymin) / (bounds.ymax - bounds.ymin) 
+                data[:, 2] = (data[:, 2] - bounds.zmin) / (bounds.zmax - bounds.zmin) 
                 predicted_image_latents = label_model(lerf_model, data.to(DEVICE), scale = lerf_scale)
             if model_type == 'cf':
                 data_text_tokens = F.normalize(predicted_label_latents, p=2, dim=-1).to(DEVICE)
@@ -280,6 +307,12 @@ def find_alignment_for_B(label_model, B, dataloader, model_type,
     B_dataset = B_dataset.reshape(-1, 3)
     return DataLoader(B_dataset, batch_size = BATCH_SIZE, num_workers = 10)
 
+def lerf_scales_processing(lerf_scales):
+    compute_scales = list(set(lerf_scales))
+    scale_to_inds = {k: v for v, k in enumerate(compute_scales)}
+    lerf_scale_inds = [scale_to_inds[lerf_scale] for lerf_scale in lerf_scales]
+    return compute_scales, lerf_scale_inds
+
 def find_alignment_for_A(label_model, A, dataloader, model_type, 
             # for clip-fields
             vision_weight = 10.0, text_weight = 10.0, linguistic = 'owl', 
@@ -287,11 +320,29 @@ def find_alignment_for_A(label_model, A, dataloader, model_type,
             relevancy = False,
             # for lerf specifically
             lerf_scale = 0.5):
-    alignments = find_alignment_over_model(label_model, A, dataloader, model_type,
+    if type(lerf_scale) == type(0.0) or model_type != 'lerf':
+        alignments = find_alignment_over_model(label_model, A, dataloader, model_type,
                 vision_weight, text_weight, linguistic,
                 relevancy,
                 lerf_scale).cpu()
-    return dataloader.dataset[alignments.argmax(dim = -1)]
+        return dataloader.dataset[alignments.argmax(dim = -1)]
+    else:
+        compute_scales, lerf_scale_inds = lerf_scales_processing(lerf_scale)
+        alignments = []
+        #print(lerf_scale, lerf_scale_inds, compute_scales)
+        for scale in compute_scales:
+            alignments.append(find_alignment_over_model(label_model, A, dataloader, model_type,
+                vision_weight, text_weight, linguistic,
+                relevancy,
+                scale).cpu())
+        alignments = torch.stack(alignments)
+        final_alignments = []
+        for i in range(len(lerf_scale_inds)):
+            #print(lerf_scale_inds[i], lerf_scale[i], i, alignments.shape)
+            final_alignments.append(alignments[lerf_scale_inds[i], i, :])
+        final_alignments = torch.stack(final_alignments, dim = 0)
+        return dataloader.dataset[final_alignments.argmax(dim = -1)]
+        
 
 # Note that even though we cannot localize many queries with LERF at the same time,
 # we can actually select lerf scales for many queries at the same time.
@@ -307,8 +358,9 @@ def scale_selection(label_model, queries, dataloader,
     scales = torch.arange(0.1, 2.0, 0.3).to(DEVICE)[torch.stack(relevancy_scores, dim = 1).squeeze(-1).argmax(dim = -1)]    
     return scales
 
-FIELD_TYPE = 'lerf'
-MODEL_TYPE = 'openclip'
+FIELD_TYPE = 'cf'
+MODEL_TYPE = 'owl'
+DATASET_PATH = 'clip-fields/detic_labeled_dataset.pt'
 if MODEL_TYPE != 'owl':
     MODEL_NAME = 'ViT-B/32'
 else:
@@ -323,25 +375,37 @@ if FIELD_TYPE == 'lerf':
     WEIGHT_PATH = 'lerf/outputs/Kitchen/lerf/2023-09-04_155930/nerfstudio_models/step-000029999.ckpt'
     CONFIG_PATH = None
 load_pretrained(field_type = FIELD_TYPE, model_type = MODEL_TYPE , model_name = MODEL_NAME)
-label_model = load_field(field_type = FIELD_TYPE, config_path = CONFIG_PATH, model_weights_path = WEIGHT_PATH)
+
 points_dataloader = get_dataloader(r3d_path = 'clip-fields/Kitchen.r3d')
+
+#max_coords, _ = points_dataloader.dataset.max(dim=0)
+#min_coords, _ = points_dataloader.dataset.min(dim=0)
+max_coords = torch.tensor([bounds.xmax, bounds.zmax, -bounds.ymin])
+min_coords = torch.tensor([bounds.xmin, bounds.zmin, -bounds.ymax])
+
+label_model = load_field(field_type = FIELD_TYPE, config_path = CONFIG_PATH, model_weights_path = WEIGHT_PATH, max_coords = max_coords, min_coords = min_coords)
 #scales = scale_selection(label_model, 'Chair', points_dataloader,
 #        linguistic = MODEL_TYPE, model_type = FIELD_TYPE, relevancy = True)
-scales = torch.tensor([0.4])
-print(scales)
 
 eval_data = pd.read_csv('clip-fields/kitchen.csv')
 queries = list(eval_data['query'])
 
-xs, ys, zs, affords = list(eval_data['x']), list(eval_data['z']), list(eval_data['y']), list(eval_data['affordance'])
-xyzs = torch.stack([torch.tensor(xs), -torch.tensor(ys), torch.tensor(zs)], dim = 1)
-max_points = find_alignment_for_A(label_model, queries, points_dataloader, FIELD_TYPE, 
-            # for clip-fields
-            vision_weight = 10.0, text_weight = 10.0, linguistic = MODEL_TYPE)
-print(max_points.shape)
-print(max_points)
+xs, ys, zs, affords = list(eval_data['x']), list(eval_data['y']), list(eval_data['z']), list(eval_data['affordance'])
 
-correctness = torch.linalg.norm((max_points[:, [0, 1]] - xyzs[:, [0, 1]]), dim = -1) <= torch.tensor(affords)
+xyzs = torch.stack([torch.tensor(xs), torch.tensor(zs), -torch.tensor(ys)], dim = 1)
+
+if FIELD_TYPE == 'lerf':
+    max_points = find_alignment_for_A(label_model, queries, points_dataloader, FIELD_TYPE, 
+            vision_weight = 1.0, text_weight = 10.0, linguistic = MODEL_TYPE, relevancy = False,
+            lerf_scale = scale_selection(label_model, queries, points_dataloader, relevancy = False).detach().cpu().tolist())
+else:
+    max_points = find_alignment_for_A(label_model, queries, points_dataloader, FIELD_TYPE, 
+            vision_weight = 10.0, text_weight = 10.0, linguistic = MODEL_TYPE, relevancy = False)
+print(max_points.shape)
+for max_point, query in zip(max_points, queries):
+    print(max_point, query)
+
+correctness = torch.linalg.norm((max_points[:, [0, 2]] - xyzs[:, [0, 2]]), dim = -1) <= torch.tensor(affords)
 print(np.array(queries)[torch.where(correctness)[0].numpy()], 
     np.array(queries)[torch.where(~correctness)[0].numpy()], 
     len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
