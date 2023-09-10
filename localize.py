@@ -181,7 +181,7 @@ def get_dataloader(r3d_path = None, cf_path = None):
         data_xyzs = torch.vstack(data_xyzs)
     batch_size = 30_000
     points_dataloader = DataLoader(
-        data_xyzs.detach().cpu(), batch_size=batch_size, num_workers=10,
+        data_xyzs.detach().cpu(), batch_size=batch_size
     )
     print("Created data loader", points_dataloader)
     merged_pcd = o3d.geometry.PointCloud()
@@ -237,8 +237,8 @@ def find_alignment_over_model(label_model, queries, dataloader, model_type,
             if model_type == 'cf':
                 # We assume clip-fields models will be run on clip-fields dataset
                 # If you run it on USA-Net dataset, uncomment these two lines of codes
-                data = data[:, [0, 2, 1]]
-                data[:, 2] = -data[:, 2]
+                #data = data[:, [0, 2, 1]]
+                #data[:, 2] = -data[:, 2]
                 predicted_label_latents, predicted_image_latents = label_model(data.to(DEVICE))
             elif model_type == 'usa':
                 predicted_image_latents = label_model(data.to(DEVICE))[:, :-1]
@@ -358,15 +358,15 @@ def scale_selection(label_model, queries, dataloader,
     scales = torch.arange(0.1, 2.0, 0.3).to(DEVICE)[torch.stack(relevancy_scores, dim = 1).squeeze(-1).argmax(dim = -1)]    
     return scales
 
-FIELD_TYPE = 'cf'
-MODEL_TYPE = 'owl'
+FIELD_TYPE = 'usa'
+MODEL_TYPE = 'clip'
 DATASET_PATH = 'clip-fields/detic_labeled_dataset.pt'
 if MODEL_TYPE != 'owl':
     MODEL_NAME = 'ViT-B/32'
 else:
     MODEL_NAME = 'google/owlvit-base-patch32'
 if FIELD_TYPE == 'cf':
-    WEIGHT_PATH = 'clip-fields/kitchen_owl1/implicit_scene_label_model_latest.pt'
+    WEIGHT_PATH = 'clip-fields/kitchen_owl/implicit_scene_label_model_latest.pt'
     CONFIG_PATH = 'clip-fields/configs/train.yaml'
 if FIELD_TYPE == 'usa':
     WEIGHT_PATH = 'usa/usa/4_256_no/run_0/checkpoints/ckpt.8000.pt'
@@ -377,11 +377,12 @@ if FIELD_TYPE == 'lerf':
 load_pretrained(field_type = FIELD_TYPE, model_type = MODEL_TYPE , model_name = MODEL_NAME)
 
 points_dataloader = get_dataloader(r3d_path = 'clip-fields/Kitchen.r3d')
+#points_dataloader = get_dataloader(cf_path = DATASET_PATH)
 
-#max_coords, _ = points_dataloader.dataset.max(dim=0)
-#min_coords, _ = points_dataloader.dataset.min(dim=0)
-max_coords = torch.tensor([bounds.xmax, bounds.zmax, -bounds.ymin])
-min_coords = torch.tensor([bounds.xmin, bounds.zmin, -bounds.ymax])
+max_coords, _ = points_dataloader.dataset.max(dim=0)
+min_coords, _ = points_dataloader.dataset.min(dim=0)
+#max_coords = torch.tensor([bounds.xmax, bounds.zmax, -bounds.ymin])
+#min_coords = torch.tensor([bounds.xmin, bounds.zmin, -bounds.ymax])
 
 label_model = load_field(field_type = FIELD_TYPE, config_path = CONFIG_PATH, model_weights_path = WEIGHT_PATH, max_coords = max_coords, min_coords = min_coords)
 #scales = scale_selection(label_model, 'Chair', points_dataloader,
@@ -393,6 +394,7 @@ queries = list(eval_data['query'])
 xs, ys, zs, affords = list(eval_data['x']), list(eval_data['y']), list(eval_data['z']), list(eval_data['affordance'])
 
 xyzs = torch.stack([torch.tensor(xs), torch.tensor(zs), -torch.tensor(ys)], dim = 1)
+#xyzs = torch.stack([torch.tensor(xs), torch.tensor(ys), torch.tensor(zs)], dim = 1)
 
 if FIELD_TYPE == 'lerf':
     max_points = find_alignment_for_A(label_model, queries, points_dataloader, FIELD_TYPE, 
