@@ -220,6 +220,6 @@ def evaluate():
         np.array(queries)[torch.where(~correctness)[0].numpy()], 
         len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
 
-label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything('usa/configs/train.yaml', 'usa/usa/4_256_no/run_0/checkpoints/ckpt.8000.pt')
-print(localize_AonB(label_model, clip_model, preprocessor, 'trash can', '', points_dataloader, k_A = 10, k_B = 1000, linguistic = model_type))
-evaluate()
+#label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything('usa/configs/train.yaml', 'usa/usa/4_256_no/run_0/checkpoints/ckpt.8000.pt')
+#print(localize_AonB(label_model, clip_model, preprocessor, 'trash can', '', points_dataloader, k_A = 10, k_B = 1000, linguistic = model_type))
+#evaluate()

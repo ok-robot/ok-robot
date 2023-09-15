@@ -1,1 +1,8 @@
 debug: False
+map_config: "usa/configs/train.yaml"
+map_type: "conservative_vlmap"
+localize_type: "cf"
+
+cf_config: "clip-fields/configs/train.yaml"
+usa_config: "usa/configs/train.yaml"
+usa_weight: "usa/usa/4_256_no/run_0/checkpoints/ckpt.8000.pt"

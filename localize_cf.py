@@ -241,6 +241,6 @@ def evaluate():
         np.array(queries)[torch.where(~correctness)[0].numpy()], 
         len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
 
-label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything('clip-fields/configs/train.yaml')
-print(localize_AonB(label_model, clip_model, preprocessor, sentence_model, 'yellow cube', 'table', points_dataloader, k_A = 10, k_B = 1000, linguistic = model_type))
-evaluate()
+#label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything('clip-fields/configs/train.yaml')
+#print(localize_AonB(label_model, clip_model, preprocessor, sentence_model, 'yellow cube', 'table', points_dataloader, k_A = 10, k_B = 1000, linguistic = model_type))
+#evaluate()
