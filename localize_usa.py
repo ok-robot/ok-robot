@@ -220,6 +220,12 @@ def evaluate():
         np.array(queries)[torch.where(~correctness)[0].numpy()], 
         len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
 
-#label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything('usa/configs/train.yaml', 'usa/usa/4_256_no/run_0/checkpoints/ckpt.8000.pt')
+#label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything('usa/configs/train.yaml', 'usa/CDSLab/4_256_no/run_0/checkpoints/ckpt.pt')
 #print(localize_AonB(label_model, clip_model, preprocessor, 'trash can', '', points_dataloader, k_A = 10, k_B = 1000, linguistic = model_type))
 #evaluate()
+#max_points = find_alignment_for_A(label_model, clip_model, preprocessor,
+#                 ['bowl', 'green bottle', 'ping pong ball', 'yellow bottle', 'red can', 'red cup', 'apple', 'barricade', 'VR glasses', 
+#                                 'white bottle', 'black robot arm', 'plants'], points_dataloader, linguistic = model_type)
+#for i, query in enumerate(['bowl', 'green bottle', 'ping pong ball', 'yellow bottle', 'red can', 'red cup', 'apple', 'barricade', 'VR glasses', 
+#                'white bottle', 'black robot arm', 'plants']):
+#    print(max_points[i], query)

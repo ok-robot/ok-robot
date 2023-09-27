@@ -66,7 +66,8 @@ def load_map(config_path, map_type = 'conservative_vlmap'):
     config = OmegaConf.load(config_path)
     config.task.dataset_path = os.path.join("usa", config.task.dataset_path)
     # You can change this number to change the number of training steps.
-    config.task.finished.max_steps = 0
+    config.task.finished.max_steps = 10
+    config.trainer.base_run_dir = os.path.join('usa', config.trainer.base_run_dir)
     # Loads the config objects.
     objs = ml.instantiate_config(config)
     # Unpacking the different components.
@@ -99,7 +100,7 @@ def load_map(config_path, map_type = 'conservative_vlmap'):
 
     if map_type == 'conservative_vlmap':
         obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = True).grid
-    if map_type == 'sdf map':
+    if map_type == 'sdf_map':
         obs_map = grid_planner.get_map().grid[:, :, 0]
     if map_type == 'brave_vlmap':
         obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = False).grid
@@ -150,6 +151,7 @@ def main(cfg):
             print(end_xy)
             socket.send_string('end_xy received')
             paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy=end_xy)
+            print(paths)
         else:
             print('receive text query')
             A = socket.recv_string()
