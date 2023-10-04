@@ -61,14 +61,17 @@ from localize_usa import localize_AonB as localize_usa
 from usa.planners.clip_sdf import AStarPlanner, GradientPlanner
 from usa.planners.base import get_ground_truth_map_from_dataset
 
-def load_map(config_path, map_type = 'conservative_vlmap'):
+import math
+
+def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
     # Using the default config, but overriding the dataset.
     config = OmegaConf.load(config_path)
     config.task.dataset_path = os.path.join("usa", config.task.dataset_path)
     # You can change this number to change the number of training steps.
-    config.task.finished.max_steps = 10
+    #config.task.finished.max_steps = 10
     config.trainer.base_run_dir = os.path.join('usa', config.trainer.base_run_dir)
     # Loads the config objects.
+    print(config)
     objs = ml.instantiate_config(config)
     # Unpacking the different components.
     model = objs.model
@@ -80,31 +83,66 @@ def load_map(config_path, map_type = 'conservative_vlmap'):
     trainer.train(model, task, optimizer, lr_scheduler)
 
     dataset = task._dataset
+    # grid_planner = GradientPlanner(
+    #     dataset=dataset,
+    #     model=model.double(),
+    #     task=task.double(),
+    #     device=task._device,
+
+    #     # The learning rate for the optimizer for the waypoints
+    #     lr=1e-3,
+    #     # The weight for the total path distance loss term
+    #     dist_loss_weight=0.0,
+    #     # The weight for the inter-point distance loss term
+    #     spacing_loss_weight=50.0,
+    #     # The weight for the "no-crashing-into-a-wall" loss term
+    #     occ_loss_weight=25.0,
+    #     # The weight for the loss term of the final semantic location
+    #     sim_loss_weight=0.0,
+    #     # Maximum number of optimization steps
+    #     num_optimization_steps=5,
+    #     # The grid resolution
+    #     # If points move less than this distance, stop optimizing
+    #     min_distance=1e-5,
+    #     # Where to store cache artifacts
+    #     # cache_dir=Path("cache"),
+    #     cache_dir=None,
+    #     # Height of the floor
+    #     floor_height=-1,
+    #     # Height of the ceiling
+    #     ceil_height=0,
+    #     occ_avoid_radius = 0.3 if not path_cfg else path_cfg.occ_avoid_radius
+    # ).double()
     grid_planner = AStarPlanner(
-        dataset=dataset,
-        model=model.double(),
-        task=task.double(),
+       dataset=dataset,
+       model=model.double(),
+       task=task.double(),
         device=task._device,
         # The heuristic to use for AStar
         heuristic="euclidean",
         # The grid resolution
-        resolution=0.1,
+        resolution=0.1 if not path_cfg else path_cfg.resolution,
         # Where to store cache artifacts
         cache_dir=None,
         # Height of the floor
-        floor_height=-1,
+        floor_height=-1.05,
         # Height of the ceiling
-        ceil_height=0,
-        occ_avoid_radius = 0.2
+        ceil_height=0.05,
+        occ_avoid_radius = 0.3 if not path_cfg else path_cfg.occ_avoid_radius
     ).double()
 
+    occ_avoid = 3 if not path_cfg else math.ceil((path_cfg.occ_avoid_radius) / path_cfg.resolution)
     if map_type == 'conservative_vlmap':
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = True).grid
-    if map_type == 'sdf_map':
-        obs_map = grid_planner.get_map().grid[:, :, 0]
+        print("load conservative vlmap")
+        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = True, occ_avoid = occ_avoid).grid
+        grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
+        #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     if map_type == 'brave_vlmap':
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = False).grid
-    grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
+        print("load brave vlmap")
+        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = False, occ_avoid = occ_avoid).grid
+        grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
+        #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
+    # if map_type == 'sdf_map', don't do anything, the default map of grid planner is sdf map
     return grid_planner, dataset
 
 context = zmq.Context()
@@ -131,7 +169,7 @@ def recv_array(socket, flags=0, copy=True, track=False):
 
 @hydra.main(version_base="1.2", config_path=".", config_name="path.yaml")
 def main(cfg):
-    grid_planner, dataset = load_map(config_path = cfg.map_config, map_type = cfg.map_type)
+    grid_planner, dataset = load_map(config_path = cfg.map_config, map_type = cfg.map_type, path_cfg = cfg)
     if not cfg.debug:
         if cfg.localize_type == 'cf':
             load_everything = load_cf
@@ -178,6 +216,7 @@ def main(cfg):
         maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
         xs, ys, thetas = zip(*paths)
         axes[0].imshow(grid_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
+        #axes[0].imshow(grid_planner.base_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
         axes[0].plot(xs, ys, c='r')
         axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
         axes[0].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
