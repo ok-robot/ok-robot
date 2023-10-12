@@ -150,18 +150,20 @@ def find_alignment_over_model(label_model, clip_model, preprocessor, sentence_mo
 
 # Currently we only support compute one query each time, in the future we might want to support check many queries
 
-def localize_AonB(label_model, clip_model, preprocessor, sentence_model, A, B, dataloader, k_A = 10, k_B = 1000,
+def localize_AonB(label_model, clip_model, preprocessor, sentence_model, A, B, dataloader, k_A = 10, k_B = 50,
         vision_weight = 10.0, text_weight = 10.0, linguistic = 'clip'):
+    print("A is ", A)
+    print("B is ", B)
     if B is None or B == '':
         target = find_alignment_for_A(label_model, clip_model, preprocessor, sentence_model, [A], dataloader,
             vision_weight = vision_weight, text_weight = text_weight, linguistic = linguistic)[0]
     else:
         alignments = find_alignment_over_model(label_model, clip_model, preprocessor, sentence_model,
                 [A, B], dataloader, vision_weight = vision_weight, text_weight = text_weight, linguistic = linguistic).cpu()
-        A_points = dataloader.dataset[alignments.topk(k = k_A, dim = -1).indices].reshape(-1, 3)
-        B_points = dataloader.dataset[alignments.topk(k = k_B, dim = -1).indices].reshape(-1, 3)
+        A_points = dataloader.dataset[alignments[0].topk(k = k_A, dim = -1).indices].reshape(-1, 3)
+        B_points = dataloader.dataset[alignments[1].topk(k = k_B, dim = -1).indices].reshape(-1, 3)
         distances = torch.norm(A_points.unsqueeze(1) - B_points.unsqueeze(0), dim=2)
-        target = A_points[torch.argmin(torch.min(distances, dim = 0).values)]
+        target = A_points[torch.argmin(torch.min(distances, dim = 1).values)]
     target = target[[0, 2, 1]]
     target[1] = -target[1]
     return target

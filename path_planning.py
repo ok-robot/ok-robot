@@ -125,22 +125,23 @@ def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
         # Where to store cache artifacts
         cache_dir=None,
         # Height of the floor
-        floor_height=-1.05,
+        floor_height=-0.9,
         # Height of the ceiling
-        ceil_height=0.05,
+        ceil_height=0.1,
         occ_avoid_radius = 0.3 if not path_cfg else path_cfg.occ_avoid_radius
     ).double()
 
     occ_avoid = 3 if not path_cfg else math.ceil((path_cfg.occ_avoid_radius) / path_cfg.resolution)
+    print(occ_avoid)
     if map_type == 'conservative_vlmap':
         print("load conservative vlmap")
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = True, occ_avoid = occ_avoid).grid
+        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-0.9, 0.1), conservative = True, occ_avoid = occ_avoid).grid
         grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
         #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     if map_type == 'brave_vlmap':
         print("load brave vlmap")
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1, 0), conservative = False, occ_avoid = occ_avoid).grid
-        grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
+        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-0.9, 0.1), conservative = False, occ_avoid = occ_avoid).grid
+        grid_planner.a_star_planner.is_occ = np.expand_dims(obs_map, axis = -1)
         #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     # if map_type == 'sdf_map', don't do anything, the default map of grid planner is sdf map
     return grid_planner, dataset
@@ -180,17 +181,16 @@ def main(cfg):
             localize_AonB = localize_usa
             label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything(cfg.usa_config, cfg.usa_weight)
     while True:
-        start_xyt = recv_array(socket)
-        print(start_xyt)
-        socket.send_string('start_xyt received')
         if cfg.debug:
+            start_xyt = [0.156937, 0.451714]
             print('receive end xy')
-            end_xy = recv_array(socket)
+            end_xy = [2.7629,  0.8322]
             print(end_xy)
-            socket.send_string('end_xy received')
-            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy=end_xy)
-            print(paths)
+            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points = False)
         else:
+            start_xyt = recv_array(socket)
+            print(start_xyt)
+            socket.send_string('xyt received')
             print('receive text query')
             A = socket.recv_string()
             print(A)
@@ -200,15 +200,34 @@ def main(cfg):
             socket.send_string('B received')
             if cfg.localize_type == 'cf':
                 end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
-                    sentence_model, A, B, points_dataloader, k_A = 10, k_B = 500, linguistic = model_type)
+                    sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
             else:
                 end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
-                    A, B, points_dataloader, k_A = 10, k_B = 500, linguistic = model_type)
-            print(end_xyz)
+                    A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
             end_xy = end_xyz[:2]
-            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy)
-        print(socket.recv_string())
-        send_array(socket, paths)
+            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
+            end_pt = grid_planner.a_star_planner.to_pt(paths[-1][:2])
+            theta = paths[-1][2] if paths[-1][2] > 0 else paths[-1][2] + 2 * np.pi
+            if (theta >= np.pi / 8) and (theta <= 3 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] + 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] - 1))
+            elif (theta >= 3 * np.pi / 8) and (theta <= 5 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1]), grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1]))
+            elif (theta >= 5 * np.pi / 8) and (theta <= 7 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] - 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] + 1))
+            elif (theta >= 7 * np.pi / 8) and (theta <= 9 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] - 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] + 1))
+            elif (theta >= 9 * np.pi / 8) and (theta <= 11 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] - 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] + 1))
+            elif (theta >= 11 * np.pi / 8) and (theta <= 13 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1]), grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1]))
+            elif (theta >= 13 * np.pi / 8) and (theta <= 15 * np.pi / 8):
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] + 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] - 1))
+            else:
+                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] + 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] - 1))
+            print(socket.recv_string())
+            send_array(socket, paths)
+            print(socket.recv_string())
+            send_array(socket, [not move_range[0], not move_range[1]])
         print(paths)
         fig, axes = plt.subplots(2, 1, figsize=(8, 8))
         minx, miny = grid_planner.occ_map.origin
@@ -221,12 +240,12 @@ def main(cfg):
         axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
         axes[0].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
         axes[0].scatter(xs, ys, c = 'cyan', s = 10)
-        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-1, 0)).grid[::-1], extent=(minx, maxx, miny, maxy))
+        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-0.9, 0.1)).grid[::-1], extent=(minx, maxx, miny, maxy))
         axes[1].plot(xs, ys, c='r')
         axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
         axes[1].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
         axes[1].scatter(xs, ys, c = 'cyan', s = 10)
-        fig.savefig('output.jpg')
+        fig.savefig('output_' + A + '.jpg')
 
 
 if __name__ == "__main__":

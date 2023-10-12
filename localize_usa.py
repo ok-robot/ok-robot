@@ -145,10 +145,10 @@ def localize_AonB(label_model, clip_model, preprocessor, A, B, dataloader, k_A =
         return find_alignment_for_A(label_model, clip_model, preprocessor, [A], dataloader, linguistic = linguistic)[0]
     alignments = find_alignment_over_model(label_model, clip_model, preprocessor, 
                 [A, B], dataloader, linguistic = linguistic).cpu()
-    A_points = dataloader.dataset[alignments.topk(k = k_A, dim = -1).indices].reshape(-1, 3)
-    B_points = dataloader.dataset[alignments.topk(k = k_B, dim = -1).indices].reshape(-1, 3)
+    A_points = dataloader.dataset[alignments[0].topk(k = k_A, dim = -1).indices].reshape(-1, 3)
+    B_points = dataloader.dataset[alignments[1].topk(k = k_B, dim = -1).indices].reshape(-1, 3)
     distances = torch.norm(A_points.unsqueeze(1) - B_points.unsqueeze(0), dim=2)
-    return A_points[torch.argmin(torch.min(distances, dim = 0).values)]
+    return A_points[torch.argmin(torch.min(distances, dim = 1).values)]
 
 # Keep in mind that the objective is picking up A from B
 def find_alignment_for_B(label_model, clip_model, preprocessor, B, dataloader, 
