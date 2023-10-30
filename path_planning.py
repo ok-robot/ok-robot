@@ -54,9 +54,11 @@ from matplotlib import pyplot as plt
 
 from localize_cf import load_everything as load_cf
 from localize_usa import load_everything as load_usa
+from localize_voxel_map import load_everything as load_voxel_map
 
 from localize_cf import localize_AonB as localize_cf
 from localize_usa import localize_AonB as localize_usa
+from localize_voxel_map import localize_AonB as localize_voxel_map
 
 from usa.planners.clip_sdf import AStarPlanner, GradientPlanner
 from usa.planners.base import get_ground_truth_map_from_dataset
@@ -176,10 +178,14 @@ def main(cfg):
             load_everything = load_cf
             localize_AonB = localize_cf
             label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything(cfg.cf_config)
-        else:
+        elif cfg.localize_type == 'usa':
             load_everything = load_usa
             localize_AonB = localize_usa
             label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything(cfg.usa_config, cfg.usa_weight)
+        else:
+            load_everything = load_voxel_map
+            localize_AonB = localize_voxel_map
+            voxel_pcd, clip_model, preprocessor, model_type = load_everything(cfg.cf_config)
     while True:
         if cfg.debug:
             start_xyt = [0.156937, 0.451714]
@@ -201,9 +207,12 @@ def main(cfg):
             if cfg.localize_type == 'cf':
                 end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
                     sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
-            else:
+            elif cfg.localize_type == 'usa':
                 end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
                     A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
+            else:
+                end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 3, k_B = 5,
+                          linguistic = model_type, data_type = 'r3d')
             end_xy = end_xyz[:2]
             paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
             end_pt = grid_planner.a_star_planner.to_pt(paths[-1][:2])

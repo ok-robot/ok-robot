@@ -1,8 +1,7 @@
 debug: False
 map_config: "usa/configs/train.yaml"
-map_type: "conservative_vlmap"
-#map_type: "sdf_map"
-localize_type: "cf"
+map_type: "conservative_vlmap" # "conservative_vlmap" "sdf_map" "brave_vlmap"
+localize_type: "voxel map" # "cf" "usa" "voxel map"
 
 cf_config: "clip-fields/configs/train.yaml"
 usa_config: "usa/configs/train.yaml"

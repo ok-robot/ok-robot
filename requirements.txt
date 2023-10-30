@@ -40,9 +40,3 @@ jupyter
 ml-starter==0.0.44
 more_itertools
 seaborn
-
-# lerf
-ninja 
-git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
-nerfstudio
-torchtyping

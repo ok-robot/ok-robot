@@ -151,7 +151,7 @@ def find_alignment_over_model(label_model, clip_model, preprocessor, sentence_mo
 # Currently we only support compute one query each time, in the future we might want to support check many queries
 
 def localize_AonB(label_model, clip_model, preprocessor, sentence_model, A, B, dataloader, k_A = 10, k_B = 50,
-        vision_weight = 10.0, text_weight = 10.0, linguistic = 'clip'):
+        vision_weight = 10.0, text_weight = 10.0, linguistic = 'clip', data_type = 'r3d'):
     print("A is ", A)
     print("B is ", B)
     if B is None or B == '':
@@ -164,8 +164,9 @@ def localize_AonB(label_model, clip_model, preprocessor, sentence_model, A, B, d
         B_points = dataloader.dataset[alignments[1].topk(k = k_B, dim = -1).indices].reshape(-1, 3)
         distances = torch.norm(A_points.unsqueeze(1) - B_points.unsqueeze(0), dim=2)
         target = A_points[torch.argmin(torch.min(distances, dim = 1).values)]
-    target = target[[0, 2, 1]]
-    target[1] = -target[1]
+    if data_type == 'r3d':
+        target = target[[0, 2, 1]]
+        target[1] = -target[1]
     return target
 
 # Keep in mind that the objective is picking up A from B
@@ -212,7 +213,7 @@ def load_everything(config_path):
     return label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type
 
 def localize_pickupAfromB(label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type,
-             A, B, config_path, vision_weight = 10.0, text_weight = 10.0):
+             A, B, config_path, vision_weight = 10.0, text_weight = 10.0, data_type = 'r3d'):
     B_dataloader = find_alignment_for_B(
         label_model, clip_model, preprocessor, sentence_model, [B], points_dataloader, 
         linguistic = model_type, vision_weight = vision_weight, text_weight = text_weight)
@@ -220,8 +221,10 @@ def localize_pickupAfromB(label_model, clip_model, preprocessor, sentence_model,
         label_model, clip_model, preprocessor, sentence_model, [A], B_dataloader, 
         linguistic = model_type, vision_weight = vision_weight, text_weight = text_weight)
     del B_dataloader
-    final_point[:, -1] = -final_point[:, -1]
-    return final_point[0, [0, 2, 1]]
+    if data_type == 'r3d':
+        final_point[:, -1] = -final_point[:, -1]
+        final_point = final_point[0, [0, 2, 1]]
+    return final_point
 
 def evaluate():
     label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything('clip-fields/configs/train.yaml')
