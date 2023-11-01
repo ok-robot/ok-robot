@@ -66,11 +66,13 @@ from usa.planners.base import get_ground_truth_map_from_dataset
 import math
 
 def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
+    # TODO: Load AStar planner without using USA-Net's codes
+
     # Using the default config, but overriding the dataset.
     config = OmegaConf.load(config_path)
     config.task.dataset_path = os.path.join("usa", config.task.dataset_path)
     # You can change this number to change the number of training steps.
-    #config.task.finished.max_steps = 10
+    config.task.finished.max_steps = 10
     config.trainer.base_run_dir = os.path.join('usa', config.trainer.base_run_dir)
     # Loads the config objects.
     print(config)
@@ -85,36 +87,6 @@ def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
     trainer.train(model, task, optimizer, lr_scheduler)
 
     dataset = task._dataset
-    # grid_planner = GradientPlanner(
-    #     dataset=dataset,
-    #     model=model.double(),
-    #     task=task.double(),
-    #     device=task._device,
-
-    #     # The learning rate for the optimizer for the waypoints
-    #     lr=1e-3,
-    #     # The weight for the total path distance loss term
-    #     dist_loss_weight=0.0,
-    #     # The weight for the inter-point distance loss term
-    #     spacing_loss_weight=50.0,
-    #     # The weight for the "no-crashing-into-a-wall" loss term
-    #     occ_loss_weight=25.0,
-    #     # The weight for the loss term of the final semantic location
-    #     sim_loss_weight=0.0,
-    #     # Maximum number of optimization steps
-    #     num_optimization_steps=5,
-    #     # The grid resolution
-    #     # If points move less than this distance, stop optimizing
-    #     min_distance=1e-5,
-    #     # Where to store cache artifacts
-    #     # cache_dir=Path("cache"),
-    #     cache_dir=None,
-    #     # Height of the floor
-    #     floor_height=-1,
-    #     # Height of the ceiling
-    #     ceil_height=0,
-    #     occ_avoid_radius = 0.3 if not path_cfg else path_cfg.occ_avoid_radius
-    # ).double()
     grid_planner = AStarPlanner(
        dataset=dataset,
        model=model.double(),
@@ -137,20 +109,23 @@ def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
     print(occ_avoid)
     if map_type == 'conservative_vlmap':
         print("load conservative vlmap")
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-0.9, 0.1), conservative = True, occ_avoid = occ_avoid).grid
+        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1.2, 0.1), conservative = True, occ_avoid = occ_avoid).grid
         grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
         #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     if map_type == 'brave_vlmap':
         print("load brave vlmap")
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-0.9, 0.1), conservative = False, occ_avoid = occ_avoid).grid
+        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1.2, 0.1), conservative = False, occ_avoid = occ_avoid).grid
         grid_planner.a_star_planner.is_occ = np.expand_dims(obs_map, axis = -1)
         #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     # if map_type == 'sdf_map', don't do anything, the default map of grid planner is sdf map
     return grid_planner, dataset
 
-context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind("tcp://*:5555")
+def load_socket(port_number):
+    context = zmq.Context()
+    socket = context.socket(zmq.REP)
+    socket.bind("tcp://*:" + str(port_number))
+
+    return socket
 
 def send_array(socket, A, flags=0, copy=True, track=False):
     """send a numpy array with metadata"""
@@ -172,6 +147,7 @@ def recv_array(socket, flags=0, copy=True, track=False):
 
 @hydra.main(version_base="1.2", config_path=".", config_name="path.yaml")
 def main(cfg):
+    socket = load_socket(cfg.port_number)
     grid_planner, dataset = load_map(config_path = cfg.map_config, map_type = cfg.map_type, path_cfg = cfg)
     if not cfg.debug:
         if cfg.localize_type == 'cf':
@@ -188,11 +164,15 @@ def main(cfg):
             voxel_pcd, clip_model, preprocessor, model_type = load_everything(cfg.cf_config)
     while True:
         if cfg.debug:
-            start_xyt = [0.156937, 0.451714]
-            print('receive end xy')
-            end_xy = [2.7629,  0.8322]
+            start_x = float(input('start x'))
+            start_y = float(input('start y'))
+            start_xy = [start_x, start_y]
+            print(start_xy)
+            end_x = float(input('end x'))
+            end_y = float(input('end y'))
+            end_xy = [end_x,  end_y]
             print(end_xy)
-            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points = False)
+            paths = grid_planner.plan(start_xy=start_xy, end_xy=end_xy, remove_line_of_sight_points = False)
         else:
             start_xyt = recv_array(socket)
             print(start_xyt)

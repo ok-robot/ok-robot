@@ -127,7 +127,7 @@ def find_alignment_over_model(voxel_pcd, clip_model, preprocessor, queries, ling
 # Currently we only support compute one query each time, in the future we might want to support check many queries
 
 def localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 50,
-        linguistic = 'clip', data_type = 'r3d'):
+        linguistic = 'clip', data_type = 'r3d', device = 'cuda'):
     print("A is ", A)
     print("B is ", B)
     if B is None or B == '':
