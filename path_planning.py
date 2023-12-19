@@ -64,6 +64,7 @@ from usa.planners.clip_sdf import AStarPlanner, GradientPlanner
 from usa.planners.base import get_ground_truth_map_from_dataset
 
 import math
+import os
 
 def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
     # TODO: Load AStar planner without using USA-Net's codes
@@ -99,9 +100,9 @@ def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
         # Where to store cache artifacts
         cache_dir=None,
         # Height of the floor
-        floor_height=-0.9,
+        floor_height=path_cfg.min_height,
         # Height of the ceiling
-        ceil_height=0.1,
+        ceil_height=path_cfg.max_height,
         occ_avoid_radius = 0.3 if not path_cfg else path_cfg.occ_avoid_radius
     ).double()
 
@@ -109,12 +110,12 @@ def load_map(config_path, map_type = 'conservative_vlmap', path_cfg = None):
     print(occ_avoid)
     if map_type == 'conservative_vlmap':
         print("load conservative vlmap")
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1.2, 0.1), conservative = True, occ_avoid = occ_avoid).grid
+        obs_map = get_occupancy_map_from_dataset(dataset, path_cfg.resolution, (path_cfg.min_height, path_cfg.max_height), conservative = True, occ_avoid = occ_avoid).grid
         grid_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
         #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     if map_type == 'brave_vlmap':
         print("load brave vlmap")
-        obs_map = get_occupancy_map_from_dataset(dataset, 0.1, (-1.2, 0.1), conservative = False, occ_avoid = occ_avoid).grid
+        obs_map = get_occupancy_map_from_dataset(dataset, path_cfg.resolution, (path_cfg.min_height, path_cfg.max_height), conservative = False, occ_avoid = occ_avoid).grid
         grid_planner.a_star_planner.is_occ = np.expand_dims(obs_map, axis = -1)
         #grid_planner.base_planner.a_star_planner.is_occ = np.expand_dims((obs_map == -1), axis = -1)
     # if map_type == 'sdf_map', don't do anything, the default map of grid planner is sdf map
@@ -149,30 +150,45 @@ def recv_array(socket, flags=0, copy=True, track=False):
 def main(cfg):
     socket = load_socket(cfg.port_number)
     grid_planner, dataset = load_map(config_path = cfg.map_config, map_type = cfg.map_type, path_cfg = cfg)
-    if not cfg.debug:
-        if cfg.localize_type == 'cf':
-            load_everything = load_cf
-            localize_AonB = localize_cf
-            label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything(cfg.cf_config)
-        elif cfg.localize_type == 'usa':
-            load_everything = load_usa
-            localize_AonB = localize_usa
-            label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything(cfg.usa_config, cfg.usa_weight)
-        else:
-            load_everything = load_voxel_map
-            localize_AonB = localize_voxel_map
-            voxel_pcd, clip_model, preprocessor, model_type = load_everything(cfg.cf_config)
+    if not os.path.exists(cfg.localize_type):
+        os.makedirs(cfg.localize_type)
+    if cfg.localize_type == 'cf':
+        load_everything = load_cf
+        localize_AonB = localize_cf
+        label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything(cfg.cf_config)
+    elif cfg.localize_type == 'usa':
+        load_everything = load_usa
+        localize_AonB = localize_usa
+        label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything(cfg.usa_config, cfg.usa_weight)
+    else:
+        load_everything = load_voxel_map
+        localize_AonB = localize_voxel_map
+        voxel_pcd, clip_model, preprocessor, model_type = load_everything(cfg.cf_config)
     while True:
         if cfg.debug:
-            start_x = float(input('start x'))
-            start_y = float(input('start y'))
-            start_xy = [start_x, start_y]
-            print(start_xy)
-            end_x = float(input('end x'))
-            end_y = float(input('end y'))
-            end_xy = [end_x,  end_y]
-            print(end_xy)
-            paths = grid_planner.plan(start_xy=start_xy, end_xy=end_xy, remove_line_of_sight_points = False)
+            # start_x = float(input('start x'))
+            # start_y = float(input('start y'))
+            # start_xy = [start_x, start_y]
+            # print(start_xy)
+            # end_x = float(input('end x'))
+            # end_y = float(input('end y'))
+            # end_xy = [end_x,  end_y]
+            # print(end_xy)
+            # paths = grid_planner.plan(start_xy=start_xy, end_xy=end_xy, remove_line_of_sight_points = True)
+            A = input("A: ")
+            start_xyt = [0.447679, -0.032573]
+            B = input("B: ")
+            if cfg.localize_type == 'cf':
+                end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
+                    sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
+            elif cfg.localize_type == 'usa':
+                end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
+                    A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
+            else:
+                end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 30,
+                          linguistic = model_type, data_type = 'r3d')
+            end_xy = end_xyz[:2]
+            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
         else:
             start_xyt = recv_array(socket)
             print(start_xyt)
@@ -191,8 +207,11 @@ def main(cfg):
                 end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
                     A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
             else:
-                end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 3, k_B = 5,
+                end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 30,
                           linguistic = model_type, data_type = 'r3d')
+            # print(end_xyz)
+            # end_xyz[2] = end_xyz[2] - cfg.min_height
+            # paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xyz[:2], remove_line_of_sight_points = True)
             end_xy = end_xyz[:2]
             paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
             end_pt = grid_planner.a_star_planner.to_pt(paths[-1][:2])
@@ -216,7 +235,7 @@ def main(cfg):
             print(socket.recv_string())
             send_array(socket, paths)
             print(socket.recv_string())
-            send_array(socket, [not move_range[0], not move_range[1]])
+            send_array(socket, end_xyz)
         print(paths)
         fig, axes = plt.subplots(2, 1, figsize=(8, 8))
         minx, miny = grid_planner.occ_map.origin
@@ -227,14 +246,17 @@ def main(cfg):
         #axes[0].imshow(grid_planner.base_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
         axes[0].plot(xs, ys, c='r')
         axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
-        axes[0].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
+        axes[0].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
         axes[0].scatter(xs, ys, c = 'cyan', s = 10)
-        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, 0.1, (-0.9, 0.1)).grid[::-1], extent=(minx, maxx, miny, maxy))
+        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, cfg.resolution, (cfg.min_height, cfg.max_height)).grid[::-1], extent=(minx, maxx, miny, maxy))
         axes[1].plot(xs, ys, c='r')
         axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
-        axes[1].scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
+        axes[1].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
         axes[1].scatter(xs, ys, c = 'cyan', s = 10)
-        fig.savefig('output_' + A + '.jpg')
+        if not os.path.exists(cfg.save_file + '/' + A):
+            os.makedirs(cfg.save_file + '/' + A )
+        print(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
+        fig.savefig(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
 
 
 if __name__ == "__main__":

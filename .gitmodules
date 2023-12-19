@@ -7,3 +7,9 @@
 [submodule "lerf"]
 	path = lerf
 	url = https://github.com/leo20021210/lerf
+[submodule "GrasperNet"]
+	path = GrasperNet
+	url = https://github.com/NYU-robot-learning/GrasperNet
+[submodule "anygrasp"]
+	path = anygrasp
+	url = https://github.com/NYU-robot-learning/anygrasp

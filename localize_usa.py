@@ -140,7 +140,7 @@ def find_alignment_over_model(label_model, clip_model, preprocessor, queries, da
 
 # Currently we only support compute one query each time, in the future we might want to support check many queries
 
-def localize_AonB(label_model, clip_model, preprocessor, A, B, dataloader, k_A = 10, k_B = 1000, linguistic = 'clip'):
+def localize_AonB(label_model, clip_model, preprocessor, A, B, dataloader, k_A = 10, k_B = 30, linguistic = 'clip'):
     if B is None or B == '':
         return find_alignment_for_A(label_model, clip_model, preprocessor, [A], dataloader, linguistic = linguistic)[0]
     alignments = find_alignment_over_model(label_model, clip_model, preprocessor, 
