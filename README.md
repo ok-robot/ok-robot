@@ -21,6 +21,9 @@ cd home-robot/src/home-robot
 pip install -e .
 cd ../../..
 ```
+
+You should also follow these [instructions](https://github.com/NYU-robot-learning/anygrasp/blob/4c7a9d465a85591a2a4d99c5eb709018ea26b0a6/grasp_detection/README.md) to install a conda environment for AnyGrasp.
+
 ## Hardware and software requirements
 Hardware required:
 * iPhone with Lidar sensors
