@@ -40,3 +40,7 @@ jupyter
 ml-starter==0.0.44
 more_itertools
 seaborn
+
+# others
+wget
+gdown
