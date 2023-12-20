@@ -4,7 +4,7 @@ To install navigation, run these scripts
 ```
 mamba create -n home_engine python=3.10
 mamba activate home_engine
-mamba install -y -c "nvidia/label/cuda-11.8.0" -c pytorch -c nvidia cuda-toolkit pytorch torchvision torchaudio
+mamba install cudatoolkit pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 python -m pip install -r requirements.txt
 cd clip-fields/gridencoder/
 python setup.py install
