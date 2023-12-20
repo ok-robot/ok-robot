@@ -1,5 +1,11 @@
 # Home_engine
 ## Installation
+Clone repo
+```
+git clone https://github.com/NYU-robot-learning/home-engine
+cd home-engine
+git submodule update --init --recursive
+```
 To install navigation, run these scripts
 ```
 mamba create -n home_engine python=3.10
@@ -15,6 +21,7 @@ cd usa
 pip install -e .
 
 # install required home-robot packages
+# make sure home-robot is on demo-refactor branch
 cd ..
 cd home-robot/src/home-robot
 pip install -e .
