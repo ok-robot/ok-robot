@@ -5,7 +5,6 @@ To install navigation, run these scripts
 mamba create -n home_engine python=3.10
 mamba activate home_engine
 mamba install -y -c "nvidia/label/cuda-11.8.0" -c pytorch -c nvidia cuda-toolkit pytorch torchvision torchaudio
-cd ..
 python -m pip install -r requirements.txt
 cd clip-fields/gridencoder/
 python setup.py install
@@ -22,7 +21,7 @@ pip install -e .
 cd ../../..
 ```
 
-You should also follow these [instructions](https://github.com/NYU-robot-learning/anygrasp/blob/4c7a9d465a85591a2a4d99c5eb709018ea26b0a6/grasp_detection/README.md) to install a conda environment for AnyGrasp.
+You should also follow these [instructions](https://github.com/NYU-robot-learning/anygrasp/blob/Code-Cleaning/README.md) to install a conda environment for AnyGrasp.
 
 ## Hardware and software requirements
 Hardware required:
@@ -36,7 +35,7 @@ Software required:
 * Other software packages needed for running pretrained models (e.g. Python)
   
 ## Running experiments
-After setting up environments and putting testing objects in the environments, you can start running experiments. Here shows an example environment
+After setting up environments and putting testing objects in the environments, you can start running experiments.
 ### Scan the environments
 To align the robot coordinate system (the one robot uses to localizes itself) and navigation coordinate system (the one provided by Record3D and used by navigation stack), we generally put two tapes on the ground.
 
@@ -68,5 +67,6 @@ You should also edit those config files:
 * In `anygrasp` folder you should run `bash demo.sh` to start grasping pose estimation
 * You should follow [home-robot instructions](https://github.com/leo20021210/home-robot) to install home-robot packages either on workstation or on robots.
 * Place your robot following [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing).
+* Obtain `x_offset`, `y_offset`, and `theta_offset`. Given the coordinates of tape robot stands on `(x1, y1)` and coordinates of tape robot faces to `(x2, y2)`
 * You should run robot controller in `GrasperNet` folder by run `python run.py -bf top_camera -t -x_offset [x_offset] -y_offset [y_offset] -theta_offset [theta_offset]`.
 * When running the experiments, three processes should run simultaneously, `python path_planning.py` for navigation path planning, `bash demo.sh` for pose estimation, and `python run.py` for robot controlling
