@@ -6,11 +6,11 @@ mamba create -n home_engine python=3.10
 mamba activate home_engine
 mamba install cudatoolkit pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 python -m pip install -r requirements.txt
-cd clip-fields/gridencoder/
-python setup.py install
+#cd clip-fields/gridencoder/
+#python setup.py install
 
 # install required USA-Net packages
-cd ../..
+#cd ../..
 cd usa
 pip install -e .
 
