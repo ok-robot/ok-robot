@@ -80,6 +80,5 @@ You should also edit those config files:
 * In `anygrasp` folder you should run `bash demo.sh` to start grasping pose estimation
 * You should follow [home-robot instructions](https://github.com/leo20021210/home-robot) to install home-robot packages either on workstation or on robots.
 * Place your robot following [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing).
-* Obtain `x_offset`, `y_offset`, and `theta_offset`. Given the coordinates of tape robot stands on `(x1, y1)` and coordinates of tape robot faces to `(x2, y2)`
-* You should run robot controller in `GrasperNet` folder by run `python run.py -bf top_camera -t -x_offset [x_offset] -y_offset [y_offset] -theta_offset [theta_offset]`.
+* Given the coordinates of tape robot stands on `(x1, y1)` and coordinates of tape robot faces to `(x2, y2)` you should run robot controller in `GrasperNet` folder by run `python run.py -bf top_camera -t -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]`.
 * When running the experiments, three processes should run simultaneously, `python path_planning.py` for navigation path planning, `bash demo.sh` for pose estimation, and `python run.py` for robot controlling
