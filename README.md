@@ -55,6 +55,12 @@ Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5O
 
 After you obstain a .r3d file from Record3D, you should localize the coordinates of two tapes and save it in a notepad for using them in later steps.
 
+Extract `pointcloud.ply` pointcloud from .r3d file with following python script (after running scripts, you will have a ply file named `pointcloud.ply` in your folder that represents this environment)
+```
+>>> from usa.tasks.datasets.posed_rgbd import get_pointcloud, get_posed_rgbd_dataset
+>>> get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = '[R3D file name].r3d'))
+```
+
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 ### Load navigation stack
 #### "Train" voxel map
