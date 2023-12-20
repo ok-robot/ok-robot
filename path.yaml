@@ -13,7 +13,7 @@ occ_avoid_radius: 0.2
 resolution: 0.1
 
 port_number: 5555
-save_file: "/data/pick_and_drop_exps/Pranav Bedroom"
+save_file: "./test"
 
 min_height: -0.55
 max_height: 1
