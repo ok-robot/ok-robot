@@ -17,7 +17,7 @@ import sys
 sys.path.append('clip-fields')
 
 from dataloaders.real_dataset import DeticDenseLabelledDataset
-from grid_hash_model import GridCLIPModel
+#from grid_hash_model import GridCLIPModel
 
 from misc import MLP
 

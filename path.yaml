@@ -1,4 +1,4 @@
-debug: False
+debug: True
 map_config: "usa/configs/train.yaml"
 map_type: "conservative_vlmap" # "conservative_vlmap" "sdf_map" "brave_vlmap"
 localize_type: "voxel map" # "cf" "usa" "voxel map"
