@@ -52,12 +52,12 @@ import zmq
 
 from matplotlib import pyplot as plt
 
-from localize_cf import load_everything as load_cf
-from localize_usa import load_everything as load_usa
+#from localize_cf import load_everything as load_cf
+#from localize_usa import load_everything as load_usa
 from localize_voxel_map import load_everything as load_voxel_map
 
-from localize_cf import localize_AonB as localize_cf
-from localize_usa import localize_AonB as localize_usa
+#from localize_cf import localize_AonB as localize_cf
+#from localize_usa import localize_AonB as localize_usa
 from localize_voxel_map import localize_AonB as localize_voxel_map
 
 from usa.planners.clip_sdf import AStarPlanner, GradientPlanner
