@@ -175,8 +175,8 @@ def main(cfg):
             # end_xy = [end_x,  end_y]
             # print(end_xy)
             # paths = grid_planner.plan(start_xy=start_xy, end_xy=end_xy, remove_line_of_sight_points = True)
-            A = input("A: ")
-            start_xyt = [0.447679, -0.032573]
+            A = input("A: ")    
+            start_xyt = [-0.538487, 0.596334]
             B = input("B: ")
             if cfg.localize_type == 'cf':
                 end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
