@@ -44,3 +44,5 @@ seaborn
 # others
 wget
 gdown
+pybind11-global
+torch_geometric

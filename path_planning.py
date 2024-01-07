@@ -52,13 +52,15 @@ import zmq
 
 from matplotlib import pyplot as plt
 
-from localize_cf import load_everything as load_cf
-from localize_usa import load_everything as load_usa
-from localize_voxel_map import load_everything as load_voxel_map
+#from localize_cf import load_everything as load_cf
+#from localize_usa import load_everything as load_usa
 
-from localize_cf import localize_AonB as localize_cf
-from localize_usa import localize_AonB as localize_usa
-from localize_voxel_map import localize_AonB as localize_voxel_map
+#from localize_voxel_map import load_everything as load_voxel_map
+
+#from localize_cf import localize_AonB as localize_cf
+#from localize_usa import localize_AonB as localize_usa
+
+#from localize_voxel_map import localize_AonB as localize_voxel_map
 
 from usa.planners.clip_sdf import AStarPlanner, GradientPlanner
 from usa.planners.base import get_ground_truth_map_from_dataset
@@ -152,41 +154,42 @@ def main(cfg):
     grid_planner, dataset = load_map(config_path = cfg.map_config, map_type = cfg.map_type, path_cfg = cfg)
     if not os.path.exists(cfg.localize_type):
         os.makedirs(cfg.localize_type)
-    if cfg.localize_type == 'cf':
-        load_everything = load_cf
-        localize_AonB = localize_cf
-        label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything(cfg.cf_config)
+    if cfg.localize_type == 'voxel map':
+        from localize_voxel_map import VoxelMapLocalizer
+        localizer = VoxelMapLocalizer(cfg.cf_config)
     elif cfg.localize_type == 'usa':
-        load_everything = load_usa
-        localize_AonB = localize_usa
-        label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything(cfg.usa_config, cfg.usa_weight)
+        from localize_usa import USANetLocalizer
+        localizer = USANetLocalizer(cfg.usa_config)
     else:
-        load_everything = load_voxel_map
-        localize_AonB = localize_voxel_map
-        voxel_pcd, clip_model, preprocessor, model_type = load_everything(cfg.cf_config)
+        from localize_cf import CFLocalizer
+        localizer = CFLocalizer(cfg.cf_config)
+    # if cfg.localize_type == 'cf':
+    #     load_everything = load_cf
+    #     localize_AonB = localize_cf
+    #     label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything(cfg.cf_config)
+    # elif cfg.localize_type == 'usa':
+    #     load_everything = load_usa
+    #     localize_AonB = localize_usa
+    #     label_model, clip_model, preprocessor, points_dataloader, model_type = load_everything(cfg.usa_config, cfg.usa_weight)
+    # else:
+    #     load_everything = load_voxel_map
+    #     localize_AonB = localize_voxel_map
+    #     voxel_pcd, clip_model, preprocessor, model_type = load_everything(cfg.cf_config)
     while True:
         if cfg.debug:
-            # start_x = float(input('start x'))
-            # start_y = float(input('start y'))
-            # start_xy = [start_x, start_y]
-            # print(start_xy)
-            # end_x = float(input('end x'))
-            # end_y = float(input('end y'))
-            # end_xy = [end_x,  end_y]
-            # print(end_xy)
-            # paths = grid_planner.plan(start_xy=start_xy, end_xy=end_xy, remove_line_of_sight_points = True)
-            A = input("A: ")    
-            start_xyt = [-0.538487, 0.596334]
+            A = input("A: ")
+            start_xyt = [0.447679, -0.032573]
             B = input("B: ")
-            if cfg.localize_type == 'cf':
-                end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
-                    sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
-            elif cfg.localize_type == 'usa':
-                end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
-                    A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
-            else:
-                end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 30,
-                          linguistic = model_type, data_type = 'r3d')
+            # if cfg.localize_type == 'cf':
+            #     end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
+            #         sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
+            # elif cfg.localize_type == 'usa':
+            #     end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
+            #         A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
+            # else:
+            #     end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 30,
+            #               linguistic = model_type, data_type = 'r3d')
+            end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
             paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
         else:
@@ -200,15 +203,16 @@ def main(cfg):
             B = socket.recv_string()
             print(B)
             socket.send_string('B received')
-            if cfg.localize_type == 'cf':
-                end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
-                    sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
-            elif cfg.localize_type == 'usa':
-                end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
-                    A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
-            else:
-                end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 30,
-                          linguistic = model_type, data_type = 'r3d')
+            # if cfg.localize_type == 'cf':
+            #     end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
+            #         sentence_model, A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type, vision_weight = 10.0, text_weight = 1.0)
+            # elif cfg.localize_type == 'usa':
+            #     end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
+            #         A, B, points_dataloader, k_A = 30, k_B = 50, linguistic = model_type)
+            # else:
+            #     end_xyz = localize_AonB(voxel_pcd, clip_model, preprocessor, A, B, k_A = 10, k_B = 30,
+            #               linguistic = model_type, data_type = 'r3d')
+            end_xyz = localizer.localize_AonB(A, B)
             # print(end_xyz)
             # end_xyz[2] = end_xyz[2] - cfg.min_height
             # paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xyz[:2], remove_line_of_sight_points = True)
@@ -216,22 +220,7 @@ def main(cfg):
             paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
             end_pt = grid_planner.a_star_planner.to_pt(paths[-1][:2])
             theta = paths[-1][2] if paths[-1][2] > 0 else paths[-1][2] + 2 * np.pi
-            if (theta >= np.pi / 8) and (theta <= 3 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] + 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] - 1))
-            elif (theta >= 3 * np.pi / 8) and (theta <= 5 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1]), grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1]))
-            elif (theta >= 5 * np.pi / 8) and (theta <= 7 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] - 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] + 1))
-            elif (theta >= 7 * np.pi / 8) and (theta <= 9 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] - 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] + 1))
-            elif (theta >= 9 * np.pi / 8) and (theta <= 11 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] - 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] + 1))
-            elif (theta >= 11 * np.pi / 8) and (theta <= 13 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1]), grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1]))
-            elif (theta >= 13 * np.pi / 8) and (theta <= 15 * np.pi / 8):
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0] + 1, end_pt[1] + 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0] - 1, end_pt[1] - 1))
-            else:
-                move_range = (grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] + 1), grid_planner.a_star_planner.point_is_occupied(end_pt[0], end_pt[1] - 1))
+            
             print(socket.recv_string())
             send_array(socket, paths)
             print(socket.recv_string())
