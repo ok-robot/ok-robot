@@ -1,4 +1,4 @@
-debug: True
+debug: False
 map_config: "usa/configs/train.yaml"
 map_type: "conservative_vlmap" # "conservative_vlmap" "sdf_map" "brave_vlmap"
 localize_type: "voxel map" # "cf" "usa" "voxel map"
@@ -13,7 +13,7 @@ occ_avoid_radius: 0.2
 resolution: 0.1
 
 port_number: 5555
-save_file: "./test"
+save_file: "/data/pick_and_drop_exps/VenthyaKitchen"
 
-min_height: -0.9
+min_height: -1.05
 max_height: 1
