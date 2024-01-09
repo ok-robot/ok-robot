@@ -32,220 +32,137 @@ from transformers import AutoProcessor, OwlViTModel
 DEVICE = "cuda"
 
 os.environ["TOKENIZERS_PARALLELISM"] = '(true | false)'
-
-from transformers import AutoProcessor, OwlViTModel
 from omegaconf import OmegaConf
 
-model = None
-preprocessor = None
-sentence_model = None
-bounds = None
-
-# model type can be owl, openclip (only openclip requires weight_name), or clip
-# if model_type is 'owl', then default model_name is 'google/owlvit-base-patch32'
-# if model_type is 'openclip' or clip, then default model_name is 'ViT-B/32'
-def load_pretrained(
-    model_type = 'owl', 
-    model_name = 'google/owlvit-base-patch32',
-    sentence_model_name = 'all-mpnet-base-v2',
-    device = 'cuda'):
-    global model, preprocessor, sentence_model
-    sentence_model = SentenceTransformer(sentence_model_name)
-    if model_type == 'owl':
-        model = OwlViTModel.from_pretrained(model_name).to(device)
-        preprocessor = AutoProcessor.from_pretrained(model_name)
-    else:
-        model, preprocessor = clip.load(model_name, device=device)
-    return model, preprocessor, sentence_model
-
-# For this part, if field type is clip-fields or lerf, then, You need to provide your model_weights_path
-# if your field type is usa-net, we will load your training config
-# If you are using clip VIT-B/32, image rep size is 512
-# For label rep, we are only considering SentenceTransformer("all-mpnet-base-v2"), so the label_rep_size is 768
-# If you are loading lerf, then feel free to set config_path None
-def load_field( 
-    model_weights_path, 
-    config_path = None, 
-    image_rep_size = 512, 
-    text_rep_size=768,
-    max_coords = None,
-    min_coords = None,
-    device = 'cuda'
-):
-    if config_path:
+class CFLocalizer():
+    def __init__(self, config_path, device = 'cuda', image_rep_size = 512, text_rep_size=768):
+        self.device = device
         config = OmegaConf.load(config_path)
-    model = GridCLIPModel(
-        image_rep_size = image_rep_size,
-        text_rep_size = text_rep_size,
-        mlp_depth = config.mlp_depth,
-        mlp_width = config.mlp_width,
-        log2_hashmap_size = config.log2_hashmap_size,
-        num_levels = config.num_grid_levels,
-        level_dim = config.level_dim,
-        per_level_scale = config.per_level_scale,
-        max_coords = max_coords,
-        min_coords = min_coords
-    ).to(device)
-    model_weights = torch.load(model_weights_path, map_location=device)
-    model.load_state_dict(model_weights["model"])
-    return model
-    
-
-def get_dataloader(cf_path):
-    # For this part, you can either choose to load clip fields training data
-    # or a r3d file to get an USA-Net styled data
-    # bounds is needed to test LERF, so if you choose to load dataloader from cf_path, you should not
-    # be able to test LERF
-    training_data = torch.load(cf_path)
-    data_xyzs = training_data._label_xyz
-    batch_size = 30_000
-    points_dataloader = DataLoader(
-        data_xyzs.detach().cpu(), batch_size=batch_size, num_workers=10,
-    )
-    print("Created data loader", points_dataloader)
-    merged_pcd = o3d.geometry.PointCloud()
-    merged_pcd.points = o3d.utility.Vector3dVector(points_dataloader.dataset)
-    merged_downpcd = merged_pcd.voxel_down_sample(voxel_size=0.03)
-    o3d.io.write_point_cloud(f"point_cloud.ply", merged_downpcd)
-    return points_dataloader
-
-def calculate_clip_and_st_embeddings_for_queries(queries, model, preprocessor,
-         sentence_model, device = 'cuda', model_type = 'owl'):
-    with torch.no_grad():
-        if model_type == 'owl':
-            inputs = preprocessor(
-                text=[queries], return_tensors="pt"
-            )
-            inputs['input_ids'] = inputs['input_ids'].to(device)
-            inputs['attention_mask'] = inputs['attention_mask'].to(device)
-            all_clip_tokens = model.get_text_features(**inputs)
+        self.model_type = config.web_models.segmentation
+        self.dataset_path = os.path.join('clip-fields', config.saved_dataset_path)
+        if self.model_type != 'owl':
+            self.model_name = 'ViT-B/32'
         else:
-            all_clip_queries = clip.tokenize(queries)
-            all_clip_tokens = model.encode_text(all_clip_queries.to(device)).float()
-        all_clip_tokens = F.normalize(all_clip_tokens, p=2, dim=-1)
-        all_st_tokens = torch.from_numpy(sentence_model.encode(queries))
-        all_st_tokens = F.normalize(all_st_tokens, p=2, dim=-1).to(device)
-    return all_clip_tokens, all_st_tokens
+            self.model_name = 'google/owlvit-base-patch32'
+        self.sentence_model_name = 'all-mpnet-base-v2'
+        self.clip_model, self.preprocessor, self.sentence_model = self.load_pretrained()
+        self.points_dataloader = self.get_dataloader(self.dataset_path)
+        max_coords, _ = self.points_dataloader.dataset.max(dim=0)
+        min_coords, _ = self.points_dataloader.dataset.min(dim=0)
+        model_weights_path = os.path.join('clip-fields', config.save_directory, 'implicit_scene_label_model_latest.pt')
+        self.label_model = self.load_field(
+            config,
+            max_coords,
+            min_coords,
+            model_weights_path, 
+            image_rep_size, 
+            text_rep_size
+        )
 
-def find_alignment_over_model(label_model, clip_model, preprocessor, sentence_model, queries, dataloader,
-            vision_weight = 10.0, text_weight = 10.0, linguistic = 'owl', device = 'cuda'):
-    clip_text_tokens, st_text_tokens = calculate_clip_and_st_embeddings_for_queries(
-            queries, clip_model, preprocessor, sentence_model, model_type = linguistic)
-    point_alignments = []
-    with torch.no_grad():
-        for data in tqdm.tqdm(dataloader, total = len(dataloader)):
-            # Find alignmnents with the vectors
-            predicted_label_latents, predicted_image_latents = label_model(data.to(device))
-            data_text_tokens = F.normalize(predicted_label_latents, p=2, dim=-1).to(device)
-            text_alignment = data_text_tokens @ st_text_tokens.T
-            data_visual_tokens = F.normalize(predicted_image_latents, p=2, dim=-1).to(device)
-            visual_alignment = data_visual_tokens @ clip_text_tokens.T
-            total_alignment = (text_weight * text_alignment) + (vision_weight * visual_alignment)
-            total_alignment /= (text_weight + vision_weight)
-            point_alignments.append(total_alignment)
+    def load_pretrained(self):
+        if self.model_type == 'owl':
+            model = OwlViTModel.from_pretrained(self.model_name).to(self.device)
+            preprocessor = AutoProcessor.from_pretrained(self.model_name)
+        else:
+            model, preprocessor = clip.load(self.model_name, device=self.device)
+        sentence_model = SentenceTransformer(self.sentence_model_name)
+        return model, preprocessor, sentence_model
 
-    point_alignments = torch.cat(point_alignments).T
-    print(point_alignments.shape)
-    return point_alignments
+    def get_dataloader(self, cf_path):
+        training_data = torch.load(cf_path)
+        data_xyzs = training_data._label_xyz
+        batch_size = 30_000
+        points_dataloader = DataLoader(
+            data_xyzs.detach().cpu(), batch_size=batch_size, num_workers=10,
+        )
+        print("Created data loader", points_dataloader)
+        #merged_pcd = o3d.geometry.PointCloud()
+        #merged_pcd.points = o3d.utility.Vector3dVector(points_dataloader.dataset)
+        #merged_downpcd = merged_pcd.voxel_down_sample(voxel_size=0.03)
+        #o3d.io.write_point_cloud(f"point_cloud.ply", merged_downpcd)
+        return points_dataloader
 
-# Currently we only support compute one query each time, in the future we might want to support check many queries
+    
+    def load_field( 
+        self,
+        config,
+        max_coords,
+        min_coords,
+        model_weights_path, 
+        image_rep_size, 
+        text_rep_size
+    ):
+        model = GridCLIPModel(
+            image_rep_size = image_rep_size,
+            text_rep_size = text_rep_size,
+            mlp_depth = config.mlp_depth,
+            mlp_width = config.mlp_width,
+            log2_hashmap_size = config.log2_hashmap_size,
+            num_levels = config.num_grid_levels,
+            level_dim = config.level_dim,
+            per_level_scale = config.per_level_scale,
+            max_coords = max_coords,
+            min_coords = min_coords
+        ).to(self.device)
+        model_weights = torch.load(model_weights_path, map_location=self.device)
+        model.load_state_dict(model_weights["model"])
+        return model
 
-def localize_AonB(label_model, clip_model, preprocessor, sentence_model, A, B, dataloader, k_A = 10, k_B = 50,
-        vision_weight = 10.0, text_weight = 10.0, linguistic = 'clip', data_type = 'r3d'):
-    print("A is ", A)
-    print("B is ", B)
-    if B is None or B == '':
-        target = find_alignment_for_A(label_model, clip_model, preprocessor, sentence_model, [A], dataloader,
-            vision_weight = vision_weight, text_weight = text_weight, linguistic = linguistic)[0]
-    else:
-        alignments = find_alignment_over_model(label_model, clip_model, preprocessor, sentence_model,
-                [A, B], dataloader, vision_weight = vision_weight, text_weight = text_weight, linguistic = linguistic).cpu()
-        A_points = dataloader.dataset[alignments[0].topk(k = k_A, dim = -1).indices].reshape(-1, 3)
-        B_points = dataloader.dataset[alignments[1].topk(k = k_B, dim = -1).indices].reshape(-1, 3)
-        distances = torch.norm(A_points.unsqueeze(1) - B_points.unsqueeze(0), dim=2)
-        target = A_points[torch.argmin(torch.min(distances, dim = 1).values)]
-    if data_type == 'r3d':
-        target = target[[0, 2, 1]]
-        target[1] = -target[1]
-    return target
-
-# Keep in mind that the objective is picking up A from B
-def find_alignment_for_B(label_model, clip_model, preprocessor, sentence_model, B, dataloader, 
-            # for this function only, how many points do you want to considered as relevant to B
-            threshold_precentile = 0.01,
-            # for clip-fields
-            vision_weight = 10.0, text_weight = 10.0, linguistic = 'owl'):
-    assert threshold_precentile > 0 and threshold_precentile <= 1, 'invalid threshold_precentile'
-    alignments = find_alignment_over_model(label_model, clip_model, preprocessor, sentence_model, 
-                B, dataloader, vision_weight, text_weight, linguistic).cpu()
-    threshold = int(len(dataloader.dataset) * threshold_precentile)
-    B_dataset = dataloader.dataset[alignments.topk(k = threshold, dim = -1).indices]
-    BATCH_SIZE = 30_000
-    B_dataset = B_dataset.reshape(-1, 3)
-    return DataLoader(B_dataset, batch_size = BATCH_SIZE, num_workers = 10)
-
-def find_alignment_for_A(label_model, clip_model, preprocessor, sentence_model, A, dataloader, 
-            # for clip-fields
-            vision_weight = 10.0, text_weight = 10.0, linguistic = 'owl'):
-    alignments = find_alignment_over_model(label_model, clip_model, preprocessor, sentence_model, 
-            A, dataloader, vision_weight, text_weight, linguistic).cpu()
-    return dataloader.dataset[alignments.argmax(dim = -1)]
+    def calculate_clip_and_st_embeddings_for_queries(self, queries):
+        with torch.no_grad():
+            if self.model_type == 'owl':
+                inputs = self.preprocessor(
+                    text=[queries], return_tensors="pt"
+                )
+                inputs['input_ids'] = inputs['input_ids'].to(self.device)
+                inputs['attention_mask'] = inputs['attention_mask'].to(self.device)
+                all_clip_tokens = self.clip_model.get_text_features(**inputs)
+            else:
+                all_clip_queries = clip.tokenize(queries)
+                all_clip_tokens = self.clip_model.encode_text(all_clip_queries.to(self.device)).float()
+            all_clip_tokens = F.normalize(all_clip_tokens, p=2, dim=-1)
+            all_st_tokens = torch.from_numpy(self.sentence_model.encode(queries))
+            all_st_tokens = F.normalize(all_st_tokens, p=2, dim=-1).to(self.device)
+        return all_clip_tokens, all_st_tokens
         
+    def find_alignment_over_model(self, queries, vision_weight = 10.0, text_weight = 1.0):
+        clip_text_tokens, st_text_tokens = self.calculate_clip_and_st_embeddings_for_queries(queries)
+        point_alignments = []
+        with torch.no_grad():
+            for data in tqdm.tqdm(self.points_dataloader, total = len(self.points_dataloader)):
+                # Find alignmnents with the vectors
+                predicted_label_latents, predicted_image_latents = self.label_model(data.to(self.device))
+                data_text_tokens = F.normalize(predicted_label_latents, p=2, dim=-1).to(self.device)
+                text_alignment = data_text_tokens @ st_text_tokens.T
+                data_visual_tokens = F.normalize(predicted_image_latents, p=2, dim=-1).to(self.device)
+                visual_alignment = data_visual_tokens @ clip_text_tokens.T
+                total_alignment = (text_weight * text_alignment) + (vision_weight * visual_alignment)
+                total_alignment /= (text_weight + vision_weight)
+                point_alignments.append(total_alignment)
 
-# Note that even though we cannot localize many queries with LERF at the same time,
-# we can actually select lerf scales for many queries at the same time.
+        point_alignments = torch.cat(point_alignments).T
+        print(point_alignments.shape)
+        return point_alignments
 
-def load_everything(config_path):
-    config = OmegaConf.load(config_path)
-    model_type = config.web_models.segmentation
-    dataset_path = os.path.join('clip-fields', config.saved_dataset_path)
-    if model_type != 'owl':
-        model_name = 'ViT-B/32'
-    else:
-        model_name = 'google/owlvit-base-patch32'
-    weight_path = os.path.join('clip-fields', config.save_directory, 'implicit_scene_label_model_latest.pt')
-    clip_model, preprocessor, sentence_model = load_pretrained(model_type = model_type , model_name = model_name)
-    points_dataloader = get_dataloader(cf_path = dataset_path)
-    max_coords, _ = points_dataloader.dataset.max(dim=0)
-    min_coords, _ = points_dataloader.dataset.min(dim=0)
-    label_model = load_field(
-        config_path = config_path, model_weights_path = weight_path, max_coords = max_coords, min_coords = min_coords)
-    return label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type
+    # Currently we only support compute one query each time, in the future we might want to support check many queries
 
-def localize_pickupAfromB(label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type,
-             A, B, config_path, vision_weight = 10.0, text_weight = 10.0, data_type = 'r3d'):
-    B_dataloader = find_alignment_for_B(
-        label_model, clip_model, preprocessor, sentence_model, [B], points_dataloader, 
-        linguistic = model_type, vision_weight = vision_weight, text_weight = text_weight)
-    final_point = find_alignment_for_A(
-        label_model, clip_model, preprocessor, sentence_model, [A], B_dataloader, 
-        linguistic = model_type, vision_weight = vision_weight, text_weight = text_weight)
-    del B_dataloader
-    if data_type == 'r3d':
-        final_point[:, -1] = -final_point[:, -1]
-        final_point = final_point[0, [0, 2, 1]]
-    return final_point
+    def localize_AonB(self, A, B, k_A = 10, k_B = 50, data_type = 'r3d'):
+        print("A is ", A)
+        print("B is ", B)
+        if B is None or B == '':
+            target = self.find_alignment_for_A([A])[0]
+        else:
+            #points, _, _, _ = self.voxel_pcd.get_pointcloud()
+            alignments = self.find_alignment_over_model([A, B]).cpu()
+            A_points = self.points_dataloader.dataset[alignments[0].topk(k = k_A, dim = -1).indices].reshape(-1, 3)
+            B_points = self.points_dataloader.dataset[alignments[1].topk(k = k_B, dim = -1).indices].reshape(-1, 3)
+            distances = torch.norm(A_points.unsqueeze(1) - B_points.unsqueeze(0), dim=2)
+            target = A_points[torch.argmin(torch.min(distances, dim = 1).values)]
+        if data_type == 'r3d':
+            target = target[[0, 2, 1]]
+            target[1] = -target[1]
+        return target
 
-def evaluate():
-    label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything('clip-fields/configs/train.yaml')
-
-    eval_data = pd.read_csv('clip-fields/kitchen.csv')
-    queries = list(eval_data['query'])
-
-    xs, ys, zs, affords = list(eval_data['x']), list(eval_data['y']), list(eval_data['z']), list(eval_data['affordance'])
-    xyzs = torch.stack([torch.tensor(xs), torch.tensor(ys), torch.tensor(zs)], dim = 1)
-    max_points = find_alignment_for_A(label_model, clip_model, preprocessor, sentence_model, 
-            queries, points_dataloader,
-            vision_weight = 10.0, text_weight = 10.0, linguistic = model_type)
-    print(max_points.shape)
-    for max_point, query in zip(max_points, queries):
-        print(max_point, query)
-
-    correctness = torch.linalg.norm((max_points[:, [0, 2]] - xyzs[:, [0, 2]]), dim = -1) <= torch.tensor(affords)
-    print(np.array(queries)[torch.where(correctness)[0].numpy()], 
-        np.array(queries)[torch.where(~correctness)[0].numpy()], 
-        len(np.array(queries)[torch.where(correctness)[0].numpy()]) / len(correctness))
-
-#label_model, clip_model, preprocessor, sentence_model, points_dataloader, model_type = load_everything('clip-fields/configs/train.yaml')
-#print(localize_AonB(label_model, clip_model, preprocessor, sentence_model, 'plant', '', points_dataloader, k_A = 10, k_B = 1000, linguistic = model_type))
-#evaluate()
+    def find_alignment_for_A(self, A):
+        alignments = self.find_alignment_over_model(A).cpu()
+        return self.points_dataloader.dataset[alignments.argmax(dim = -1)]
