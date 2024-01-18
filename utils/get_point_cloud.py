@@ -16,6 +16,6 @@ print(f"{args.input_file=}")
 
 from usa.tasks.datasets.posed_rgbd import get_pointcloud, get_posed_rgbd_dataset
 
-obj = get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = args.input_file))
+ get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = args.input_file))
 
-breakpoint()
+ print("... created pointcloud.ply.")
