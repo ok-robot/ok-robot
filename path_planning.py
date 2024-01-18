@@ -178,7 +178,7 @@ def main(cfg):
     while True:
         if cfg.debug:
             A = input("A: ")
-            start_xyt = [0.447679, -0.032573]
+            start_xyt = [0, 0.23]
             B = input("B: ")
             # if cfg.localize_type == 'cf':
             #     end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
