@@ -52,16 +52,6 @@ import zmq
 
 from matplotlib import pyplot as plt
 
-#from localize_cf import load_everything as load_cf
-#from localize_usa import load_everything as load_usa
-
-#from localize_voxel_map import load_everything as load_voxel_map
-
-#from localize_cf import localize_AonB as localize_cf
-#from localize_usa import localize_AonB as localize_usa
-
-#from localize_voxel_map import localize_AonB as localize_voxel_map
-
 from usa.planners.clip_sdf import AStarPlanner, GradientPlanner
 from usa.planners.base import get_ground_truth_map_from_dataset
 
@@ -178,7 +168,7 @@ def main(cfg):
     while True:
         if cfg.debug:
             A = input("A: ")
-            start_xyt = [0, 0.23]
+            #start_xyt = [-0.13, 1.33]
             B = input("B: ")
             # if cfg.localize_type == 'cf':
             #     end_xyz = localize_AonB(label_model, clip_model, preprocessor, 
@@ -191,7 +181,7 @@ def main(cfg):
             #               linguistic = model_type, data_type = 'r3d')
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
-            paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
+            #paths = grid_planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
         else:
             start_xyt = recv_array(socket)
             print(start_xyt)
@@ -225,23 +215,26 @@ def main(cfg):
             send_array(socket, paths)
             print(socket.recv_string())
             send_array(socket, end_xyz)
-        print(paths)
+            print(paths)
         fig, axes = plt.subplots(2, 1, figsize=(8, 8))
         minx, miny = grid_planner.occ_map.origin
         (ycells, xcells), resolution = grid_planner.occ_map.grid.shape, grid_planner.occ_map.resolution
         maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
-        xs, ys, thetas = zip(*paths)
+        if not cfg.debug:
+            xs, ys, thetas = zip(*paths)
         axes[0].imshow(grid_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
         #axes[0].imshow(grid_planner.base_planner.a_star_planner.is_occ[::-1], extent=(minx, maxx, miny, maxy))
-        axes[0].plot(xs, ys, c='r')
-        axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
+        if not cfg.debug:
+            axes[0].plot(xs, ys, c='r')
+            axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
+            axes[0].scatter(xs, ys, c = 'cyan', s = 10)
         axes[0].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
-        axes[0].scatter(xs, ys, c = 'cyan', s = 10)
         axes[1].imshow(get_ground_truth_map_from_dataset(dataset, cfg.resolution, (cfg.min_height, cfg.max_height)).grid[::-1], extent=(minx, maxx, miny, maxy))
-        axes[1].plot(xs, ys, c='r')
-        axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
+        if not cfg.debug:
+            axes[1].plot(xs, ys, c='r')
+            axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
+            axes[1].scatter(xs, ys, c = 'cyan', s = 10)
         axes[1].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
-        axes[1].scatter(xs, ys, c = 'cyan', s = 10)
         if not os.path.exists(cfg.save_file + '/' + A):
             os.makedirs(cfg.save_file + '/' + A )
         print(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
