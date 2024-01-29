@@ -53,6 +53,14 @@ def main(cfg):
     conservative = cfg.map_type == 'conservative_vlmap'
     planner = PathPlanner(r3d_path, cfg.min_height, cfg.max_height, cfg.resolution, cfg.occ_avoid_radius, conservative)
     localizer = VoxelMapLocalizer(cfg.cf_config)
+
+    obstacle_map = planner.occupancy_map
+    minx, miny = obstacle_map.origin
+    (ycells, xcells), resolution = obstacle_map.grid.shape, obstacle_map.resolution
+    maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
+    dataset = planner.dataset
+    ground_truth_map = get_ground_truth_map_from_dataset(dataset, cfg.resolution, (cfg.min_height, cfg.max_height))
+
     while True:
         if cfg.debug:
             A = input("A: ")
@@ -82,20 +90,16 @@ def main(cfg):
             send_array(socket, end_xyz)
             print(paths)
         fig, axes = plt.subplots(2, 1, figsize=(8, 8))
-        is_occ = planner.occupancy_map
-        minx, miny = is_occ.origin
-        (ycells, xcells), resolution = is_occ.grid.shape, is_occ.resolution
-        maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
+        
         if not cfg.debug:
             xs, ys, thetas = zip(*paths)
-        axes[0].imshow(is_occ.grid[::-1], extent=(minx, maxx, miny, maxy))
+        axes[0].imshow(obstacle_map.grid[::-1], extent=(minx, maxx, miny, maxy))
         if not cfg.debug:
             axes[0].plot(xs, ys, c='r')
             axes[0].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')
             axes[0].scatter(xs, ys, c = 'cyan', s = 10)
         axes[0].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
-        dataset = get_posed_rgbd_dataset(key = 'r3d', path = r3d_path)
-        axes[1].imshow(get_ground_truth_map_from_dataset(dataset, cfg.resolution, (cfg.min_height, cfg.max_height)).grid[::-1], extent=(minx, maxx, miny, maxy))
+        axes[1].imshow(ground_truth_map.grid[::-1], extent=(minx, maxx, miny, maxy))
         if not cfg.debug:
             axes[1].plot(xs, ys, c='r')
             axes[1].scatter(start_xyt[0], start_xyt[1], s = 50, c = 'white')

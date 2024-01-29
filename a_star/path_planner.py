@@ -53,8 +53,9 @@ class PathPlanner():
 
         # Gets the map from the parent class.
         # for now we assume all dataset is r3d dataset, so key is set to 'r3d'
+        self.dataset = get_posed_rgbd_dataset(key='r3d', path = dataset_path)
         self.occupancy_map = get_occupancy_map_from_dataset(
-            get_posed_rgbd_dataset(key='r3d', path = dataset_path),
+            self.dataset,
             resolution,
             (floor_height, ceil_height),
             occ_avoid = self.occ_avoid,
