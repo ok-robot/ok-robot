@@ -21,7 +21,7 @@ use_gt_classes_in_detic: true
 
 # Debug purposes, visualize Detic results
 visualize_detic_results: true
-detic_visualization_path: "Chris_debug"
+detic_visualization_path: "Leo_debug"
 
 # Cache only runs are for building per-dataset caches, which can be used for multi-run later.
 cache_only_run: false

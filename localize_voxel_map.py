@@ -19,6 +19,8 @@ import clip
 import pandas as pd
 
 from transformers import AutoProcessor, OwlViTModel
+import sys
+sys.path.append('voxel-map')
 
 DEVICE = "cuda"
 
@@ -32,7 +34,7 @@ class VoxelMapLocalizer():
         self.device = device
         config = OmegaConf.load(config_path)
         self.model_type = config.web_models.segmentation
-        self.dataset_path = os.path.join('voxel-map', config.saved_dataset_path)
+        self.dataset_path = os.path.join('voxel-map', config.cache_path)
         if self.model_type != 'owl':
             self.model_name = 'ViT-B/32'
         else:
