@@ -14,8 +14,8 @@ args = parser.parse_args()
 # Print the input file path
 print(f"{args.input_file=}")
 
-from usa.tasks.datasets.posed_rgbd import get_pointcloud, get_posed_rgbd_dataset
+from a_star.map_util import get_pointcloud, get_posed_rgbd_dataset
 
- get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = args.input_file))
+get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = args.input_file))
 
- print("... created pointcloud.ply.")
+print("... created pointcloud.ply.")

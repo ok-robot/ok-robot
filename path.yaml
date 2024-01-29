@@ -1,10 +1,8 @@
-debug: False
-map_config: "usa/configs/train.yaml"
+debug: True
 map_type: "conservative_vlmap" # "conservative_vlmap" "sdf_map" "brave_vlmap"
 localize_type: "voxel map" # "cf" "usa" "voxel map"
 
 cf_config: "clip-fields/configs/train.yaml"
-usa_config: "usa/configs/train.yaml"
 
 occ_avoid_radius: 0.18
 resolution: 0.06
