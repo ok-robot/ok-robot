@@ -13,13 +13,8 @@ import einops
 
 import os
 import sys
-sys.path.append('clip-fields')
-
-from misc import MLP
 
 import pandas as pd
-import pyntcloud
-from pyntcloud import PyntCloud
 import clip
 import pandas as pd
 
@@ -37,12 +32,11 @@ class VoxelMapLocalizer():
         self.device = device
         config = OmegaConf.load(config_path)
         self.model_type = config.web_models.segmentation
-        self.dataset_path = os.path.join('clip-fields', config.saved_dataset_path)
+        self.dataset_path = os.path.join('voxel-map', config.saved_dataset_path)
         if self.model_type != 'owl':
             self.model_name = 'ViT-B/32'
         else:
             self.model_name = 'google/owlvit-base-patch32'
-        self.weight_path = os.path.join('clip-fields', config.save_directory, 'implicit_scene_label_model_latest.pt')
         self.clip_model, self.preprocessor = self.load_pretrained()
         self.voxel_pcd = self.load_pcd()
 

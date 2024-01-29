@@ -2,7 +2,7 @@ debug: True
 map_type: "conservative_vlmap" # "conservative_vlmap" "brave_vlmap"
 localize_type: "voxel map" # "cf" "voxel map"
 
-cf_config: "clip-fields/configs/train.yaml"
+cf_config: "voxel-map/configs/train.yaml"
 
 occ_avoid_radius: 0.18
 resolution: 0.06

@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 from a_star.map_util import get_ground_truth_map_from_dataset, get_occupancy_map_from_dataset
 from a_star.path_planner import PathPlanner
 from a_star.data_util import get_posed_rgbd_dataset
+from localize_voxel_map import VoxelMapLocalizer
 
 import math
 import os
@@ -48,15 +49,10 @@ def recv_array(socket, flags=0, copy=True, track=False):
 def main(cfg):
     socket = load_socket(cfg.port_number)
     config = OmegaConf.load(cfg.cf_config)
-    r3d_path = os.path.join("clip-fields", config.dataset_path)
+    r3d_path = os.path.join("voxel-map", config.dataset_path)
     conservative = cfg.map_type == 'conservative_vlmap'
     planner = PathPlanner(r3d_path, cfg.min_height, cfg.max_height, cfg.resolution, cfg.occ_avoid_radius, conservative)
-    if cfg.localize_type == 'voxel map':
-        from localize_voxel_map import VoxelMapLocalizer
-        localizer = VoxelMapLocalizer(cfg.cf_config)
-    else:
-        from localize_cf import CFLocalizer
-        localizer = CFLocalizer(cfg.cf_config)
+    localizer = VoxelMapLocalizer(cfg.cf_config)
     while True:
         if cfg.debug:
             A = input("A: ")
