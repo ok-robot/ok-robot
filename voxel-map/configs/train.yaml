@@ -1,0 +1,62 @@
+defaults:
+  - _self_
+  - override hydra/launcher: submitit_slurm
+
+device: cuda
+use_cache: false
+batch_size: 12544
+
+# Dataset details
+dataset_path: "../r3d/LeoBedroom.r3d"
+cache_result: true
+cache_path: LeoBedroom.pt
+
+# Data loading and labelling specs
+sample_freq: 5
+threshold: 0.15
+subsample_prob: 0.005
+use_lseg: false
+use_extra_classes: false
+use_gt_classes_in_detic: true
+
+# Debug purposes, visualize Detic results
+visualize_detic_results: true
+detic_visualization_path: "Chris_debug"
+
+# Cache only runs are for building per-dataset caches, which can be used for multi-run later.
+cache_only_run: false
+
+web_models:
+  segmentation: "owl" # "owl", "detic"
+  clip: "google/owlvit-base-patch32" # "ViT-B/32" for "detic", "google/owlvit-base-patch32" for "owl"
+  sentence: "all-mpnet-base-v2"
+
+hydra:
+  callbacks:
+    log_job_return:
+      _target_: hydra.experimental.callbacks.LogJobReturnCallback
+
+  launcher:
+    timeout_min: 180
+    cpus_per_task: 10
+    gpus_per_node: 1
+    tasks_per_node: 1
+    mem_gb: 128
+    nodes: 1
+    name: ${hydra.job.name}
+    _target_: hydra_plugins.hydra_submitit_launcher.submitit_launcher.SlurmLauncher
+    signal_delay_s: 120
+    max_num_timeout: 1
+    additional_parameters: {}
+    array_parallelism: 256
+    setup: null
+    partition: learnfair
+
+# Add any custom labels you want here
+#custom_labels:
+#  - muffins
+#  - hat
+#  - pepper
+
+# Or just comment it out for default labels.
+custom_labels: null
