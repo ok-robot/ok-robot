@@ -1,0 +1,14 @@
+**/__pycache__/**
+**/*.egg-info/
+*.o
+gsnet.so
+lib_cxx.so
+*.egg
+.DS_Store
+.TimeRecord
+license
+/src/checkpoints/*
+/src/example_data/*
+/src/sample_save_directory/*
+/pointnet2/*
+*.pth
