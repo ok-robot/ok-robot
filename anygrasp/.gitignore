@@ -10,5 +10,4 @@ license
 /src/checkpoints/*
 /src/example_data/*
 /src/sample_save_directory/*
-/pointnet2/*
 *.pth
