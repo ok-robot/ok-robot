@@ -1,8 +1,0 @@
-**/__pycache__/**
-**/*.egg-info/
-*.o
-*.so
-*.egg
-.DS_Store
-.TimeRecord
-license
