@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, Sized, cast
+from typing import Iterator, Sized, cast, Union
 
 import more_itertools
 import numpy as np
@@ -18,7 +18,7 @@ import open3d as o3d
 
 def get_posed_rgbd_dataset(
     key: str,
-    path: str | Path | None = None
+    path: str
 ) -> Dataset[PosedRGBDItem]:
     assert key == 'home_robot' or key == 'r3d'
     if key == "home_robot":
@@ -49,7 +49,7 @@ class Bounds:
         return self.zmax - self.zmin
 
     @classmethod
-    def from_arr(cls, bounds: np.ndarray | Tensor) -> "Bounds":
+    def from_arr(cls, bounds) -> "Bounds":
         assert bounds.shape == (3, 2), f"Invalid bounds shape: {bounds.shape}"
 
         return Bounds(
@@ -193,7 +193,7 @@ def get_pointcloud(ds: Dataset[PosedRGBDItem], chunk_size: int = 16, threshold:f
     o3d.io.write_point_cloud(f"pointcloud.ply", merged_downpcd)
 
 
-def get_poses(ds: Dataset[PosedRGBDItem], cache_dir: Path | None = None) -> np.ndarray:
+def get_poses(ds: Dataset[PosedRGBDItem], cache_dir = None) -> np.ndarray:
     # pylint: disable=unsupported-assignment-operation,unsubscriptable-object
     cache_loc = None if cache_dir is None else cache_dir / "poses.npy"
 
@@ -212,11 +212,11 @@ def get_poses(ds: Dataset[PosedRGBDItem], cache_dir: Path | None = None) -> np.n
     return poses
 
 
-def get_bounds(ds: Dataset[PosedRGBDItem], cache_dir: Path | None = None) -> Bounds:
+def get_bounds(ds: Dataset[PosedRGBDItem], cache_dir = None) -> Bounds:
     # pylint: disable=unsupported-assignment-operation,unsubscriptable-object
     cache_loc = None if cache_dir is None else cache_dir / "bounds.npy"
 
-    bounds: np.ndarray | None = None
+    bounds = None
 
     if cache_loc is not None and cache_loc.is_file():
         bounds = np.load(cache_loc)
@@ -239,7 +239,7 @@ def get_bounds(ds: Dataset[PosedRGBDItem], cache_dir: Path | None = None) -> Bou
     return Bounds.from_arr(bounds)
 
 
-def aminmax(x: Tensor, dim: int | None = None) -> tuple[Tensor, Tensor]:
+def aminmax(x: Tensor, dim = None) -> tuple[Tensor, Tensor]:
     xmin, xmax = torch.aminmax(x, dim=dim)
     return xmin, xmax
 

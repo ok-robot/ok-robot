@@ -43,7 +43,7 @@ def get_occupancy_map_from_dataset(
     occ_height_range: tuple[float, float],
     occ_threshold: int = 100,
     clear_around_bot_radius: float = 0.0,
-    cache_dir: Path | None = None,
+    cache_dir = None,
     ignore_cached: bool = True,
     conservative: bool = True,
     occ_avoid: int = 2
@@ -83,8 +83,8 @@ def get_occupancy_map_from_dataset(
 
     else:
         xbins, ybins = int(bounds.xdiff / resolution) + 2, int(bounds.ydiff / resolution) + 2
-        counts: Tensor | None = None
-        any_counts: Tensor | None = None
+        counts = None
+        any_counts = None
 
         # Counts the number of points in each cell.
         with torch.no_grad():
@@ -159,7 +159,7 @@ def get_ground_truth_map_from_dataset(
     ds, cell_size, occ_height_range,
     occ_threshold: int = 100,
     clear_around_bot_radius: float = 0.0,
-    cache_dir: Path | None = None,
+    cache_dir = None,
     ignore_cached: bool = True,
 ):
     return get_occupancy_map_from_dataset(

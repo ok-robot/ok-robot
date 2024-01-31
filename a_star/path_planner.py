@@ -45,7 +45,7 @@ class PathPlanner():
         occ_avoid_radius: float = 0.2,
         conservative: bool = True,
         heuristic: Heuristic = 'euclidean',
-        cache_dir: Path | None = None
+        cache_dir = None
     ) -> None:
         self.occ_avoid_radius = occ_avoid_radius
         self.resolution = resolution

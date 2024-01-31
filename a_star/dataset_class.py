@@ -214,7 +214,7 @@ def read_metadata(r3d_file: ZipFile, use_depth_shape: bool) -> Metadata:
 class R3DDataset(Dataset[PosedRGBDItem]):
     def __init__(
         self,
-        path: str | Path,
+        path,
         *,
         use_depth_shape: bool = True,
     ) -> None:
@@ -301,7 +301,7 @@ def load_data(pkl_path: Path) -> Data:
 class HomeRobotDataset(Dataset[PosedRGBDItem]):
     def __init__(
         self,
-        path: str | Path,
+        path,
         min_depth: float = 0.3,
         max_depth: float = 3.0,
     ) -> None:

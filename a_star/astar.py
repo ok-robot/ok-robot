@@ -180,7 +180,7 @@ class AStarPlanner():
             i = j
         return cleaned_path
 
-    def get_unoccupied_neighbor(self, pt: tuple[int, int], goal_pt: tuple[int, int] | None = None) -> tuple[int, int]:
+    def get_unoccupied_neighbor(self, pt: tuple[int, int], goal_pt = None) -> tuple[int, int]:
         if not self.point_is_occupied(*pt):
             return pt
 
@@ -239,7 +239,7 @@ class AStarPlanner():
 
         # Implements A* search.
         q = [(0, start_pt)]
-        came_from: dict[tuple[int, int], tuple[int, int] | None] = {start_pt: None}
+        came_from: dict = {start_pt: None}
         cost_so_far: dict[tuple[int, int], float] = {start_pt: 0.0}
         while q:
             _, current = heapq.heappop(q)
