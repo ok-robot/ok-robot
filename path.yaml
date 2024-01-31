@@ -1,4 +1,4 @@
-debug: False
+debug: True
 map_type: "conservative_vlmap" # "conservative_vlmap" "brave_vlmap"
 localize_type: "voxel map" # "cf" "voxel map"
 
@@ -12,4 +12,7 @@ save_file: "./test"
 
 min_height: -1.1
 max_height: 1
+
+
+
 
