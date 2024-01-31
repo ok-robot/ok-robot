@@ -1,0 +1,42 @@
+ninja_required_version = 1.3
+cxx = c++
+nvcc = /usr/bin/nvcc
+
+cflags = -pthread -B /home/robot-lab/miniforge3/envs/ok-robot-env/compiler_compat -Wno-unused-result -Wsign-compare -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /home/robot-lab/miniforge3/envs/ok-robot-env/include -fPIC -O2 -isystem /home/robot-lab/miniforge3/envs/ok-robot-env/include -fPIC -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include/torch/csrc/api/include -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include/TH -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include/THC -I/home/robot-lab/miniforge3/envs/ok-robot-env/include/python3.9 -c
+post_cflags = -O2 -I/data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/include -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1011"' -DTORCH_EXTENSION_NAME=_ext -D_GLIBCXX_USE_CXX11_ABI=0 -std=c++17
+cuda_cflags = -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include/torch/csrc/api/include -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include/TH -I/home/robot-lab/miniforge3/envs/ok-robot-env/lib/python3.9/site-packages/torch/include/THC -I/home/robot-lab/miniforge3/envs/ok-robot-env/include/python3.9 -c
+cuda_post_cflags = -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr --compiler-options ''"'"'-fPIC'"'"'' -O2 -I/data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/include -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1011"' -DTORCH_EXTENSION_NAME=_ext -D_GLIBCXX_USE_CXX11_ABI=0 -gencode=arch=compute_86,code=compute_86 -gencode=arch=compute_86,code=sm_86 -std=c++17
+cuda_dlink_post_cflags = 
+ldflags = 
+
+rule compile
+  command = $cxx -MMD -MF $out.d $cflags -c $in -o $out $post_cflags
+  depfile = $out.d
+  deps = gcc
+
+rule cuda_compile
+  depfile = $out.d
+  deps = gcc
+  command = $nvcc  $cuda_cflags -c $in -o $out $cuda_post_cflags
+
+
+
+
+
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/ball_query.o: compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/ball_query.cpp
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/ball_query_gpu.o: cuda_compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/ball_query_gpu.cu
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/bindings.o: compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/bindings.cpp
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/cylinder_query.o: compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/cylinder_query.cpp
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/cylinder_query_gpu.o: cuda_compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/cylinder_query_gpu.cu
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/group_points.o: compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/group_points.cpp
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/group_points_gpu.o: cuda_compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/group_points_gpu.cu
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/interpolate.o: compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/interpolate.cpp
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/interpolate_gpu.o: cuda_compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/interpolate_gpu.cu
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/sampling.o: compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/sampling.cpp
+build /data/peiqi/home-engine/anygrasp/pointnet2/build/temp.linux-x86_64-cpython-39/pointnet2/_ext_src/src/sampling_gpu.o: cuda_compile /data/peiqi/home-engine/anygrasp/pointnet2/pointnet2/_ext_src/src/sampling_gpu.cu
+
+
+
+
+
+
