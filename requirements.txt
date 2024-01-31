@@ -34,11 +34,9 @@ git+https://github.com/facebookresearch/segment-anything
 transformers==4.30.2
 ffmpeg-python
 git+https://github.com/zhanghang1989/PyTorch-Encoding/
-ninja
 
 # usa
 jupyter
-ml-starter==0.0.44
 more_itertools
 seaborn
 

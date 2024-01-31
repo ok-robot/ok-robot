@@ -6,6 +6,7 @@ channels:
   - pyg
 dependencies:
   - python==3.9.*
+  - ipython
   - cmake
   - pybind11
   - pytorch

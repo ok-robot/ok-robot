@@ -1,4 +1,4 @@
-debug: True
+debug: False
 map_type: "conservative_vlmap" # "conservative_vlmap" "brave_vlmap"
 localize_type: "voxel map" # "cf" "voxel map"
 

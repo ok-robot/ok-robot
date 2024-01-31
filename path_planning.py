@@ -12,14 +12,51 @@ from torch import Tensor
 import zmq
 
 from matplotlib import pyplot as plt
+import open3d as o3d
 
 from a_star.map_util import get_ground_truth_map_from_dataset, get_occupancy_map_from_dataset
 from a_star.path_planner import PathPlanner
 from a_star.data_util import get_posed_rgbd_dataset
 from localize_voxel_map import VoxelMapLocalizer
+from visualizations import visualize_path
 
 import math
 import os
+
+def visualise_path(path, end_xyz, cfg):
+
+    # Example point cloud and path points (replace with your data)
+    point_cloud = o3d.io.read_point_cloud("pointcloud.ply")
+
+    path = np.array(np.array(path).tolist())
+    print(path)
+    start_point = path[0, :]
+    end_point = np.array(end_xyz.numpy())
+
+
+    path[:, 2] = cfg.min_height
+    end_point[2] = (cfg.min_height + cfg.max_height)/2
+    # Create the line set for the path
+    lines = [[i, i+1] for i in range(len(path)-1)]
+    line_set = o3d.geometry.LineSet(points=o3d.utility.Vector3dVector(path),
+                                    lines=o3d.utility.Vector2iVector(lines))
+
+    # Create spheres for start and end points
+    start_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.01)
+    end_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.01)
+
+    # Set the position of the spheres
+    start_sphere.translate(start_point)
+    end_sphere.translate(end_point)
+
+    # Set different colors for clarity
+    line_set.paint_uniform_color([1, 0, 0])  # Red path
+    start_sphere.paint_uniform_color([0, 1, 0])  # Green start
+    end_sphere.paint_uniform_color([0, 0, 1])  # Blue end
+
+    # Visualize
+    o3d.visualization.draw_geometries([point_cloud, line_set, start_sphere, end_sphere])
+
 
 def load_socket(port_number):
     context = zmq.Context()
@@ -67,6 +104,9 @@ def main(cfg):
             B = input("B: ")
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
+            start_xy = [1.6, 0.26]
+            paths = planner.plan(start_xy=start_xy, end_xy = end_xy, remove_line_of_sight_points = True)
+            visualize_path(paths, end_xyz, cfg)
         else:
             start_xyt = recv_array(socket)
             print(start_xyt)
@@ -81,6 +121,7 @@ def main(cfg):
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
             paths = planner.plan(start_xy=start_xyt[:2], end_xy = end_xy, remove_line_of_sight_points = True)
+            visualize_path(paths, end_xyz, cfg)
             end_pt = planner.a_star_planner.to_pt(paths[-1][:2])
             theta = paths[-1][2] if paths[-1][2] > 0 else paths[-1][2] + 2 * np.pi
             
