@@ -1,34 +1,11 @@
 # Home_engine
-## Installation
-Clone repo
-```
-git clone https://github.com/NYU-robot-learning/home-engine
-cd home-engine
-git submodule update --init --recursive
-```
-To install navigation, run these scripts
-```
-mamba create -n home_engine python=3.10
-mamba activate home_engine
-mamba install cudatoolkit pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-python -m pip install -r requirements.txt
-cd clip-fields/gridencoder/
-python setup.py install
-
-# install required USA-Net packages
-#cd ../..
-cd usa
-pip install -e .
-
-# install required home-robot packages
-# make sure home-robot is on demo-refactor branch
-cd ..
-cd home-robot/src/home-robot
-pip install -e .
-cd ../../..
-```
-
-You should also follow these [instructions](https://github.com/NYU-robot-learning/anygrasp/blob/Code-Cleaning/README.md) to install a conda environment for AnyGrasp.
+## Issues
+- KeyError jointwrist pitch
+- * grdiencoder "CUDA_HOME=/usr/local/cuda-11.7"
+- No such file or directory: 'clip-fields/Yaswanth_Bedroom_model_weights/implicit_scene_label_model_latest.pt
+- AssertionError: Torch not compiled with CUDA enabled
+- assert len(conf_fnames) == tsz [Record 3d issue]
+- No reachable points [Check min-height, ]
 
 ## Hardware and software requirements
 Hardware required:
@@ -37,12 +14,47 @@ Hardware required:
 * A workstation machine that can use to run pretrained models
   
 Software required:
+* Python 3.9
 * [CloudCompare](https://www.danielgm.net/cc/release/) (a pointcloud processing software)
-* Record3D (installed on iPhone)
+* Record3D (installed on iPhone) [Has to mention the version]
 * Other software packages needed for running pretrained models (e.g. Python)
-  
+
+## Workspace Installation and setup
+install Mamba if it is not present 
+```
+mamba env create -n ok-robot-env -f ./environment1.yml
+mamba activate ok-robot-env
+
+pip install graspnetAPI
+
+# Setup Home-robot
+cd home-robot
+python -m pip install -e src/home_robot
+cd ..
+
+# Setup poincept
+cd anygrasp/pointnet2/
+python setup.py install
+cd ../../
+```
+
+See anygrasp/README.MD for additional setup required for grasping module [Will be updated once the anygrasp directory is set]
+
+## Installation Verification
+Verify whether you are able to succesfully run path_planning.py file. It should run succesfully and you see a prompt asking to enter A
+'''
+python path_planning.py
+'''
+
+Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place.
+'''
+cd anygrasp/src
+./demo.sh
+'''
+
 ## Running experiments
 After setting up environments and putting testing objects in the environments, you can start running experiments.
+
 ### Scan the environments
 To align the robot coordinate system (the one robot uses to localizes itself) and navigation coordinate system (the one provided by Record3D and used by navigation stack), we generally put two tapes on the ground.
 
