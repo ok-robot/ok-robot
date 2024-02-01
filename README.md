@@ -82,59 +82,52 @@ cd $OK-Robot/
 cp home-robot/assets/hab_stretch/ GrasperNet
 ```
 
-## Running experiments
-After setting up environments and putting testing objects in the environments, you can start running experiments.
-
-### Scan the environments
-To align the robot coordinate system (the one robot uses to localizes itself) and navigation coordinate system (the one provided by Record3D and used by navigation stack), we generally put two tapes on the ground.
-
+## Environment Setup
 Use Record3D to scan the environments. Recording should include: 
-* all obstacles in environments
-* the floor where the robots can navigate onto
-* all testing objects.
+* All Obstacles in environments
+* Complete floor where the robots can navigate
+* All testing objects.
+* Two tapes in the scene which will serve as a orgin for the robot.
 
 Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) and gain insights on how you should place tapes on the ground, how you should scan the environment.
 
-After you obstain a .r3d file from Record3D, you should localize the coordinates of two tapes and save it in a notepad for using them in later steps.
+After you obstain a .r3d file from Record3D. If you just want to try out a sample, download the [sample data](https://osf.io/famgv) `nyu.r3d` and run the following command. Place it in the `/voxel_map/r3d/` folder. 
 
-Use the [get_point_cloud](utils/get_point_cloud.py) script to extract this PLY file.
-Extract `pointcloud.ply` pointcloud from .r3d file with following python script (after running scripts, you will have a ply file named `pointcloud.ply` in your folder that represents this environment).
 
-After this, you can load and visualize the point cloud.
+Use the `get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `pointcloud.ply` in home directory. 
+```
+python get_point_cloud.py --input_file=[your r3d file]
+```
+Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x1, y1), (x2, y2) be the co-ordiantes of two tapes [tape1, tape2] then place the robot base on tape1 and orient it towards tape2 like this[will attach a image]
 
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
-### Load navigation stack
-#### "Train" voxel map
-Once you have the dependencies installed, you can run the training script `train.py` with any [.r3d](https://record3d.app/) files that you have! If you just want to try out a sample, download the [sample data](https://osf.io/famgv) `nyu.r3d` and run the following command.
 
+## Train voxel map 
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `/voxel_map` directory.
 ```
-cd clip-fields
-python train.py dataset_path=nyu.r3d
-```
-You can check out the `config/train.yaml` for a list of possible configuration options. In particular, if you want to train with any particular set of labels, you can specify them in the `custom_labels` field in `config/train.yaml`.
-
-Change the location in `clip-fields/config.train.yaml`; for example:
-```
-cache_path: ChrisHome.pt
-saved_dataset_path: ChrisHome.pt
+cd voxel-map
+python train.py dataset_path=[your r3d file location]
 ```
 
-This is where data will be stored.
+## Config files
+### `/voxel-map/config/train.yaml`
+It contains parameters realted to training the voxel map. Some of the important parameters are
+* **dataset_path** - path to your r3d file
+* **cache_path** - path to your semantic information file
+* **sample_freq** - sampling frequency of frames while training voxel map
+* **custom_labels** - Fill this [@peiqi]
 
-#### Update other necessary config files
-You should also edit those config files:
-* In `usa/configs/train.yaml`, modify field `task/dataset_path` to .r3d file you used for "training" voxel map.
-* In `path.yaml` you should modify `min_height` and `max_height` fields as they are floor heights and ceil heights we used for loading navigation obstacle map. Generally you should set `min_height` slightly higher (10cm) than z coordinates of orange tapes.
-* Next you might run `python path_planning.py` to start navigation planning.
-
-### Load manipulation stack
-* In `anygrasp` folder you should run `bash demo.sh` to start grasping pose estimation
-* You should follow [home-robot instructions](https://github.com/leo20021210/home-robot) to install home-robot packages either on workstation or on robots.
-* Place your robot following [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing).
-* Given the coordinates of tape robot stands on `(x1, y1)` and coordinates of tape robot faces to `(x2, y2)` you should run robot controller in `GrasperNet` folder by run `python run.py -bf top_camera -t -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]`.
-* When running the experiments, three processes should run simultaneously, `python path_planning.py` for navigation path planning, `bash demo.sh` for pose estimation, and `python run.py` for robot controlling
+### `/path.yaml`
+Contains parameters related to path planning
+* **min_height** - z co-ordinate value below which everything is considered as non-navigable points. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+0.5 or 1].
+* **max_height** - z co-ordiante of the scene above which everything is neglected.
+* **map_type** - conservative_vlmap or brave_vlmap Fill more abt this @peiqi
+* **localize_type** - 
+* **resolution** - 
+* **occ_avoid_radius** - 
 
 ### Running experiments
+Once the above config filesa reset you can start running experiments
 
 Start home-robot on the Stretch:
 ```
@@ -154,6 +147,6 @@ bash demo.sh
 
 Robot control:
 ```
-python run.py
+python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]
 ```
 
