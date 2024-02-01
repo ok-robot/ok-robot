@@ -1,4 +1,6 @@
-**/__pycache__/**
+*.tar
+*.pyc
+/outputs/*
 **/*.egg-info/
 *.o
 gsnet.so

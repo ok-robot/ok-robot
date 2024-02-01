@@ -10,8 +10,8 @@
 ## Hardware and software requirements
 Hardware required:
 * iPhone with Lidar sensors
-* Stretch robot
-* A workstation machine that can use to run pretrained models
+* Stretch re1 robot
+* A workstation machine to run pretrained models 
   
 Software required:
 * Python 3.9
@@ -19,10 +19,16 @@ Software required:
 * Record3D (installed on iPhone) [Has to mention the version]
 * Other software packages needed for running pretrained models (e.g. Python)
 
+## Clone this repository to your local machine
+```
+git clone https://github.com/NYU-robot-learning/home-engine
+git submodule update --init --recursive
+```
+
 ## Workspace Installation and setup
 install Mamba if it is not present 
 ```
-mamba env create -n ok-robot-env -f ./environment1.yml
+mamba env create -n ok-robot-env -f ./environment.yml
 mamba activate ok-robot-env
 
 pip install graspnetAPI
@@ -35,22 +41,46 @@ cd ..
 # Setup poincept
 cd anygrasp/pointnet2/
 python setup.py install
-cd ../../
 ```
 
-See anygrasp/README.MD for additional setup required for grasping module [Will be updated once the anygrasp directory is set]
+## Anygrasp Setup
+Get license from so and so
+
+```
+cd ./anygrasp
+cp gsnet_versions/gsnet.cpython-39-x86_64-linux-gnu.so src/gsnet.so
+cp license_registration/lib_cxx_versions/lib_cxx.cpython-39-x86_64-linux-gnu.so
+```
+
+Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/checkpoints/
 
 ## Installation Verification
 Verify whether you are able to succesfully run path_planning.py file. It should run succesfully and you see a prompt asking to enter A
-'''
+```
 python path_planning.py
-'''
+```
 
 Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place.
-'''
+```
 cd anygrasp/src
 ./demo.sh
-'''
+```
+
+## Robot Installation and setup
+Enter home-robot submodule
+```
+cd $OK-Robot/home-robot
+```
+
+Follow the [home-robot installation instructions](https://github.com/leo20021210/home-robot/blob/main/docs/install_robot.md) to install home-robot on your Stretch robot.
+
+Also follow [home-robot calibration instructions](https://github.com/leo20021210/home-robot/blob/main/docs/calibration.md) to calibrate your robot.
+
+After that run the following commands to move calibrated urdf to robot controller
+```
+cd $OK-Robot/
+cp home-robot/assets/hab_stretch/ GrasperNet
+```
 
 ## Running experiments
 After setting up environments and putting testing objects in the environments, you can start running experiments.
