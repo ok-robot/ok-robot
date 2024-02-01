@@ -102,12 +102,17 @@ Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x
 
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
-## Train voxel map 
-Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `/voxel_map` directory.
+## Load voxel map 
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `/voxel-map` directory.
 ```
 cd voxel-map
-python train.py dataset_path=[your r3d file location]
+python load_voxel_map.py dataset_path=[your r3d file location]
 ```
+You can check other config settings in `/voxel-map/configs/train.yaml`.
+
+To modify these config settings, you can either do that in command line or by modifying YAML file.
+
+After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `/voxel-map/configs/train.yaml`
 
 ## Config files
 ### `/voxel-map/config/train.yaml`
@@ -115,7 +120,9 @@ It contains parameters realted to training the voxel map. Some of the important 
 * **dataset_path** - path to your r3d file
 * **cache_path** - path to your semantic information file
 * **sample_freq** - sampling frequency of frames while training voxel map
-* **custom_labels** - Fill this [@peiqi]
+* **threshold** - threshold for your segmentation models such as OWL-ViT and Detic
+* **subsample_prob** - sampling probability for points extracted from each R3D video frame.
+* **custom_labels** - some additional labels you want to add for OWL-ViT to detect.
 
 ### `/path.yaml`
 Contains parameters related to path planning
@@ -129,12 +136,14 @@ Contains parameters related to path planning
 ### Running experiments
 Once the above config filesa reset you can start running experiments
 
+Scan the environments with Record3D, follow steps mentioned above in Environment Setup and Load Voxel map to load semantic map and obstacle map. Move the robot to the starting point specified by the tapes or other labels marked on the ground.
+
 Start home-robot on the Stretch:
 ```
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-Navigation planning:
+Navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
 ```
 python path_planning.py
 
