@@ -136,8 +136,7 @@ roslaunch home_robot_hw startup_stretch_hector_slam.launch
 
 Navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
 ```
-python path_planning.py
-
+python path_planning.py debug=False
 ```
 
 Pose estimation:
