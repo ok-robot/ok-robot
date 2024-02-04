@@ -1,12 +1,3 @@
-# Home_engine
-## Issues
-- KeyError jointwrist pitch
-- * grdiencoder "CUDA_HOME=/usr/local/cuda-11.7"
-- No such file or directory: 'clip-fields/Yaswanth_Bedroom_model_weights/implicit_scene_label_model_latest.pt
-- AssertionError: Torch not compiled with CUDA enabled
-- assert len(conf_fnames) == tsz [Record 3d issue]
-- No reachable points [Check min-height, ]
-
 ## Hardware and software requirements
 Hardware required:
 * iPhone with Lidar sensors
@@ -57,7 +48,7 @@ Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/chec
 ## Installation Verification
 Verify whether you are able to succesfully run path_planning.py file. It should run succesfully and you see a prompt asking to enter A
 ```
-python path_planning.py
+python path_planning.py debug=True
 ```
 
 Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place.
