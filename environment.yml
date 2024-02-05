@@ -64,9 +64,9 @@ dependencies:
     - pyliblzfse
     - einops
     - transformers
-    - sentence-transformers
-    - git+https://github.com/facebookresearch/detectron2.git
-    - git+https://github.com/zhanghang1989/PyTorch-Encoding/
+    #- sentence-transformers
+    #- git+https://github.com/facebookresearch/detectron2.git
+    #- git+https://github.com/zhanghang1989/PyTorch-Encoding/
     - pytorch-lightning
     - wget
     - gdown
