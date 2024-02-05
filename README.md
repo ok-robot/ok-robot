@@ -22,6 +22,7 @@ Software required:
 ## Clone this repository to your local machine
 ```
 git clone https://github.com/NYU-robot-learning/home-engine
+cd home-engine
 git submodule update --init --recursive
 ```
 
