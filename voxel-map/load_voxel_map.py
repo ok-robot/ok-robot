@@ -12,13 +12,9 @@ import tqdm
 from omegaconf import OmegaConf
 from torch.utils.data import DataLoader, Subset
 
-import wandb
 from dataloaders import (
     R3DSemanticDataset,
-    DeticDenseLabelledDataset,
     OWLViTLabelledDataset,
-    ClassificationExtractor,
-#    HomeRobotDataset
 )
 
 DEVICE = "cuda"
@@ -49,7 +45,7 @@ def get_real_dataset(cfg):
             location_train_dataset = OWLViTLabelledDataset(
                 view_dataset,
                 owl_model_name=cfg.web_models.clip,
-                sentence_encoding_model_name=cfg.web_models.sentence,
+                #sentence_encoding_model_name=cfg.web_models.sentence,
                 device=cfg.device,
                 threshold=cfg.threshold,
                 subsample_prob=cfg.subsample_prob,

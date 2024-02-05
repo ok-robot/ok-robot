@@ -4,9 +4,3 @@
 [submodule "GrasperNet"]
 	path = GrasperNet
 	url = https://github.com/NYU-robot-learning/GrasperNet
-[submodule "voxel-map/Detic"]
-	path = voxel-map/Detic
-	url = https://github.com/notmahi/Detic
-[submodule "voxel-map/LSeg"]
-	path = voxel-map/LSeg
-	url = https://github.com/notmahi/LSeg
