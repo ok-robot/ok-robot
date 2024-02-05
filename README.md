@@ -57,7 +57,7 @@ Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/chec
 ## Installation Verification
 Verify whether you are able to succesfully run path_planning.py file. It should run succesfully and you see a prompt asking to enter A
 ```
-python path_planning.py
+python path_planning.py debug=True
 ```
 
 Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place.
@@ -102,12 +102,17 @@ Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x
 
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
-## Train voxel map 
-Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `/voxel_map` directory.
+## Load voxel map 
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `/voxel-map` directory.
 ```
 cd voxel-map
-python train.py dataset_path=[your r3d file location]
+python load_voxel_map.py dataset_path=[your r3d file location]
 ```
+You can check other config settings in `/voxel-map/configs/train.yaml`.
+
+To modify these config settings, you can either do that in command line or by modifying YAML file.
+
+After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `/voxel-map/configs/train.yaml`
 
 ## Config files
 ### `/voxel-map/config/train.yaml`
@@ -129,15 +134,16 @@ Contains parameters related to path planning
 ### Running experiments
 Once the above config filesa reset you can start running experiments
 
+Scan the environments with Record3D, follow steps mentioned above in Environment Setup and Load Voxel map to load semantic map and obstacle map. Move the robot to the starting point specified by the tapes or other labels marked on the ground.
+
 Start home-robot on the Stretch:
 ```
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-Navigation planning:
+Navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
 ```
-python path_planning.py
-
+python path_planning.py debug=False
 ```
 
 Pose estimation:
