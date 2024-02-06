@@ -27,7 +27,8 @@ DEVICE = "cuda"
 os.environ["TOKENIZERS_PARALLELISM"] = '(true | false)'
 from omegaconf import OmegaConf
 
-from home_robot.utils.voxel import VoxelizedPointcloud
+#from home_robot.utils.voxel import VoxelizedPointcloud
+from voxel import VoxelizedPointcloud
 
 class VoxelMapLocalizer():
     def __init__(self, config_path, device = 'cuda'):

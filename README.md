@@ -23,6 +23,7 @@ Software required:
 ```
 git clone https://github.com/NYU-robot-learning/home-engine
 cd home-engine
+git checkout peiqi
 git submodule update --init --recursive
 ```
 
@@ -36,7 +37,7 @@ pip install graspnetAPI
 
 # Setup Home-robot
 cd home-robot
-python -m pip install -e src/home_robot
+pip install -e src/home-robot
 cd ..
 
 # Setup poincept
