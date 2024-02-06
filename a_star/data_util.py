@@ -11,7 +11,7 @@ from torch import Tensor
 from torch.utils.data.dataset import Dataset
 
 from .dataset_class import PosedRGBDItem
-from .dataset_class import R3DDataset, HomeRobotDataset
+from .dataset_class import R3DDataset
 
 import open3d as o3d
 
@@ -21,8 +21,7 @@ def get_posed_rgbd_dataset(
     path: str
 ) -> Dataset[PosedRGBDItem]:
     assert key == 'home_robot' or key == 'r3d'
-    if key == "home_robot":
-        return HomeRobotDataset(path)
+    # Currently we only support data from Record3D
     if key == "r3d":
         return R3DDataset(path)
 
