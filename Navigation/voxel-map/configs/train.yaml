@@ -2,9 +2,9 @@ device: cuda
 use_cache: false
 
 # Dataset details
-dataset_path: "../r3d/LeoBedroom.r3d"
+dataset_path: "../r3d/sample.r3d"
 cache_result: true
-cache_path: LeoBedroom.pt
+cache_path: sample.pt
 
 # Data loading and labelling specs
 sample_freq: 5
@@ -16,7 +16,7 @@ use_gt_classes_in_detic: true
 
 # Debug purposes, visualize Detic results
 visualize_detic_results: true
-detic_visualization_path: "Leo_debug"
+detic_visualization_path: "sample_debug"
 
 # Cache only runs are for building per-dataset caches, which can be used for multi-run later.
 cache_only_run: false
