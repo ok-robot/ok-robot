@@ -81,13 +81,13 @@ python load_voxel_map.py
 cd ../
 ```
 
-Run `/Navigation/path_planning.py` file. If run succesfully, you see a prompt asking to enter A
+Run `/Navigation/path_planning.py` file. If run succesfully, you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `Navigation/test/{object_name}` folder.
 ```
 python path_planning.py debug=True
 cd ../
 ```
 
-Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place.
+Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place. [If you facing any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
 ```
 cd anygrasp/src
 python demo.py --checkpoint_path checkpoints/checkpoint_detection.tar --debug

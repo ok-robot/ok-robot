@@ -10,7 +10,7 @@ resolution: 0.06
 port_number: 5555
 save_file: "./test"
 
-min_height: -1.1
+min_height: -0.7
 max_height: 1
 
 

@@ -103,10 +103,6 @@ def main(cfg):
             A = input("A: ")
             B = input("B: ")
             end_xyz = localizer.localize_AonB(A, B)
-            end_xy = end_xyz[:2]
-            start_xy = [1.6, 0.26]
-            paths = planner.plan(start_xy=start_xy, end_xy = end_xy, remove_line_of_sight_points = True)
-            visualize_path(paths, end_xyz, cfg)
         else:
             start_xyt = recv_array(socket)
             print(start_xyt)
