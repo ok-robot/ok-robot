@@ -51,9 +51,10 @@ pip install graspnetAPI
 
 ### CUDA-11.8
 ```
-mamba env create -n ok-robot-env -f ./environment.yml
+mamba env create -n ok-robot-env -f ./env-cu118.yml
 mamba activate ok-robot-env
 
+pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0
 pip install graspnetAPI
 
 # Setup poincept
