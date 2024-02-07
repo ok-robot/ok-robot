@@ -1,6 +1,5 @@
 device: cuda
 use_cache: false
-batch_size: 12544
 
 # Dataset details
 dataset_path: "../r3d/LeoBedroom.r3d"

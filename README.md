@@ -56,11 +56,6 @@ mamba activate ok-robot-env
 
 pip install graspnetAPI
 
-# Setup Home-robot
-cd home-robot
-pip install -e src/home-robot
-cd ..
-
 # Setup poincept
 cd anygrasp/pointnet2/
 python setup.py install

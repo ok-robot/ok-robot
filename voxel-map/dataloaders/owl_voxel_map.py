@@ -13,7 +13,7 @@ import numpy as np
 from pathlib import Path
 from torch.utils.data import Dataset, DataLoader, Subset
 from dataloaders.record3d import R3DSemanticDataset
-from dataloaders.scannet_200_classes import SCANNET_COLOR_MAP_200, CLASS_LABELS_200
+from dataloaders.scannet_200_classes import CLASS_LABELS_200
 
 
 # Setup detectron2 logger
@@ -43,14 +43,6 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 # New visualizer class to disable jitter.
 import matplotlib.colors as mplc
 
-
-SCANNET_NAME_TO_COLOR = {
-    x: np.array(c) for x, c in zip(CLASS_LABELS_200, SCANNET_COLOR_MAP_200.values())
-}
-
-SCANNET_ID_TO_COLOR = {
-    i: np.array(c) for i, c in enumerate(SCANNET_COLOR_MAP_200.values())
-}
 
 def center_to_corners_format(bboxes_center):
     center_x, center_y, width, height = bboxes_center.unbind(-1)
@@ -438,10 +430,4 @@ class OWLViTLabelledDataset(Dataset):
         self._all_classes = [
             OWLViTLabelledDataset.process_text(x) for x in self._all_classes
         ]
-        # new_metadata = MetadataCatalog.get("__unused")
-        # new_metadata.thing_classes = self._all_classes
-        # if self._use_scannet_colors:
-        #     new_metadata.thing_colors = SCANNET_ID_TO_COLOR
-        # self.metadata = new_metadata
-        # Reset visualization threshold
         output_score_threshold = self._owl_threshold
