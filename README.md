@@ -29,6 +29,27 @@ git submodule update --init --recursive
 
 ## Workspace Installation and setup
 install Mamba if it is not present 
+
+### CUDA 12.*
+```
+# Environment creation
+mamba env create -n ok-robot-env -f ./env-cu121.yml
+mamba activate ok-robot-env
+
+# Pointnet setup for anygrasp
+cd anygrasp/pointnet2/
+python setup.py install
+cd ../../
+
+# Additional pip packages isntallation
+pip install -r requirements-cu121.txt
+# pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 (any issue realted to sklearn)
+# pip install torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html (if you are not able to import torch cluster properly)
+pip install graspnetAPI
+
+```
+
+### CUDA-11.8
 ```
 mamba env create -n ok-robot-env -f ./environment.yml
 mamba activate ok-robot-env

@@ -13,3 +13,4 @@ license
 /src/example_data/*
 /src/sample_save_directory/*
 *.pth
+/anygrasp/pointnet2/*

@@ -23,14 +23,15 @@ dependencies:
   - pip:
     - numpy # certain deprecated operations were used in other deps
     - scipy == 1.10.1
+    # - scikit-learn==1.4.0
     #- sentencepiece==0.1.99 
     - pandas==2.0.3
-    - torch
+    - torch==2.1.0
     - torchvision
     - torchaudio
     - hydra-core
-    # - torch-scatter
-    - torch-cluster
+    # - torch-scatter -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
+    # - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
     # - sophuspy
     # - pybullet
     # - trimesh
@@ -81,13 +82,12 @@ dependencies:
     # - git+https://github.com/facebookresearch/segment-anything
     - ninja
     - zmq
-    
 
     # grasping
-    - git+https://github.com/NVIDIA/MinkowskiEngine
+    # - git+https://github.com/pccws/MinkowskiEngine
     # - graspnetAPI
     - protobuf==3.19.0
-    - git+https://github.com/luca-medeiros/lang-segment-anything.git
+    # - git+https://github.com/luca-medeiros/lang-segment-anything.git
 
 
 
