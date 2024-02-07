@@ -4,8 +4,6 @@
 /outputs/*
 **/*.egg-info/
 *.o
-gsnet.so
-lib_cxx.so
 *.egg
 .DS_Store
 .TimeRecord

@@ -63,14 +63,6 @@ python setup.py install
 
 ## Anygrasp Setup
 Please refer licence [readme](/anygrasp/license_registration/README.md) for more details on how to get the anygrasp license. Once this process is done you will receive the license and checkpoint.tar through email.
-
-```
-cd ./anygrasp
-cp gsnet_versions/gsnet.cpython-39-x86_64-linux-gnu.so src/gsnet.so
-cp license_registration/lib_cxx_versions/lib_cxx.cpython-39-x86_64-linux-gnu.so src/lib_cxx.so
-cd ../
-```
-
 Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/checkpoints/
 
 ## Installation Verification
