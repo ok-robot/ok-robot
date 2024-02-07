@@ -1,0 +1,36 @@
+device: cuda
+use_cache: false
+
+# Dataset details
+dataset_path: "../r3d/LeoBedroom.r3d"
+cache_result: true
+cache_path: LeoBedroom.pt
+
+# Data loading and labelling specs
+sample_freq: 5
+threshold: 0.15
+subsample_prob: 0.005
+use_lseg: false
+use_extra_classes: false
+use_gt_classes_in_detic: true
+
+# Debug purposes, visualize Detic results
+visualize_detic_results: true
+detic_visualization_path: "Leo_debug"
+
+# Cache only runs are for building per-dataset caches, which can be used for multi-run later.
+cache_only_run: false
+
+web_models:
+  segmentation: "owl" # "owl", "detic"
+  clip: "google/owlvit-base-patch32" # "ViT-B/32" for "detic", "google/owlvit-base-patch32" for "owl"
+  sentence: "all-mpnet-base-v2"
+
+# Add any custom labels you want here
+#custom_labels:
+#  - muffins
+#  - hat
+#  - pepper
+
+# Or just comment it out for default labels.
+custom_labels: null

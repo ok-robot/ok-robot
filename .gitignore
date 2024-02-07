@@ -1,5 +1,6 @@
 *.tar
 *.pyc
+/Navigation/outputs/*
 /outputs/*
 **/*.egg-info/
 *.o
