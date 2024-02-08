@@ -148,8 +148,8 @@ def main(cfg):
         axes[1].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
         if not os.path.exists(cfg.save_file + '/' + A):
             os.makedirs(cfg.save_file + '/' + A )
-        print(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
-        fig.savefig(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
+        print(cfg.save_file + '/' + A + '/navigation_vis.jpg')
+        fig.savefig(cfg.save_file + '/' + A + '/navigation_vis.jpg')
 
 
 if __name__ == "__main__":

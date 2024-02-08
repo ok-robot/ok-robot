@@ -1,5 +1,9 @@
 """
- This file implements PosedRGBDItem and Record3D dataset in USA-Net project
+ This file implements PosedRGBDItem and Record3D dataset in 
+    USA-Net (https://github.com/codekansas/usa) project
+ Codes are basically adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/tasks/datasets/posed_rgbd.py
+    2. https://github.com/codekansas/usa/blob/master/usa/tasks/datasets/r3d.py
 """
 
 import pickle as pkl

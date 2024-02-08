@@ -1,3 +1,10 @@
+"""
+ This file implements R3DSemanticDataset
+    in Clip-fields (https://github.com/notmahi/clip-fields) project
+ Most codes are adapted from:
+    1. https://github.com/notmahi/clip-fields/blob/main/dataloaders/record3d.py
+"""
+
 import json
 from pathlib import Path
 from typing import List, Optional

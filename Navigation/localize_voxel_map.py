@@ -22,8 +22,6 @@ from transformers import AutoProcessor, OwlViTModel
 import sys
 sys.path.append('voxel-map')
 
-DEVICE = "cuda"
-
 os.environ["TOKENIZERS_PARALLELISM"] = '(true | false)'
 from omegaconf import OmegaConf
 
@@ -33,21 +31,28 @@ class VoxelMapLocalizer():
     def __init__(self, config_path, device = 'cuda'):
         self.device = device
         config = OmegaConf.load(config_path)
-        self.model_type = config.web_models.segmentation
+        #self.model_type = config.web_models.segmentation
         self.dataset_path = os.path.join('voxel-map', config.cache_path)
-        if self.model_type != 'owl':
-            self.model_name = 'ViT-B/32'
-        else:
-            self.model_name = 'google/owlvit-base-patch32'
+        # 'google/owlvit-base-patch32' is a config setting for owl-vit, and we currently hardcode it 
+        # as our only supported model config
+        self.model_name = 'google/owlvit-base-patch32'
+        # if self.model_type != 'owl':
+        #     self.model_name = 'ViT-B/32'
+        # else:
+        #     self.model_name = 'google/owlvit-base-patch32'
         self.clip_model, self.preprocessor = self.load_pretrained()
         self.voxel_pcd = self.load_pcd()
 
     def load_pretrained(self):
-        if self.model_type == 'owl':
-            model = OwlViTModel.from_pretrained(self.model_name).to(self.device)
-            preprocessor = AutoProcessor.from_pretrained(self.model_name)
-        else:
-            model, preprocessor = clip.load(self.model_name, device=self.device)
+        # As mentioned, we only support owlvit-base-patch32 for now
+        model = OwlViTModel.from_pretrained(self.model_name).to(self.device)
+        preprocessor = AutoProcessor.from_pretrained(self.model_name)
+        
+        # if self.model_type == 'owl':
+        #     model = OwlViTModel.from_pretrained(self.model_name).to(self.device)
+        #     preprocessor = AutoProcessor.from_pretrained(self.model_name)
+        # else:
+        #     model, preprocessor = clip.load(self.model_name, device=self.device)
         return model, preprocessor
 
     

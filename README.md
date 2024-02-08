@@ -43,7 +43,7 @@ cd ../../
 
 # Additional pip packages isntallation
 pip install -r requirements-cu121.txt
-# pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 (any issue realted to sklearn)
+# pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 (any issue realted to sklearn: ValueError: numpy.ufunc size changed, may indicate binary incompatibility. Expected 232 from C header, got 216 from PyObject)
 # pip install torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html (if you are not able to import torch cluster properly)
 pip install graspnetAPI
 

@@ -1,3 +1,10 @@
+"""
+ This file implements GridPlanner as a wrapper for AStar planner
+    in USA-Net (https://github.com/codekansas/usa) project
+ Most codes are adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/planners/clip_sdf.py
+"""
+
 from pathlib import Path
 from typing import Type, cast
 

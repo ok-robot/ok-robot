@@ -1,0 +1,33 @@
+.DS_Store
+__pycache__
+notebooks
+outputs
+wandb
+training.log
+core
+
+# Data files
+*.r3d
+*.zip
+*.pt
+*.ply
+*.pcd
+*.jpg
+*.pt
+*.pth
+
+# Slurm files
+*.sbatch
+wrapper.sh
+multirun
+
+# C/C++ bindings files
+*.so
+*.o
+*.egg-info
+build
+dist
+
+.cache
+.ipynb_checkpoints
+.pytest_cache

@@ -1,3 +1,10 @@
+"""
+ This file implements obstacle mapping building function get_occupancy_map_from_dataset
+    in USA-Net (https://github.com/codekansas/usa) project
+ Most codes are adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/planners/base.py
+"""
+
 from dataclasses import dataclass
 from pathlib import Path
 
