@@ -149,7 +149,7 @@ class ObjectHandler():
             if self.action == "place":
                 retry = not self.place(points, seg_mask)
             else:
-                retry = not self.pickup(points, seg_mask, bbox)
+                retry = not self.pickup(points, seg_mask, bbox, (tries == 11))
 
             if retry:
                 if self.cfgs.open_communication:
