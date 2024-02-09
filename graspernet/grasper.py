@@ -85,7 +85,7 @@ def capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT,
                     time.sleep(1)
             
             elif side_retries == 3:
-                print("No poses found in all retries")
+                print("Tried in all angles but couldn't ")
                 time.sleep(2)
             
 
