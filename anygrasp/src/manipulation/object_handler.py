@@ -130,6 +130,7 @@ class ObjectHandler():
                     print(f"Try no: {tries}")
                     data_msg = "No Objects detected, Have to try again"
                     self.socket.send_data([[0], [0], [0, 0, 2], data_msg])
+                    continue
                     # self.socket.send_data("No Objects detected, Have to try again")
                 else:
                     print("Didnt find the Object. Try with another object or tune grasper height and width parameters in demo.py")
