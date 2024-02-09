@@ -86,7 +86,7 @@ def main(cfg):
         socket = load_socket(cfg.port_number)
     conservative = cfg.map_type == 'conservative_vlmap'
     planner = PathPlanner(cfg.dataset_path, cfg.min_height, cfg.max_height, cfg.resolution, cfg.occ_avoid_radius, conservative)
-    localizer = VoxelMapLocalizer(semantic_memory, owl_vit_config = cfg.web_models.owl device = cfg.path_planning_device)
+    localizer = VoxelMapLocalizer(semantic_memory, owl_vit_config = cfg.web_models.owl, device = cfg.path_planning_device)
 
     obstacle_map = planner.occupancy_map
     minx, miny = obstacle_map.origin
