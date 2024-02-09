@@ -186,12 +186,12 @@ Contains parameters related to path planning
 <!-- Once the above config filesa reset you can start running experiments -->
 Scan the environments with Record3D, follow steps mentioned above in Environment Setup and Load Voxel map to load semantic map and obstacle map. Move the robot to the starting point specified by the tapes or other labels marked on the ground.
 
-Start home-robot on the Stretch:
+**Start home-robot on the Stretch**:
 ```
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
+**Path Planning:** (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
 ```
 mamba activate ok-robot-env
 
@@ -199,7 +199,7 @@ cd navigation
 python path_planning.py debug=False
 ```
 
-Pose estimation:
+**Pose estimation:**
 More details can be found in Manipulation [ReadME](./anygrasp/README.md)
 ```
 mamba activate ok-robot-env
@@ -208,7 +208,7 @@ cd anygrasp/src/
 python demo.py --debug
 ```
 
-Robot control:
+**Robot control:**
 More details can be found in graspernet [ReadME](./graspernet/README.md)
 ```
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]
