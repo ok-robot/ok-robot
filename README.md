@@ -193,6 +193,8 @@ roslaunch home_robot_hw startup_stretch_hector_slam.launch
 
 navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
 ```
+mamba activate ok-robot-env
+
 cd navigation
 python path_planning.py debug=False
 ```
@@ -200,12 +202,14 @@ python path_planning.py debug=False
 Pose estimation:
 More details can be found in Manipulation [ReadME](./anygrasp/README.md)
 ```
+mamba activate ok-robot-env
+
 cd anygrasp/src/
 python demo.py --debug
 ```
 
 Robot control:
-<!-- More details can be found in graspernet [ReadME] -->
+More details can be found in graspernet [ReadME](./graspernet/README.md)
 ```
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]
 ```
