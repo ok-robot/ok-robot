@@ -58,6 +58,6 @@ Due to the IP issue, currently only the SDK library file of AnyGrasp is availabl
 Run your code like `demo.py` or any desired applications that uses `gsnet.so`. 
 ```bash
     cd src/; 
-    sh demo.sh
+    python demo.py --debug
     # For just testing grasping remove the open_communication option in demo.sh. 
 ```
