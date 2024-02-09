@@ -4,7 +4,7 @@
 This section contains Manipulation related code. Below figure describes high level pipeline of how a final grasp is generated from a RGBD Image taken from robot head camera.
 * [Anygrasp](https://arxiv.org/abs/2212.08333) generates all possible poses in the scence
 * [Lang-sam](https://github.com/luca-medeiros/lang-segment-anything) is used to extract the object mask
-* The grasps points are projected back onto the image and filter the ones that fall into mask
+* The grasps points are projected back onto the image and filtered to retain only ones that fall on the mask.
 * The grasp with max score is chosen as final grasp.
 
 ![Manipulation Pipeline](https://drive.google.com/uc?export=view&id=1H7ddROUyjqFDhEMOOyr_-vcOqFwm203o)
