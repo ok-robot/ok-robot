@@ -82,22 +82,29 @@ python path_planning.py debug=True
 cd ../
 ```
 
-Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in `/anygrasp/src/example_data/ptest_rgb.png`. Choose a object from the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place. [If you face any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
+Then verify the grasping module. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in `/anygrasp/src/example_data/ptest_rgb.png`. Choose a object from the scene and you can see visualizations showing a grasp around the object for pick and a green disk showing the area it want to place. [If you face any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
 ```
 cd anygrasp/src
 python demo.py --debug 
-# run in debug mode to see 3D Manipulation Visualisations. If you are running through ssh its better to avoid this option
+# run in debug mode to see 3D Manipulation Visualisations. If you are running remotely its better to avoid this option
 ```
 
-## Robot Installation and setup
+## Robot Installation and Setup
 **Home Robot Instatallation:** Follow the [home-robot installation instructions](https://github.com/leo20021210/home-robot/blob/main/docs/install_robot.md) to install home-robot on your Stretch robot.
 
-**New calibrated URDF:** This is not required if you already have a proper calibrated urdf but if we dont then
- follow [home-robot calibration instructions](https://github.com/hello-robot/stretch_ros/blob/noetic/stretch_description/README.md#changing-the-tool) to create a new calibrated urdf for your robot.
+**Copy Hab Stretch Folder:** Copy hab stretch folder from [home robot repo](https://github.com/facebookresearch/home-robot/tree/main/assets/hab_stretch) 
+```
+cd $OK-Robot/
+cp home-robot/assets/hab_stretch/ grasperNet
+```
 
-Ensure the generated urdf has `wrist_roll` and `wrist_pitch` joints. If not, follow these documentations for [re1](https://docs.hello-robot.com/0.2/stretch-hardware-guides/docs/dex_wrist_guide_re1/) and [re2](https://docs.hello-robot.com/0.2/stretch-hardware-guides/docs/dex_wrist_guide_re2/) hello stretch for installating a dex wrist on the robot. 
+**New calibrated URDF:** If you already have a calibrated urdf these steps can be skipped. 
 
-Once you have a proper urdf add the following link and joint to the urdf
+* Follow [home-robot calibration instructions](https://github.com/hello-robot/stretch_ros/blob/noetic/stretch_description/README.md#changing-the-tool) to create a new calibrated urdf for your robot.
+
+* Ensure the generated urdf has `wrist_roll` and `wrist_pitch` joints. If not, follow these documentations for [re1](https://docs.hello-robot.com/0.2/stretch-hardware-guides/docs/dex_wrist_guide_re1/) and [re2](https://docs.hello-robot.com/0.2/stretch-hardware-guides/docs/dex_wrist_guide_re2/) hello stretch for installating a dex wrist on the robot. 
+
+* Once you have a proper urdf add the following link and joint to the urdf
 ```
 <link name="fake_link_x">
     <inertial>
@@ -115,7 +122,7 @@ Once you have a proper urdf add the following link and joint to the urdf
   </joint>
 ```
 
-Also, modify the `parent link` of `joint_mast` joint from `base_link` to `fake_link_x`. The joint should finally look like this
+* Also, modify the `parent link` of `joint_mast` joint from `base_link` to `fake_link_x`. The joint should finally look like this
 ```
 <joint name="joint_mast" type="fixed">
     <origin xyz="-0.06886239813360509 0.13725755297906447 0.025143215009302215" rpy="1.5725304449603004 0.0027932103811125764 0.013336895699597295"/>
@@ -125,11 +132,7 @@ Also, modify the `parent link` of `joint_mast` joint from `base_link` to `fake_l
   </joint>
 ```
 
-After that move the calibrated urdf to robot controller
-```
-cd $OK-Robot/
-cp home-robot/assets/hab_stretch/ grasperNet
-```
+**URDF Location:** After that replace the strech_manip_mode.urdf in `graspernet/hab_stretch/urdf/` directory with this new calibrated urdf.
 
 ## Experiment Setup
 **Environment Setup:** Use Record3D to scan the environments. Recording should include: 
@@ -140,7 +143,7 @@ cp home-robot/assets/hab_stretch/ grasperNet
 
 **Tape Placement:** This [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) has illustrations on how to place tapes on the ground and scan the environment properly.
 
-**Scan the Environment:** Once the objects and tapes are placed you can scan the environment and place the record3D r3d file in the `navigation/r3d/` folder. If you just want to try out a sample r3d file, you can use `navigation/r3d/sample.r3d`.
+**Scan the Environment:** After positioning the objects and tapes, proceed to scan the environment and save the Record3D r3d file in the `navigation/r3d/` folder. If you just want to try out a sample r3d file, you can use `navigation/r3d/sample.r3d`.
 
 **Extract PointCloud:** Then, use the `navigation/get_point_cloud.py` script to extract the pointcloud of the scene, which will be stored as `navigation/pointcloud.ply`. 
 ```
@@ -153,37 +156,34 @@ python get_point_cloud.py --input_file=[your r3d file]
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
 ## Load voxel map 
-Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `navigation/voxel-map` directory.
+Once the environment setup is complete, run voxel map with your r3d file to save the semantic information of 3D scene in `navigation/voxel-map` directory.
 ```
 cd navigation/voxel-map
 python load_voxel_map.py dataset_path=[your r3d file location]
 ```
 You can check other config settings in `navigation/voxel-map/configs/train.yaml`.
 
-To modify these config settings, you can either do that in command line or by modifying YAML file.
+After this process finishes, you can see the semantic map in the path specified by `cache_path` in `navigation/voxel-map/configs/train.yaml`
 
-After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `navigation/voxel-map/configs/train.yaml`
-
-## Config files
+<!-- ## Config files
 ### `navigation/voxel-map/config/train.yaml`
 It contains parameters realted to training the voxel map. Some of the important parameters are
 * **dataset_path** - path to your r3d file
 * **cache_path** - path to your semantic information file
-* **sample_freq** - sampling frequency of frames while training voxel map
+* **sample_freq** - sampling frequency of frames while training voxel map -->
 <!-- * **custom_labels** - Fill this [@peiqi] -->
 
-### `navigation/path.yaml`
+<!-- ### `navigation/path.yaml`
 Contains parameters related to path planning
 * **min_height** - z co-ordinate value below which everything is considered as non-navigable points. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+0.5 or 1].
 * **max_height** - z co-ordiante of the scene above which everything is neglected.
-* **map_type** - conservative_vlmap or brave_vlmap Fill
+* **map_type** - conservative_vlmap or brave_vlmap Fill -->
 <!-- * **localize_type** - 
 * **resolution** - 
 * **occ_avoid_radius** -  -->
 
-### Running experiments
-Once the above config filesa reset you can start running experiments
-
+## Running experiments
+<!-- Once the above config filesa reset you can start running experiments -->
 Scan the environments with Record3D, follow steps mentioned above in Environment Setup and Load Voxel map to load semantic map and obstacle map. Move the robot to the starting point specified by the tapes or other labels marked on the ground.
 
 Start home-robot on the Stretch:
@@ -205,6 +205,7 @@ python demo.py --debug
 ```
 
 Robot control:
+<!-- More details can be found in graspernet [ReadME] -->
 ```
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]
 ```
