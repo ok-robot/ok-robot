@@ -124,13 +124,17 @@ class ObjectHandler():
                                                             "/lseg_segmentation_" + str(tries) + ".jpg")
 
             if bbox is None:
-                print("Didnt detect the object, Trying Again")
-                tries = tries + 1
-                print(f"Try no: {tries}")
                 if self.cfgs.open_communication:
+                    print("Didnt detect the object, Trying Again")
+                    tries = tries + 1
+                    print(f"Try no: {tries}")
                     data_msg = "No Objects detected, Have to try again"
                     self.socket.send_data([[0], [0], [0, 0, 2], data_msg])
                     # self.socket.send_data("No Objects detected, Have to try again")
+                else:
+                    print("Didnt find the Object. Try with another object or tune grasper height and width parameters in demo.py")
+                    retry = False
+                    continue
 
             bbox_x_min, bbox_y_min, bbox_x_max, bbox_y_max = bbox
 
@@ -148,13 +152,16 @@ class ObjectHandler():
                 retry = not self.pickup(points, seg_mask, bbox)
 
             if retry:
-                print("Trying Again")
-                tries = tries + 1
-                print(f"Try no: {tries}")
                 if self.cfgs.open_communication:
+                    print("Trying Again")
+                    tries = tries + 1
+                    print(f"Try no: {tries}")
                     data_msg = "No poses, Have to try again"
                     self.socket.send_data([[0], [0], [0, 0, 2], data_msg])
                     # self.socket.send_data("No poses, Have to try again")
+                else:
+                    print("Try with another object or tune grasper height and width parameters in demo.py")
+                    retry = False
 
     def center_robot(self, bbox: Bbox):
         ''' 

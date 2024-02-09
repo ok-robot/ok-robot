@@ -24,6 +24,9 @@ class LangSAMProcessor(ImageProcessor):
     ) -> Tuple[np.ndarray, List[int]]:
 
         masks, boxes, phrases, logits = self.model.predict(image, text)
+        if len(masks) == 0:
+            return masks, None
+        
         seg_mask = np.array(masks[0])
         bbox = np.array(boxes[0], dtype=int)
 
