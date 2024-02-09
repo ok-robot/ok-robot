@@ -59,6 +59,7 @@ class ImageProcessor(ABC):
             else:
                 img_drw.rectangle([(box[0], box[1]), (box[2], box[3])], outline="white")
         new_image.save(save_file)
+        print(f"Saved Detection boxes at {save_file}")
 
     def draw_mask_on_image(
         self,
@@ -81,3 +82,4 @@ class ImageProcessor(ABC):
         highlighted_image = cv2.cvtColor(highlighted_image, cv2.COLOR_RGB2BGR)
 
         cv2.imwrite(save_file, highlighted_image)
+        print(f"Saved Segmentation Mask at {save_file}")
