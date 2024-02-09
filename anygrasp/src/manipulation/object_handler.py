@@ -104,7 +104,7 @@ class ObjectHandler():
             self.receive_input(tries)
 
             # Directory for saving visualisations
-            self.save_dir = self.cfgs.environment + "/" + self.query + "/anygrasp/" + self.cfgs.method
+            self.save_dir = self.cfgs.environment + "/" + self.query + "/anygrasp/"
             if not os.path.exists(self.save_dir):
                 os.makedirs(self.save_dir)
             if self.cfgs.open_communication:
@@ -117,11 +117,9 @@ class ObjectHandler():
             seg_mask, bbox = self.lang_sam.detect_obj(self.cam.image, self.query, 
                                                       visualize_box = True, visualize_mask = True,
                                                       box_filename = self.cfgs.environment + "/" + self.query + \
-                                                            "/anygrasp/" + self.cfgs.method + \
-                                                            "/lseg_detection_" + str(tries) + ".jpg",
+                                                            "/anygrasp/lseg_detection_" + str(tries) + ".jpg",
                                                       mask_filename = self.cfgs.environment + "/" + self.query + \
-                                                            "/anygrasp/" + self.cfgs.method + \
-                                                            "/lseg_segmentation_" + str(tries) + ".jpg")
+                                                            "/anygrasp/lseg_segmentation_" + str(tries) + ".jpg")
 
             if bbox is None:
                 print("Didnt detect the object, Trying Again")
@@ -342,7 +340,7 @@ class ObjectHandler():
             print("No grasp poses detected for this object try to move the object a little and try again")
             return False
 
-        projections_file_name = self.cfgs.environment + "/" + self.query + "/anygrasp/" + self.cfgs.method +  "/grasp_projections.jpg"
+        projections_file_name = self.cfgs.environment + "/" + self.query + "/anygrasp/grasp_projections.jpg"
         image.save(projections_file_name)
         print(f"Saved projections of grasps at {projections_file_name}")
         filter_gg = filter_gg.nms().sort_by_score()
@@ -358,9 +356,9 @@ class ObjectHandler():
                 gripper.transform(trans_mat)
             
             visualize_cloud_geometries(cloud, grippers, visualize = True, 
-                    save_file = self.cfgs.environment + "/" + self.query  + "/anygrasp/" + self.cfgs.method +  "/poses.jpg")
+                    save_file = self.cfgs.environment + "/" + self.query  + "/anygrasp/poses.jpg")
             visualize_cloud_geometries(cloud, [filter_grippers[0].paint_uniform_color([1.0, 0.0, 0.0])], visualize=True, 
-                    save_file = self.cfgs.environment + "/" + self.query  + "/anygrasp/" + self.cfgs.method + "/best_pose.jpg")
+                    save_file = self.cfgs.environment + "/" + self.query  + "/anygrasp/best_pose.jpg")
 
         if self.cfgs.open_communication:
             data_msg = "Now you received the gripper pose, good luck."
