@@ -69,12 +69,12 @@ Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/chec
 ## Installation Verification
 <!-- Load Voxel Map. This is should create a sample.pt file in `/Navigation/voxel-map/` folder
 ```
-cd Navigation/voxel-map/
+cd navigation/voxel-map/
 python load_voxel_map.py
 cd ../
 ``` -->
 
-Run `/Navigation/path_planning.py` file and set debug be True. If run succesfully, the process will load the semantic memory from record3D file, and you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `Navigation/test/{object_name}` folder.
+Run `/Navigation/path_planning.py` file and set debug be True. If run succesfully, the process will load the semantic memory from record3D file, and you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `Navigation/test/{object_name}` folder. 
 ```
 python path_planning.py debug=True
 cd ../
@@ -111,10 +111,10 @@ Use Record3D to scan the environments. Recording should include:
 
 Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) and gain insights on how you should place tapes on the ground, how you should scan the environment.
 
-After you obstain a .r3d file from Record3D place it in the `Navigation/r3d/` folder. If you just want to try out a sample, you can use `Navigation/r3d/sample.r3d`.
+After you obstain a .r3d file from Record3D place it in the `navigation/r3d/` folder. If you just want to try out a sample, you can use `navigation/r3d/sample.r3d`.
 
 
-Use the `Navigation/get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `Navigation/pointcloud.ply` of the scene. 
+Use the `navigation/get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `navigation/pointcloud.ply` of the scene. 
 ```
 python get_point_cloud.py --input_file=[your r3d file]
 ```
@@ -123,18 +123,18 @@ Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
 <!--## Load voxel map 
-Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `Navigation/voxel-map` directory.
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `Navigation/voxel-map` directory. 
 ```
-cd Navigation/voxel-map
+cd navigation/voxel-map
 python load_voxel_map.py dataset_path=[your r3d file location]
 ```
-You can check other config settings in `Navigation/voxel-map/configs/train.yaml`.
+You can check other config settings in `navigation/voxel-map/configs/train.yaml`.
 
 To modify these config settings, you can either do that in command line or by modifying YAML file.
 
 After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `Navigation/voxel-map/configs/train.yaml`-->
 
-## Config files `Navigation/configs/path.yaml`
+## Config files `Navigation/configs/path.yaml` 40a17efae7bc154518cc8b8830b25fe63776146c
 It contains parameters realted to training the voxel map. Some of the important parameters are
 * **debug** - debug=True: generate localization result for each text query; debug=False: communicate with robots and send planned path to robots
 * **dataset_path** - path to your r3d file
@@ -144,7 +144,7 @@ It contains parameters realted to training the voxel map. Some of the important 
 * **max_height** - z co-ordiante of the scene above which everything is not considered as obstacles.
 * **map_type** - "conservative_vlmap" (space not scanned is non-navigable) "brave_vlmap" (sapce scanned is navigable, used when you forget to scan the floor)
 * **port_number** - zmq communication port, need to the the same with robot's navigation port number
-* **save_file** - planned path and generated localization results will be saved here
+* **save_file** - planned path and generated localization results will be saved here 
 
 ## Running experiments
 Once the above config files are set you can start running experiments
@@ -158,7 +158,7 @@ roslaunch home_robot_hw startup_stretch_hector_slam.launch
 
 Navigation planning (See `Navigation/configs/path.yaml` for any config settings):
 ```
-cd Navigation
+cd navigation
 python path_planning.py debug=False
 ```
 
