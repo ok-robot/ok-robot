@@ -60,9 +60,9 @@ class ObjectHandler():
         else:
             head_tilt= -45
             data_dir = "./example_data/"
-            colors = np.array(Image.open(os.path.join(data_dir, 'peiqi_test_rgb21.png')))
-            image = Image.open(os.path.join(data_dir, 'peiqi_test_rgb21.png'))
-            depths = np.array(Image.open(os.path.join(data_dir, 'peiqi_test_depth21.png')))
+            colors = np.array(Image.open(os.path.join(data_dir, 'test_rgb.png')))
+            image = Image.open(os.path.join(data_dir, 'test_rgb.png'))
+            depths = np.array(Image.open(os.path.join(data_dir, 'test_depth.png')))
             fx, fy, cx, cy, scale = 306, 306, 118, 211, 0.001
             if tries == 1:
                 self.action = str(input("Enter action [pick/place]: "))
