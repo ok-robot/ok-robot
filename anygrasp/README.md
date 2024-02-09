@@ -1,9 +1,9 @@
 <!-- <img src="https://user-images.githubusercontent.com/12446953/208367719-4ef7922f-4001-41f7-aa9f-076e462d1325.png" width="60%"> -->
 
-## Requirements
-- Python 3.6/3.7/3.8/3.9
-- PyTorch 1.7.1 with CUDA 11.0
-- [MinkowskiEngine](https://github.com/NVIDIA/MinkowskiEngine) v0.5.4
+# Manipulation Module
+This section code contains manipulation part of the project. On a high level it takes the RGBD images and a query for the object then using [anygrasp](https://arxiv.org/abs/2212.08333) it generates all possible poses in the 
+
+![Manipulation Pipeline](https://drive.google.com/file/d/1H7ddROUyjqFDhEMOOyr_-vcOqFwm203o/view?usp=sharing)
 
 ## Installation
 1. Create Conda environment and install torch

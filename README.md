@@ -1,4 +1,5 @@
-# Home_engine
+# Ok-Robot
+Ok-Robot is a simpe framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 <!-- ## Previous encountered setup Issues [just to keep track will be removed afterwards] -->
 <!-- - KeyError jointwrist pitch [Removed inn latest upgrades]
 - grdiencoder "CUDA_HOME=/usr/local/cuda-11.7" []
@@ -10,25 +11,22 @@
 ## Hardware and software requirements
 Hardware required:
 * iPhone with Lidar sensors
-* Stretch re1 robot
+* Stretch robot
 * A workstation machine to run pretrained models 
   
 Software required:
 * Python 3.9
-* [CloudCompare](https://www.danielgm.net/cc/release/) (a pointcloud processing software)
 * Record3D (installed on iPhone) [has to mention the version]
-* Other software packages needed for running pretrained models (e.g. Python)
 
 ## Clone this repository to your local machine
 ```
 git clone https://github.com/NYU-robot-learning/home-engine
 cd home-engine
 git checkout peiqi
-git submodule update --init --recursive
 ```
 
 ## Workspace Installation and setup
-install Mamba if it is not present 
+Install [Mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) if it is not present 
 
 ### CUDA 12.*
 ```
@@ -43,13 +41,13 @@ cd ../../
 
 # Additional pip packages isntallation
 pip install -r requirements-cu121.txt
-pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 (any issue realted to sklearn)
-pip install torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html (if you are not able to import torch cluster properly)
+pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 
+pip install torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html 
 pip install graspnetAPI
 
 ```
 
-### CUDA-11.8
+### CUDA 11.*
 ```
 mamba env create -n ok-robot-env -f ./env-cu118.yml
 mamba activate ok-robot-env
@@ -63,8 +61,11 @@ python setup.py install
 ```
 
 ## Anygrasp Setup
-Please refer licence [readme](/anygrasp/license_registration/README.md) for more details on how to get the anygrasp license. Once this process is done you will receive the license and checkpoint.tar through email.
-Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/checkpoints/
+Please refer licence [readme](/anygrasp/license_registration/README.md) for detailed information on how to get the anygrasp license. After completing the necessary steps you will receive the license and checkpoint.tar through email.
+
+Once you receive these files
+* Received license folder should be renamed to `license` and place in anygrasp/src/ directory.
+* Move the checkpoint.tar into the anygrasp/src/checkpoints/ directory.
 
 ## Installation Verification
 Load Voxel Map. This is should create a sample.pt file in `/navigation/voxel-map/` folder
@@ -74,51 +75,79 @@ python load_voxel_map.py
 cd ../
 ```
 
-Run `/navigation/path_planning.py` file. If run succesfully, you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `navigation/test/{object_name}` folder.
+Run `/navigation/path_planning.py` file. If run succesfully, you should see a prompt asking for Object Name "A" and near by Object name 'B'. Upon entering object name, it will generate a 2D Map of the scene with the object localised with a green dot. This map will be saved in `navigation/test/{object_name}` folder.
 ```
 python path_planning.py debug=True
 cd ../
 ```
 
-Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place. [If you facing any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
+Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in `/anygrasp/src/example_data/ptest_rgb.png`. Choose a object from the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place. [If you face any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
 ```
 cd anygrasp/src
-python demo.py --checkpoint_path checkpoints/checkpoint_detection.tar --debug
+python demo.py --debug 
+# run in debug mode to see 3D Manipulation Visualisations. If you are running through ssh its better to avoid this option
 ```
 
 ## Robot Installation and setup
-Enter home-robot submodule
+**Home Robot Instatallation:** Follow the [home-robot installation instructions](https://github.com/leo20021210/home-robot/blob/main/docs/install_robot.md) to install home-robot on your Stretch robot.
+
+**New calibrated URDF:** This is not required if you already have a proper calibrated urdf but if we dont then
+ follow [home-robot calibration instructions](https://github.com/hello-robot/stretch_ros/blob/noetic/stretch_description/README.md#changing-the-tool) to create a new calibrated urdf for your robot.
+
+Ensure the generated urdf has `wrist_roll` and `wrist_pitch` joints. If not, follow these documentations for [re1](https://docs.hello-robot.com/0.2/stretch-hardware-guides/docs/dex_wrist_guide_re1/) and [re2](https://docs.hello-robot.com/0.2/stretch-hardware-guides/docs/dex_wrist_guide_re2/) hello stretch for installating a dex wrist on the robot. 
+
+Once you have a proper urdf add the following link and joint to the urdf
 ```
-cd $OK-Robot/home-robot
+<link name="fake_link_x">
+    <inertial>
+      <origin rpy="0.0 0.0 0." xyz="0. 0. 0."/>
+      <mass value="0.749143203376"/>
+      <inertia ixx="0.0709854511955" ixy="-0.00433428742758" ixz="-0.000186110788698" iyy="0.000437922053343" iyz="-0.00288788257713" izz="0.0711048085017"/>
+    </inertial>
+  </link>
+  <joint name="joint_fake" type="prismatic">
+    <origin rpy="0. 0. 0." xyz="0. 0. 0."/>
+    <axis xyz="1.0 0.0 0.0"/>
+    <parent link="base_link"/>
+    <child link="fake_link_x"/>
+    <limit effort="100.0" lower="-1.0" upper="1.1" velocity="1.0"/>
+  </joint>
 ```
 
-Follow the [home-robot installation instructions](https://github.com/leo20021210/home-robot/blob/main/docs/install_robot.md) to install home-robot on your Stretch robot.
+Also, modify the `parent link` of `joint_mast` joint from `base_link` to `fake_link_x`. The joint should finally look like this
+```
+<joint name="joint_mast" type="fixed">
+    <origin xyz="-0.06886239813360509 0.13725755297906447 0.025143215009302215" rpy="1.5725304449603004 0.0027932103811125764 0.013336895699597295"/>
+    <axis xyz="0.0 0.0 0.0"/>
+    <parent link="fake_link_x"/>
+    <child link="link_mast"/>
+  </joint>
+```
 
-Also follow [home-robot calibration instructions](https://github.com/leo20021210/home-robot/blob/main/docs/calibration.md) to calibrate your robot.
-
-After that run the following commands to move calibrated urdf to robot controller
+After that move the calibrated urdf to robot controller
 ```
 cd $OK-Robot/
-cp home-robot/assets/hab_stretch/ GrasperNet
+cp home-robot/assets/hab_stretch/ grasperNet
 ```
 
-## Testing Environment Setup
-Use Record3D to scan the environments. Recording should include: 
+## Experiment Setup
+**Environment Setup:** Use Record3D to scan the environments. Recording should include: 
 * All Obstacles in environments
 * Complete floor where the robots can navigate
 * All testing objects.
 * Two tapes in the scene which will serve as a orgin for the robot.
 
-Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) and gain insights on how you should place tapes on the ground, how you should scan the environment.
+**Tape Placement:** This [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) has illustrations on how to place tapes on the ground and scan the environment properly.
 
-After you obstain a .r3d file from Record3D place it in the `navigation/r3d/` folder. If you just want to try out a sample, you can use `navigation/r3d/sample.r3d`.
+**Scan the Environment:** Once the objects and tapes are placed you can scan the environment and place the record3D r3d file in the `navigation/r3d/` folder. If you just want to try out a sample r3d file, you can use `navigation/r3d/sample.r3d`.
 
-
-Use the `navigation/get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `navigation/pointcloud.ply` of the scene. 
+**Extract PointCloud:** Then, use the `navigation/get_point_cloud.py` script to extract the pointcloud of the scene, which will be stored as `navigation/pointcloud.ply`. 
 ```
 python get_point_cloud.py --input_file=[your r3d file]
 ```
-Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x1, y1), (x2, y2) be the co-ordiantes of two tapes [tape1, tape2] then place the robot base on tape1 and orient it towards tape2 like this[will attach a image]
+**Identify Tape Co-ordinates** Use a 3D Visualizer to determine the coordinates of the two orange tapes in the environment. Let the co-ordinates of these tapes are (x1, y1) for the first tape(tape1) and (x2, y2) for the second tape(tape2).
+
+**Robot Base Placement** Position the robot's base on tape1 and orient it towards tape2 as shown in the [image](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw). Make sure the position and rotation of the robot as accurate as possible as it is crucial for the experiments to run properly. 
 
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
@@ -168,9 +197,10 @@ python path_planning.py debug=False
 ```
 
 Pose estimation:
+More details can be found in Manipulation [ReadME](./anygrasp/README.md)
 ```
 cd anygrasp/src/
-bash demo.sh
+python demo.py --debug
 ```
 
 Robot control:
