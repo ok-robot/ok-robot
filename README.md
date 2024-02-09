@@ -1,5 +1,5 @@
 # Ok-Robot
-Ok-Robot is a simpe framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
+Ok-Robot is a framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 ![Intro Figure](https://drive.google.com/uc?export=view&id=1IAyAMZS__gcZmsZevQyeETLU369a0n9X)
 <!-- ## Previous encountered setup Issues [just to keep track will be removed afterwards] -->
 <!-- - KeyError jointwrist pitch [Removed inn latest upgrades]
