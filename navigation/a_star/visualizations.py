@@ -110,4 +110,7 @@ def visualize_path(path, end_xyz, cfg):
         geometries = [point_cloud, end_sphere]
     visualizer.poll_events()
     visualizer.update_renderer()
+    for geometry in geometries:
+        visualizer.add_geometry(geometry)
+    visualizer.run()
     visualizer.destroy_window()

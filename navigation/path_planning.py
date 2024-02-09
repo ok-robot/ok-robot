@@ -11,6 +11,9 @@ from torch import Tensor
 
 import zmq
 
+# Set matplotlib backedn to "pdf" to prevent any conflicts with open3d
+import matplotlib
+matplotlib.use('pdf')
 from matplotlib import pyplot as plt
 import open3d as o3d
 

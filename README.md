@@ -1,11 +1,4 @@
 # Home_engine
-<!-- ## Previous encountered setup Issues [just to keep track will be removed afterwards] -->
-<!-- - KeyError jointwrist pitch [Removed inn latest upgrades]
-- grdiencoder "CUDA_HOME=/usr/local/cuda-11.7" []
-- No such file or directory: 'clip-fields/Yaswanth_Bedroom_model_weights/implicit_scene_label_model_latest.pt [Have to be document properly]
-- AssertionError: Torch not compiled with CUDA enabled [torch installation. Removed in latest build]
-- assert len(conf_fnames) == tsz [Record 3d issue]
-- No reachable points [Check min-height, ] -->
 
 ## Hardware and software requirements
 Hardware required:
@@ -67,14 +60,8 @@ Please refer licence [readme](/anygrasp/license_registration/README.md) for more
 Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/checkpoints/
 
 ## Installation Verification
-<!-- Load Voxel Map. This is should create a sample.pt file in `/Navigation/voxel-map/` folder
-```
-cd navigation/voxel-map/
-python load_voxel_map.py
-cd ../
-``` -->
 
-Run `/Navigation/path_planning.py` file and set debug be True. If run succesfully, the process will load the semantic memory from record3D file, and you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `Navigation/test/{object_name}` folder. 
+Run `/Navigation/path_planning.py` file and set debug be True. If run succesfully, the process will load the semantic memory from record3D file, and you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in visualization folder, by default it is `Navigation/test/{object_name}`. 
 ```
 python path_planning.py debug=True
 cd ../
@@ -134,7 +121,7 @@ To modify these config settings, you can either do that in command line or by mo
 
 After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `Navigation/voxel-map/configs/train.yaml`-->
 
-## Config files `Navigation/configs/path.yaml` 40a17efae7bc154518cc8b8830b25fe63776146c
+## Config files `navigation/configs/path.yaml` 40a17efae7bc154518cc8b8830b25fe63776146c
 It contains parameters realted to training the voxel map. Some of the important parameters are
 * **debug** - debug=True: generate localization result for each text query; debug=False: communicate with robots and send planned path to robots
 * **dataset_path** - path to your r3d file
@@ -156,7 +143,7 @@ Start home-robot on the Stretch:
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-Navigation planning (See `Navigation/configs/path.yaml` for any config settings):
+Navigation planning (See `navigation/configs/path.yaml` for any config settings):
 ```
 cd navigation
 python path_planning.py debug=False
