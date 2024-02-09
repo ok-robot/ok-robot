@@ -1,3 +1,10 @@
+"""
+ This file implements GridPlanner as a wrapper for AStar planner
+    in USA-Net (https://github.com/codekansas/usa) project
+ Most codes are adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/planners/clip_sdf.py
+"""
+
 from pathlib import Path
 from typing import Type, cast
 
@@ -7,10 +14,10 @@ import tqdm
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
 
-from .map_util import Map, get_occupancy_map_from_dataset
-from .astar import AStarPlanner, Heuristic
-from .dataset_class import PosedRGBDItem
-from .data_util import get_posed_rgbd_dataset
+from a_star.map_util import Map, get_occupancy_map_from_dataset
+from a_star.astar import AStarPlanner, Heuristic
+from a_star.dataset_class import PosedRGBDItem
+from a_star.data_util import get_posed_rgbd_dataset
 
 import math
 

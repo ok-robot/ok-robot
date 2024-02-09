@@ -1,5 +1,6 @@
 import open3d as o3d
 import numpy as np
+import os
 
 def create_dashed_cylinder_line(points, radius=0.03, dash_length=0.06, gap_length=0.04, color=[1, 0, 0]):  # Default color red
     geometries = []
@@ -55,18 +56,28 @@ def create_arrow_geometry(start_point, end_point, arrow_length=0.2, cylinder_rad
 
 def visualize_path(path, end_xyz, cfg):
 
+    
+    if not os.path.exists('pointcloud.ply'):
+        print('\nNo pointcloud.ply found, creating a new one.\n')
+        from a_star.map_util import get_posed_rgbd_dataset
+        from a_star.data_util import get_pointcloud
+        get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path))
+        print('\npointcloud.ply created.\n')
+
     # Example point cloud and path points (replace with your data)
     point_cloud = o3d.io.read_point_cloud("pointcloud.ply")
 
-    path = np.array(np.array(path).tolist())
-    print(path)
-    start_point = path[0, :]
+    if path is not None:
+        path = np.array(np.array(path).tolist())
+        print(path)
+        start_point = path[0, :]
     end_point = np.array(end_xyz.numpy())
 
-    path[:, 2] = cfg.min_height
+    if path is not None:
+        path[:, 2] = cfg.min_height
+        lines = create_dashed_cylinder_line(path)
     end_point[2] = (cfg.min_height + cfg.max_height)/2
 
-    lines = create_dashed_cylinder_line(path)
     # arrows = add_arrows_to_line(lines)
 
     # Create the line set for the path
@@ -75,17 +86,31 @@ def visualize_path(path, end_xyz, cfg):
     #                                 lines=o3d.utility.Vector2iVector(lines))
 
     # Create spheres for start and end points
-    start_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
+    if path is not None:
+        start_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
     end_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
 
     # Set the position of the spheres
-    start_sphere.translate(start_point)
+    if path is not None:
+        start_sphere.translate(start_point)
     end_sphere.translate(end_point)
 
     # Set different colors for clarity
     # lines.paint_uniform_color([1, 0, 0])  # Red path
-    start_sphere.paint_uniform_color([0, 1, 0])  # Green start
+    if path is not None:
+        start_sphere.paint_uniform_color([0, 1, 0])  # Green start
     end_sphere.paint_uniform_color([0, 0, 1])  # Blue end
 
     # Visualize
-    o3d.visualization.draw_geometries([point_cloud, *lines, start_sphere, end_sphere])
+    visualizer = o3d.visualization.Visualizer()
+    visualizer.create_window(visible=True)
+    if path is not None:
+        geometries = [point_cloud, *lines, start_sphere, end_sphere]
+    else:
+        geometries = [point_cloud, end_sphere]
+    visualizer.poll_events()
+    visualizer.update_renderer()
+    for geometry in geometries:
+        visualizer.add_geometry(geometry)
+    visualizer.run()
+    visualizer.destroy_window()

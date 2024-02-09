@@ -11,52 +11,31 @@ from torch import Tensor
 
 import zmq
 
+# Set matplotlib backedn to "pdf" to prevent any conflicts with open3d
+import matplotlib
+matplotlib.use('pdf')
 from matplotlib import pyplot as plt
 import open3d as o3d
+
+import sys
+sys.path.append('voxel_map')
 
 from a_star.map_util import get_ground_truth_map_from_dataset, get_occupancy_map_from_dataset
 from a_star.path_planner import PathPlanner
 from a_star.data_util import get_posed_rgbd_dataset
-from localize_voxel_map import VoxelMapLocalizer
-from visualizations import visualize_path
+from voxel_map_localizer import VoxelMapLocalizer
+from a_star.visualizations import visualize_path
 
 import math
-import os
+import os 
 
-def visualise_path(path, end_xyz, cfg):
+import sys
+sys.path.append('voxel_map')
 
-    # Example point cloud and path points (replace with your data)
-    point_cloud = o3d.io.read_point_cloud("pointcloud.ply")
-
-    path = np.array(np.array(path).tolist())
-    print(path)
-    start_point = path[0, :]
-    end_point = np.array(end_xyz.numpy())
-
-
-    path[:, 2] = cfg.min_height
-    end_point[2] = (cfg.min_height + cfg.max_height)/2
-    # Create the line set for the path
-    lines = [[i, i+1] for i in range(len(path)-1)]
-    line_set = o3d.geometry.LineSet(points=o3d.utility.Vector3dVector(path),
-                                    lines=o3d.utility.Vector2iVector(lines))
-
-    # Create spheres for start and end points
-    start_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.01)
-    end_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.01)
-
-    # Set the position of the spheres
-    start_sphere.translate(start_point)
-    end_sphere.translate(end_point)
-
-    # Set different colors for clarity
-    line_set.paint_uniform_color([1, 0, 0])  # Red path
-    start_sphere.paint_uniform_color([0, 1, 0])  # Green start
-    end_sphere.paint_uniform_color([0, 0, 1])  # Blue end
-
-    # Visualize
-    o3d.visualization.draw_geometries([point_cloud, line_set, start_sphere, end_sphere])
-
+from dataloaders import (
+    R3DSemanticDataset,
+    OWLViTLabelledDataset,
+)
 
 def load_socket(port_number):
     context = zmq.Context()
@@ -82,14 +61,35 @@ def recv_array(socket, flags=0, copy=True, track=False):
     A = np.frombuffer(msg, dtype=md['dtype'])
     return A.reshape(md['shape'])
 
-@hydra.main(version_base="1.2", config_path=".", config_name="path.yaml")
+def load_dataset(cfg):
+    if os.path.exists(cfg.cache_path):
+        if input('\nWe have found an existing semantic memory, do you want to use it? [y|n]').lower() == 'y':
+            print('\n\nSemantic memory ready!\n\n')
+            return torch.load(cfg.cache_path)
+    print('\n\nFetching semantic memory from record3D file, might take some time ....\n\n')
+    r3d_dataset = R3DSemanticDataset(cfg.dataset_path, cfg.custom_labels, subsample_freq=cfg.sample_freq)
+    semantic_memory = OWLViTLabelledDataset(
+        r3d_dataset,
+        owl_model_name=cfg.web_models.owl,
+        sam_model_type=cfg.web_models.sam,
+        device=cfg.memory_load_device,
+        threshold=cfg.threshold,
+        subsample_prob=cfg.subsample_prob,
+        visualize_results=cfg.visualize_results,
+        visualization_path=cfg.visualization_path,
+    )
+    torch.save(semantic_memory, cfg.cache_path)
+    print('\n\nSemantic memory ready!\n\n')
+    return semantic_memory
+
+@hydra.main(version_base="1.2", config_path="configs", config_name="path.yaml")
 def main(cfg):
-    socket = load_socket(cfg.port_number)
-    config = OmegaConf.load(cfg.cf_config)
-    r3d_path = os.path.join("voxel-map", config.dataset_path)
+    semantic_memory = load_dataset(cfg)
+    if not cfg.debug:
+        socket = load_socket(cfg.port_number)
     conservative = cfg.map_type == 'conservative_vlmap'
-    planner = PathPlanner(r3d_path, cfg.min_height, cfg.max_height, cfg.resolution, cfg.occ_avoid_radius, conservative)
-    localizer = VoxelMapLocalizer(cfg.cf_config)
+    planner = PathPlanner(cfg.dataset_path, cfg.min_height, cfg.max_height, cfg.resolution, cfg.occ_avoid_radius, conservative)
+    localizer = VoxelMapLocalizer(semantic_memory, owl_vit_config = cfg.web_models.owl, device = cfg.path_planning_device)
 
     obstacle_map = planner.occupancy_map
     minx, miny = obstacle_map.origin
@@ -103,6 +103,8 @@ def main(cfg):
             A = input("A: ")
             B = input("B: ")
             end_xyz = localizer.localize_AonB(A, B)
+            end_xy = end_xyz[:2]
+            visualize_path(None, end_xyz, cfg)
         else:
             start_xyt = recv_array(socket)
             print(start_xyt)
@@ -144,8 +146,8 @@ def main(cfg):
         axes[1].scatter(end_xyz[0], end_xyz[1], s = 50, c = 'g')
         if not os.path.exists(cfg.save_file + '/' + A):
             os.makedirs(cfg.save_file + '/' + A )
-        print(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
-        fig.savefig(cfg.save_file + '/' + A + '/' + cfg.localize_type + '.jpg')
+        print(cfg.save_file + '/' + A + '/navigation_vis.jpg')
+        fig.savefig(cfg.save_file + '/' + A + '/navigation_vis.jpg')
 
 
 if __name__ == "__main__":

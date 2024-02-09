@@ -1,3 +1,11 @@
+"""
+ This file implements get_posed_rgbd_dataset, get_xyz, iter_xyz, and a series of util functions
+    in USA-Net (https://github.com/codekansas/usa) project
+ Most codes are adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/planners/base.py
+    2. https://github.com/codekansas/usa/blob/master/usa/tasks/datasets/posed_rgbd.py
+"""
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,8 +18,8 @@ import tqdm
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
 
-from .dataset_class import PosedRGBDItem
-from .dataset_class import R3DDataset
+from a_star.dataset_class import PosedRGBDItem
+from a_star.dataset_class import R3DDataset
 
 import open3d as o3d
 

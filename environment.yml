@@ -1,6 +1,6 @@
 channels:
   - pytorch
-  - pytorch3d
+  #- pytorch3d
   - nvidia
   - conda-forge
   - pyg

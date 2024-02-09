@@ -1,3 +1,10 @@
+"""
+ This file implements obstacle mapping building function get_occupancy_map_from_dataset
+    in USA-Net (https://github.com/codekansas/usa) project
+ Most codes are adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/planners/base.py
+"""
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -6,11 +13,11 @@ import torch
 from torch import Tensor, nn
 from torch.utils.data.dataset import Dataset
 
-from .data_util import get_bounds, get_poses, iter_xyz
-from .dataset_class import PosedRGBDItem
+from a_star.data_util import get_bounds, get_poses, iter_xyz
+from a_star.dataset_class import PosedRGBDItem
 
 # for testing purpose only
-from .data_util import get_posed_rgbd_dataset
+from a_star.data_util import get_posed_rgbd_dataset
 from matplotlib import pyplot as plt
 
 import cv2

@@ -1,18 +1,11 @@
 # Ok-Robot
 Ok-Robot is a framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 ![Intro Figure](https://drive.google.com/uc?export=view&id=1IAyAMZS__gcZmsZevQyeETLU369a0n9X)
-<!-- ## Previous encountered setup Issues [just to keep track will be removed afterwards] -->
-<!-- - KeyError jointwrist pitch [Removed inn latest upgrades]
-- grdiencoder "CUDA_HOME=/usr/local/cuda-11.7" []
-- No such file or directory: 'clip-fields/Yaswanth_Bedroom_model_weights/implicit_scene_label_model_latest.pt [Have to be document properly]
-- AssertionError: Torch not compiled with CUDA enabled [torch installation. Removed in latest build]
-- assert len(conf_fnames) == tsz [Record 3d issue]
-- No reachable points [Check min-height, ] -->
 
 ## Hardware and software requirements
 Hardware required:
 * iPhone with Lidar sensors
-* Stretch robot
+* Stretch robot with Dex Wrist installed
 * A workstation machine to run pretrained models 
   
 Software required:
@@ -69,14 +62,8 @@ Once you receive these files
 * Move the checkpoint.tar into the anygrasp/src/checkpoints/ directory.
 
 ## Installation Verification
-Load Voxel Map. This is should create a sample.pt file in `/navigation/voxel-map/` folder
-```
-cd navigation/voxel-map/
-python load_voxel_map.py
-cd ../
-```
 
-Run `/navigation/path_planning.py` file. If run succesfully, you should see a prompt asking for Object Name "A" and near by Object name 'B'. Upon entering object name, it will generate a 2D Map of the scene with the object localised with a green dot. This map will be saved in `navigation/test/{object_name}` folder.
+Run `/Navigation/path_planning.py` file and set debug be True. If run succesfully, the process will load the semantic memory from record3D file, and you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in visualization folder, by default it is `Navigation/test/{object_name}`. 
 ```
 python path_planning.py debug=True
 cd ../
@@ -155,32 +142,22 @@ python get_point_cloud.py --input_file=[your r3d file]
 
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
-## Load voxel map 
-Once the environment setup is complete, run voxel map with your r3d file to save the semantic information of 3D scene in `navigation/voxel-map` directory.
+<!--## Load voxel map 
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `Navigation/voxel-map` directory. 
 ```
 cd navigation/voxel-map
 python load_voxel_map.py dataset_path=[your r3d file location]
 ```
 You can check other config settings in `navigation/voxel-map/configs/train.yaml`.
 
-After this process finishes, you can see the semantic map in the path specified by `cache_path` in `navigation/voxel-map/configs/train.yaml`
-
-<!-- ## Config files
-### `navigation/voxel-map/config/train.yaml`
-It contains parameters realted to training the voxel map. Some of the important parameters are
-* **dataset_path** - path to your r3d file
-* **cache_path** - path to your semantic information file
-* **sample_freq** - sampling frequency of frames while training voxel map -->
-<!-- * **custom_labels** - Fill this [@peiqi] -->
-
-<!-- ### `navigation/path.yaml`
-Contains parameters related to path planning
-* **min_height** - z co-ordinate value below which everything is considered as non-navigable points. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+0.5 or 1].
-* **max_height** - z co-ordiante of the scene above which everything is neglected.
-* **map_type** - conservative_vlmap or brave_vlmap Fill -->
-<!-- * **localize_type** - 
-* **resolution** - 
-* **occ_avoid_radius** -  -->
+After this process finishes, you can see the semantic map in the path specified by `cache_path` in `navigation/voxel-map/configs/train.yaml`-->
+<!-- ## Config files `navigation/configs/path.yaml` 
+* **sample_freq** - sampling frequency of frames while training voxel map
+* **min_height** - z co-ordinate value below which everything is not considered as obstacles. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+ 0.1].
+* **max_height** - z co-ordiante of the scene above which everything is not considered as obstacles.
+* **map_type** - "conservative_vlmap" (space not scanned is non-navigable) "brave_vlmap" (sapce scanned is navigable, used when you forget to scan the floor)
+* **port_number** - zmq communication port, need to the the same with robot's navigation port number
+* **save_file** - planned path and generated localization results will be saved here -->
 
 ## Running experiments
 <!-- Once the above config filesa reset you can start running experiments -->
@@ -191,7 +168,7 @@ Scan the environments with Record3D, follow steps mentioned above in Environment
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-**Path Planning:** (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
+Navigation planning (See `navigation/configs/path.yaml` for any config settings):
 ```
 mamba activate ok-robot-env
 

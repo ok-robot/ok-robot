@@ -1,3 +1,10 @@
+"""
+ This file implements AStar planner
+    in USA-Net (https://github.com/codekansas/usa) project
+ Most codes are adapted from:
+    1. https://github.com/codekansas/usa/blob/master/usa/planners/common.py
+"""
+
 import functools
 import heapq
 import math
@@ -6,11 +13,11 @@ from typing import Literal
 import numpy as np
 import torch
 
-from .map_util import Map
+from a_star.map_util import Map
 
 # For testing purpose only
-from .data_util import get_posed_rgbd_dataset
-from .map_util import get_occupancy_map_from_dataset
+from a_star.data_util import get_posed_rgbd_dataset
+from a_star.map_util import get_occupancy_map_from_dataset
 from matplotlib import pyplot as plt
 
 Heuristic = Literal["manhattan", "euclidean", "octile", "chebyshev"]

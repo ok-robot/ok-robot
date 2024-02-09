@@ -22,56 +22,43 @@ from transformers import AutoProcessor, OwlViTModel
 import sys
 sys.path.append('voxel-map')
 
-DEVICE = "cuda"
-
 os.environ["TOKENIZERS_PARALLELISM"] = '(true | false)'
 from omegaconf import OmegaConf
 
 from voxel import VoxelizedPointcloud
 
 class VoxelMapLocalizer():
-    def __init__(self, config_path, device = 'cuda'):
+    def __init__(self, semantic_memory, owl_vit_config = 'google/owlvit-base-patch32', device = 'cuda'):
         self.device = device
-        config = OmegaConf.load(config_path)
-        self.model_type = config.web_models.segmentation
-        self.dataset_path = os.path.join('voxel-map', config.cache_path)
-        if self.model_type != 'owl':
-            self.model_name = 'ViT-B/32'
-        else:
-            self.model_name = 'google/owlvit-base-patch32'
+        self.dataset = semantic_memory
+        self.model_name = owl_vit_config
         self.clip_model, self.preprocessor = self.load_pretrained()
         self.voxel_pcd = self.load_pcd()
 
     def load_pretrained(self):
-        if self.model_type == 'owl':
-            model = OwlViTModel.from_pretrained(self.model_name).to(self.device)
-            preprocessor = AutoProcessor.from_pretrained(self.model_name)
-        else:
-            model, preprocessor = clip.load(self.model_name, device=self.device)
+        # As mentioned, we only support owlvit-base-patch32 for now
+        model = OwlViTModel.from_pretrained(self.model_name).to(self.device)
+        preprocessor = AutoProcessor.from_pretrained(self.model_name)
         return model, preprocessor
 
     
     def load_pcd(self):
-        training_data = torch.load(self.dataset_path)
         voxel_pcd = VoxelizedPointcloud()
-        voxel_pcd.add(points = training_data._label_xyz, 
-              features = training_data._image_features,
-              rgb = training_data._label_rgb,
-              weights = training_data._label_weight)
+        voxel_pcd.add(points = self.dataset._label_xyz, 
+              features = self.dataset._image_features,
+              rgb = self.dataset._label_rgb,
+              weights = self.dataset._label_weight)
         return voxel_pcd
 
     def calculate_clip_and_st_embeddings_for_queries(self, queries):
         with torch.no_grad():
-            if self.model_type == 'owl':
-                inputs = self.preprocessor(
-                    text=[queries], return_tensors="pt"
-                )
-                inputs['input_ids'] = inputs['input_ids'].to(self.device)
-                inputs['attention_mask'] = inputs['attention_mask'].to(self.device)
-                all_clip_tokens = self.clip_model.get_text_features(**inputs)
-            else:
-                all_clip_queries = clip.tokenize(queries)
-                all_clip_tokens = self.clip_model.encode_text(all_clip_queries.to(self.device)).float()
+            # We only support owl-vit for now
+            inputs = self.preprocessor(
+                text=[queries], return_tensors="pt"
+            )
+            inputs['input_ids'] = inputs['input_ids'].to(self.device)
+            inputs['attention_mask'] = inputs['attention_mask'].to(self.device)
+            all_clip_tokens = self.clip_model.get_text_features(**inputs)
             all_clip_tokens = F.normalize(all_clip_tokens, p=2, dim=-1)
         return all_clip_tokens
         
