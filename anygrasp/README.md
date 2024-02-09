@@ -3,7 +3,7 @@
 # Manipulation Module
 This section code contains manipulation part of the project. On a high level it takes the RGBD images and a query for the object then using [anygrasp](https://arxiv.org/abs/2212.08333) it generates all possible poses in the 
 
-![Manipulation Pipeline](https://drive.google.com/file/d/1H7ddROUyjqFDhEMOOyr_-vcOqFwm203o/view?usp=sharing)
+![Manipulation Pipeline](https://drive.google.com/uc?export=view&id=1H7ddROUyjqFDhEMOOyr_-vcOqFwm203o)
 
 ## Installation
 1. Create Conda environment and install torch
