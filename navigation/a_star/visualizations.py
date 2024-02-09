@@ -58,9 +58,11 @@ def visualize_path(path, end_xyz, cfg):
 
     
     if not os.path.exists('pointcloud.ply'):
+        print('\nNo pointcloud.ply found, creating a new one.\n')
         from a_star.map_util import get_posed_rgbd_dataset
         from a_star.data_util import get_pointcloud
         get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path))
+        print('\npointcloud.ply created.\n')
 
     # Example point cloud and path points (replace with your data)
     point_cloud = o3d.io.read_point_cloud("pointcloud.ply")
@@ -100,7 +102,12 @@ def visualize_path(path, end_xyz, cfg):
     end_sphere.paint_uniform_color([0, 0, 1])  # Blue end
 
     # Visualize
+    visualizer = o3d.visualization.Visualizer()
+    visualizer.create_window(visible=True)
     if path is not None:
-        o3d.visualization.draw_geometries([point_cloud, *lines, start_sphere, end_sphere])
+        geometries = [point_cloud, *lines, start_sphere, end_sphere]
     else:
-        o3d.visualization.draw_geometries([point_cloud, end_sphere])
+        geometries = [point_cloud, end_sphere]
+    visualizer.poll_events()
+    visualizer.update_renderer()
+    visualizer.destroy_window()
