@@ -67,14 +67,14 @@ Please refer licence [readme](/anygrasp/license_registration/README.md) for more
 Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/checkpoints/
 
 ## Installation Verification
-Load Voxel Map. This is should create a sample.pt file in `/Navigation/voxel-map/` folder
+Load Voxel Map. This is should create a sample.pt file in `/navigation/voxel-map/` folder
 ```
-cd Navigation/voxel-map/
+cd navigation/voxel-map/
 python load_voxel_map.py
 cd ../
 ```
 
-Run `/Navigation/path_planning.py` file. If run succesfully, you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `Navigation/test/{object_name}` folder.
+Run `/navigation/path_planning.py` file. If run succesfully, you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `navigation/test/{object_name}` folder.
 ```
 python path_planning.py debug=True
 cd ../
@@ -111,10 +111,10 @@ Use Record3D to scan the environments. Recording should include:
 
 Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) and gain insights on how you should place tapes on the ground, how you should scan the environment.
 
-After you obstain a .r3d file from Record3D place it in the `Navigation/r3d/` folder. If you just want to try out a sample, you can use `Navigation/r3d/sample.r3d`.
+After you obstain a .r3d file from Record3D place it in the `navigation/r3d/` folder. If you just want to try out a sample, you can use `navigation/r3d/sample.r3d`.
 
 
-Use the `Navigation/get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `Navigation/pointcloud.ply` of the scene. 
+Use the `navigation/get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `navigation/pointcloud.ply` of the scene. 
 ```
 python get_point_cloud.py --input_file=[your r3d file]
 ```
@@ -123,26 +123,26 @@ Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
 ## Load voxel map 
-Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `Navigation/voxel-map` directory.
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `navigation/voxel-map` directory.
 ```
-cd Navigation/voxel-map
+cd navigation/voxel-map
 python load_voxel_map.py dataset_path=[your r3d file location]
 ```
-You can check other config settings in `Navigation/voxel-map/configs/train.yaml`.
+You can check other config settings in `navigation/voxel-map/configs/train.yaml`.
 
 To modify these config settings, you can either do that in command line or by modifying YAML file.
 
-After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `Navigation/voxel-map/configs/train.yaml`
+After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `navigation/voxel-map/configs/train.yaml`
 
 ## Config files
-### `Navigation/voxel-map/config/train.yaml`
+### `navigation/voxel-map/config/train.yaml`
 It contains parameters realted to training the voxel map. Some of the important parameters are
 * **dataset_path** - path to your r3d file
 * **cache_path** - path to your semantic information file
 * **sample_freq** - sampling frequency of frames while training voxel map
 <!-- * **custom_labels** - Fill this [@peiqi] -->
 
-### `Navigation/path.yaml`
+### `navigation/path.yaml`
 Contains parameters related to path planning
 * **min_height** - z co-ordinate value below which everything is considered as non-navigable points. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+0.5 or 1].
 * **max_height** - z co-ordiante of the scene above which everything is neglected.
@@ -161,9 +161,9 @@ Start home-robot on the Stretch:
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-Navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
+navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
 ```
-cd Navigation
+cd navigation
 python path_planning.py debug=False
 ```
 
