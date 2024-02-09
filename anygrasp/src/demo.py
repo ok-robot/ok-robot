@@ -14,7 +14,7 @@ parser.add_argument('--crop', action='store_true', help='Passing cropped image t
 parser.add_argument('--max_depth', type=float, default = 2, help='Maximum depth of point cloud')
 parser.add_argument('--min_depth', type=float, default = 0, help='Maximum depth of point cloud')
 parser.add_argument('--sampling_rate', type=float, default = 1, help='Sampling rate of points [<= 1]')
-parser.add_argument('--environment', default = './example_data/', help='Environment name')
+parser.add_argument('--environment', default = './example_data', help='Environment name')
 parser.add_argument('--method', default = 'voxel map', help='navigation method name')
 cfgs = parser.parse_args()
 cfgs.max_gripper_width = max(0, min(0.2, cfgs.max_gripper_width))
