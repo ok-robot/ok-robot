@@ -18,8 +18,8 @@ import tqdm
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
 
-from .dataset_class import PosedRGBDItem
-from .dataset_class import R3DDataset
+from a_star.dataset_class import PosedRGBDItem
+from a_star.dataset_class import R3DDataset
 
 import open3d as o3d
 

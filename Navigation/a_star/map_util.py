@@ -13,11 +13,11 @@ import torch
 from torch import Tensor, nn
 from torch.utils.data.dataset import Dataset
 
-from .data_util import get_bounds, get_poses, iter_xyz
-from .dataset_class import PosedRGBDItem
+from a_star.data_util import get_bounds, get_poses, iter_xyz
+from a_star.dataset_class import PosedRGBDItem
 
 # for testing purpose only
-from .data_util import get_posed_rgbd_dataset
+from a_star.data_util import get_posed_rgbd_dataset
 from matplotlib import pyplot as plt
 
 import cv2

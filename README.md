@@ -10,14 +10,14 @@
 ## Hardware and software requirements
 Hardware required:
 * iPhone with Lidar sensors
-* Stretch re1 robot
+* Stretch robot with Dex Wrist installed
 * A workstation machine to run pretrained models 
   
 Software required:
 * Python 3.9
 * [CloudCompare](https://www.danielgm.net/cc/release/) (a pointcloud processing software)
 * Record3D (installed on iPhone) [has to mention the version]
-* Other software packages needed for running pretrained models (e.g. Python)
+* Other software packages needed for installing python packages (e.g. Mamba, conda)
 
 ## Clone this repository to your local machine
 ```
@@ -43,17 +43,18 @@ cd ../../
 
 # Additional pip packages isntallation
 pip install -r requirements-cu121.txt
-# pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 (any issue realted to sklearn: ValueError: numpy.ufunc size changed, may indicate binary incompatibility. Expected 232 from C header, got 216 from PyObject)
-# pip install torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html (if you are not able to import torch cluster properly)
+pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0 (any issue realted to sklearn)
+pip install torch_cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html (if you are not able to import torch cluster properly)
 pip install graspnetAPI
 
 ```
 
 ### CUDA-11.8
 ```
-mamba env create -n ok-robot-env -f ./environment.yml
+mamba env create -n ok-robot-env -f ./env-cu118.yml
 mamba activate ok-robot-env
 
+pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0
 pip install graspnetAPI
 
 # Setup poincept
@@ -63,25 +64,26 @@ python setup.py install
 
 ## Anygrasp Setup
 Please refer licence [readme](/anygrasp/license_registration/README.md) for more details on how to get the anygrasp license. Once this process is done you will receive the license and checkpoint.tar through email.
-
-```
-cd ./anygrasp
-cp gsnet_versions/gsnet.cpython-39-x86_64-linux-gnu.so src/gsnet.so
-cp license_registration/lib_cxx_versions/lib_cxx.cpython-39-x86_64-linux-gnu.so
-```
-
 Place the license folder in anygrasp/src and checkpoint.tar in anygrasp/src/checkpoints/
 
 ## Installation Verification
-Verify whether you are able to succesfully run path_planning.py file. It should run succesfully and you see a prompt asking to enter A
+<!-- Load Voxel Map. This is should create a sample.pt file in `/Navigation/voxel-map/` folder
+```
+cd Navigation/voxel-map/
+python load_voxel_map.py
+cd ../
+``` -->
+
+Run `/Navigation/path_planning.py` file and set debug be True. If run succesfully, the process will load the semantic memory from record3D file, and you should see a prompt asking to enter A. Enter a object name and you should see a 2d map of the scene with the object localised with a green dot in `Navigation/test/{object_name}` folder.
 ```
 python path_planning.py debug=True
+cd ../
 ```
 
-Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place.
+Then verify whether the grasping module is running properly. It should ask prompts for task [pick/place] and object of interest. You can view in scene image in /anygrasp/src/example_data/peiqi_test_rgb21.png. Choose a object in the scene and you see visualizations showing a grasp around the object and green disk showing the area it want to place. [If you facing any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
 ```
 cd anygrasp/src
-./demo.sh
+python demo.py --checkpoint_path checkpoints/checkpoint_detection.tar --debug
 ```
 
 ## Robot Installation and setup
@@ -109,10 +111,10 @@ Use Record3D to scan the environments. Recording should include:
 
 Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) and gain insights on how you should place tapes on the ground, how you should scan the environment.
 
-After you obstain a .r3d file from Record3D. If you just want to try out a sample, download the [sample data](https://osf.io/famgv) `nyu.r3d` and run the following command. Place it in the `/voxel_map/r3d/` folder. 
+After you obstain a .r3d file from Record3D place it in the `Navigation/r3d/` folder. If you just want to try out a sample, you can use `Navigation/r3d/sample.r3d`.
 
 
-Use the `get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `pointcloud.ply` in home directory. 
+Use the `Navigation/get_point_cloud.py` script to extract the pointcloud of the scene. This will store the point cloud `Navigation/pointcloud.ply` of the scene. 
 ```
 python get_point_cloud.py --input_file=[your r3d file]
 ```
@@ -120,37 +122,32 @@ Extract the point co-ordinates of two orange tapes using a 3D Visualizer. Let (x
 
 We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
 
-## Load voxel map 
-Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `/voxel-map` directory.
+<!--## Load voxel map 
+Once you setup the environment run voxel map with your r3d file which will save the semantic information of 3D Scene in `Navigation/voxel-map` directory.
 ```
-cd voxel-map
+cd Navigation/voxel-map
 python load_voxel_map.py dataset_path=[your r3d file location]
 ```
-You can check other config settings in `/voxel-map/configs/train.yaml`.
+You can check other config settings in `Navigation/voxel-map/configs/train.yaml`.
 
 To modify these config settings, you can either do that in command line or by modifying YAML file.
 
-After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `/voxel-map/configs/train.yaml`
+After this process finishes, you can check your stored semantic map in the path specified by `cache_path` in `Navigation/voxel-map/configs/train.yaml`-->
 
-## Config files
-### `/voxel-map/config/train.yaml`
+## Config files `Navigation/configs/path.yaml`
 It contains parameters realted to training the voxel map. Some of the important parameters are
+* **debug** - debug=True: generate localization result for each text query; debug=False: communicate with robots and send planned path to robots
 * **dataset_path** - path to your r3d file
 * **cache_path** - path to your semantic information file
 * **sample_freq** - sampling frequency of frames while training voxel map
-<!-- * **custom_labels** - Fill this [@peiqi] -->
+* **min_height** - z co-ordinate value below which everything is not considered as obstacles. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+ 0.1].
+* **max_height** - z co-ordiante of the scene above which everything is not considered as obstacles.
+* **map_type** - "conservative_vlmap" (space not scanned is non-navigable) "brave_vlmap" (sapce scanned is navigable, used when you forget to scan the floor)
+* **port_number** - zmq communication port, need to the the same with robot's navigation port number
+* **save_file** - planned path and generated localization results will be saved here
 
-### `/path.yaml`
-Contains parameters related to path planning
-* **min_height** - z co-ordinate value below which everything is considered as non-navigable points. Ideally you should choose a point on the floor of the scene and set this value slightly more than that [+0.5 or 1].
-* **max_height** - z co-ordiante of the scene above which everything is neglected.
-* **map_type** - conservative_vlmap or brave_vlmap Fill
-<!-- * **localize_type** - 
-* **resolution** - 
-* **occ_avoid_radius** -  -->
-
-### Running experiments
-Once the above config filesa reset you can start running experiments
+## Running experiments
+Once the above config files are set you can start running experiments
 
 Scan the environments with Record3D, follow steps mentioned above in Environment Setup and Load Voxel map to load semantic map and obstacle map. Move the robot to the starting point specified by the tapes or other labels marked on the ground.
 
@@ -159,13 +156,15 @@ Start home-robot on the Stretch:
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-Navigation planning (you do not specify anything other than fields in `/path.yaml` as it will automatically read the fields in your voxel map config file such as `/voxel-map/configs/train.yaml`):
+Navigation planning (See `Navigation/configs/path.yaml` for any config settings):
 ```
+cd Navigation
 python path_planning.py debug=False
 ```
 
 Pose estimation:
 ```
+cd anygrasp/src/
 bash demo.sh
 ```
 
