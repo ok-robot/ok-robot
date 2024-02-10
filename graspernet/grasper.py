@@ -64,6 +64,11 @@ def capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT,
                                         head_tilt=head_tilt)
                 time.sleep(4)
             
+            elif (retry_flag !=0 and side_retries == 3):
+                print("Tried in all angles but couldn't succed")
+                time.sleep(2)
+                return None, None, None
+
             elif (side_retries == 2 and tilt_retries == 3):
                 hello_robot.move_to_position(base_trans=0.1, head_tilt=head_tilt)
                 side_retries = 3
@@ -84,9 +89,9 @@ def capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT,
                     tilt_retries += 1
                     time.sleep(1)
             
-            elif side_retries == 3:
-                print("Tried in all angles but couldn't ")
-                time.sleep(2)
+            # elif side_retries == 3:
+            #     print("Tried in all angles but couldn't ")
+            #     time.sleep(2)
             
 
         if args.mode == "place":
