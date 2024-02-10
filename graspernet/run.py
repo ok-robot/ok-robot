@@ -2,14 +2,10 @@ import rospy
 from std_msgs.msg import Float64MultiArray
 import numpy as np
 
-#from home_robot_hw.remote import StretchClient
 from robot import HelloRobot
-#import stretch_body.robot
 import zmq
 import time
 
-#from global_parameters import *
-#import global_parameters
 from args import get_args
 from camera import RealSenseCamera
 from utils import potrait_to_landscape, segment_point_cloud, plane_detection, display_image_and_point

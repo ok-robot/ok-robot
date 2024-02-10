@@ -1,6 +1,4 @@
 from robot import HelloRobot
-from global_parameters import *
-import global_parameters
 from args import get_args
 from camera import RealSenseCamera
 from nodes import ImagePublisher
@@ -27,7 +25,6 @@ def capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT,
         # Image to world co-ordinates conversion
         sx, sy, sz = camera.pixel2d_to_point3d(ix, iy)
         point = PyKDL.Vector(sx, -sy, sz)
-        #point = PyKDL.Vector(-sy, sx, sz)
         print(f"x - {sx}, y - {sy}, z - {sz}")
 
         rotation = PyKDL.Rotation(1, 0, 0, 0, 1, 0, 0, 0, 1)
@@ -94,65 +91,3 @@ def capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT,
 
         return rotation, translation, depth
 
-
-if __name__ == "__main__":
-    args = get_args()
-
-    # Initalize robot and move to a height of 0.86
-    base_node = TOP_CAMERA_NODE
-    transform_node = GRIPPER_MID_NODE
-    hello_robot = HelloRobot(end_link=transform_node)
-    
-    if args.mode == "pick":
-        gripper_pos = 1
-    else:
-        gripper_pos = 0
-
-    if args.mode == "capture" or args.mode == "pick" or args.mode == "place":
-        global_parameters.INIT_WRIST_PITCH = -1.57
-
-    try:
-        rospy.init_node('hello_robot_node')
-    except:
-        print('node already initialized hello_robot')
-
-    # Moving robot to intital position
-
-    print(args.picking_object)
-    print(INIT_ARM_POS, INIT_WRIST_PITCH, INIT_WRIST_ROLL, INIT_WRIST_YAW, gripper_pos)
-    hello_robot.move_to_position(arm_pos=INIT_ARM_POS,
-                                head_pan=INIT_HEAD_PAN,
-                                head_tilt=INIT_HEAD_TILT,
-                                gripper_pos = gripper_pos)
-    time.sleep(1)
-    
-    hello_robot.move_to_position(lift_pos=INIT_LIFT_POS,
-                                wrist_pitch = global_parameters.INIT_WRIST_PITCH,
-                                wrist_roll = INIT_WRIST_ROLL,
-                                wrist_yaw = INIT_WRIST_YAW)
-    time.sleep(1)
-    
-    camera = RealSenseCamera(hello_robot.robot)
-
-    context = zmq.Context()
-    socket = context.socket(zmq.REQ)
-    socket.connect("tcp://100.107.224.62:5556")
-
-    retry = True
-    while retry:
-        rotation, translation, depth = capture_and_process_image(camera, args, socket, hello_robot)
-
-        if args.mode == "move":
-            move_to_point(hello_robot, translation, base_node, transform_node)
-            retry = False
-        elif args.mode == "pick":
-            pickup(hello_robot, rotation, translation, base_node, transform_node, gripper_depth = depth)
-            args.mode = "place"
-        else:
-            hello_robot.move_to_position(lift_pos=1)
-            hello_robot.move_to_position(wrist_pitch=0)
-            move_to_point(hello_robot, translation, base_node, transform_node)
-            hello_robot.move_to_position(gripper_pos=1)
-            retry = False
-
-        

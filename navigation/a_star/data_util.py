@@ -68,25 +68,25 @@ class Bounds:
             zmax=bounds[2, 1].item(),
         )
 
-    @classmethod
-    def merge_bounds(cls, a: Tensor, b: Tensor) -> Tensor:
-        return torch.stack(
-            (
-                torch.minimum(a[:, 0], b[:, 0]),
-                torch.maximum(a[:, 1], b[:, 1]),
-            ),
-            dim=1,
-        )
+    # @classmethod
+    # def merge_bounds(cls, a: Tensor, b: Tensor) -> Tensor:
+    #     return torch.stack(
+    #         (
+    #             torch.minimum(a[:, 0], b[:, 0]),
+    #             torch.maximum(a[:, 1], b[:, 1]),
+    #         ),
+    #         dim=1,
+    #     )
 
-    @classmethod
-    def from_xyz(cls, xyz: Tensor) -> Tensor:
-        assert xyz.shape[-1] == 3
+    # @classmethod
+    # def from_xyz(cls, xyz: Tensor) -> Tensor:
+    #     assert xyz.shape[-1] == 3
 
-        xmin, xmax = aminmax(xyz[..., 0])
-        ymin, ymax = aminmax(xyz[..., 1])
-        zmin, zmax = aminmax(xyz[..., 2])
+    #     xmin, xmax = aminmax(xyz[..., 0])
+    #     ymin, ymax = aminmax(xyz[..., 1])
+    #     zmin, zmax = aminmax(xyz[..., 2])
 
-        return torch.tensor([[xmin, xmax], [ymin, ymax], [zmin, zmax]], device=xyz.device, dtype=xyz.dtype)
+    #     return torch.tensor([[xmin, xmax], [ymin, ymax], [zmin, zmax]], device=xyz.device, dtype=xyz.dtype)
 
 
 def get_xyz(depth: Tensor, mask: Tensor, pose: Tensor, intrinsics: Tensor) -> Tensor:

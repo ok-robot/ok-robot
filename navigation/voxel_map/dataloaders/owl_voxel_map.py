@@ -32,13 +32,6 @@ import cv2
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
 
-#def get_clip_embeddings(vocabulary, prompt="a photo of "):
-#    text_encoder = build_text_encoder(pretrain=True)
-#    text_encoder.eval()
-#    texts = [prompt + x.replace("-", " ") for x in vocabulary]
-#    emb = text_encoder(texts).detach().permute(1, 0).contiguous().cpu()
-#    return emb
-
 
 # New visualizer class to disable jitter.
 import matplotlib.colors as mplc
@@ -126,8 +119,10 @@ class OWLViTLabelledDataset(Dataset):
             assert visualization_path is not None
             self._visualization_path = Path(visualization_path)
             os.makedirs(self._visualization_path, exist_ok=True)
-        # First, setup detic with the combined classes.
+        # First, setup owl-vit with the combined classes.
         self._setup_owl_all_classes(view_data)
+        # Next Load SAM models according to model config as owl-vit only provides bounding boxes and we need
+        # SAM to obtain segmentation mask
         if sam_model_type == 'vit_b':
             url = 'https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth'
             sam_model_path_name = 'sam_vit_b_01ec64.pth'
@@ -255,15 +250,15 @@ class OWLViTLabelledDataset(Dataset):
         self._label_weight = torch.cat(self._label_weight).float()
         self._image_features = torch.cat(self._image_features).float()
 
-    def _resample(self):
-        resampled_indices = torch.rand(len(self._label_xyz)) < self._subsample_prob
-        logging.info(
-            f"Resampling dataset down from {len(self._label_xyz)} points to {resampled_indices.long().sum().item()} points."
-        )
-        self._label_xyz = self._label_xyz[resampled_indices]
-        self._label_rgb = self._label_rgb[resampled_indices]
-        self._label_weight = self._label_weight[resampled_indices]
-        self._image_features = self._image_features[resampled_indices]
+    # def _resample(self):
+    #     resampled_indices = torch.rand(len(self._label_xyz)) < self._subsample_prob
+    #     logging.info(
+    #         f"Resampling dataset down from {len(self._label_xyz)} points to {resampled_indices.long().sum().item()} points."
+    #     )
+    #     self._label_xyz = self._label_xyz[resampled_indices]
+    #     self._label_rgb = self._label_rgb[resampled_indices]
+    #     self._label_weight = self._label_weight[resampled_indices]
+    #     self._image_features = self._image_features[resampled_indices]
 
     def _reshape_coordinates_and_get_valid(self, coordinates, data_dict):
         if "conf" in data_dict:

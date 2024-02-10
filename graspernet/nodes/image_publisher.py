@@ -8,9 +8,6 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray,MultiArrayDimension
 
 
-IMAGE_PUBLISHER_NAME = '/gopro_image'
-DEPTH_PUBLISHER_NAME = '/gopro_depth'
-
 # use zmq to send a numpy array
 def send_array(socket, A, flags=0, copy=True, track=False):
     """send a numpy array with metadata"""
@@ -66,13 +63,13 @@ class ImagePublisher():
         print(self.socket.recv_string())
 
         ## Waiting for the base and camera transforms to center the object vertically and horizontally
-        self.socket.send_string("Waiting for gripper pose/ base and head trans")
+        self.socket.send_string("Waiting for gripper pose/ base and head trans from workstation")
         translation = recv_array(self.socket)
-        self.socket.send_string("translation received")
+        self.socket.send_string("translation received by robot")
         rotation = recv_array(self.socket)
-        self.socket.send_string("rotation received")
+        self.socket.send_string("rotation received by robot")
         add_data = recv_array(self.socket)
-        self.socket.send_string(f"Additional data received")
+        self.socket.send_string(f"Additional data received robot")
 
         depth = add_data[0]
         cropped = add_data[1]

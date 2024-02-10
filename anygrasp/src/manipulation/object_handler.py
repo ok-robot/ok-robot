@@ -26,8 +26,6 @@ class ObjectHandler():
         if self.cfgs.open_communication:
             self.socket = ZmqSocket(self.cfgs) 
 
-        # self.owl_vit = OwlVITProcessor()
-        # self.sam = SamProcessor()
         self.lang_sam = LangSAMProcessor()
 
     def receive_input(self, tries):

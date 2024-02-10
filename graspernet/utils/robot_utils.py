@@ -72,9 +72,7 @@ def kdl_tree_from_urdf_model(urdf):
                                       kdl_origin, kdl_inert)
                 tree.addSegment(kdl_sgm, parent)
                 add_children_to_tree(child_name)
-                # print(f"{parent} -> {child_name}")
     add_children_to_tree(root)
-    # print("\n\n\n")
     return tree
 
 def cam_info_to_intrinsic_mat(cam_info):
