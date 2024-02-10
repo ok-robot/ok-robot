@@ -1,6 +1,0 @@
-[submodule "home-robot"]
-	path = home-robot
-	url = https://github.com/leo20021210/home-robot
-[submodule "GrasperNet"]
-	path = GrasperNet
-	url = https://github.com/NYU-robot-learning/GrasperNet
