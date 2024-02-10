@@ -1,6 +1,6 @@
 *.tar
 *.pyc
-/Navigation/outputs/*
+/navigation/outputs/*
 /outputs/*
 **/*.egg-info/
 *.o
@@ -13,3 +13,4 @@ license
 /src/sample_save_directory/*
 *.pth
 /anygrasp/pointnet2/*
+/graspernet/hab_stretch/*

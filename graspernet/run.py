@@ -192,6 +192,9 @@ def run_manipulation(args, hello_robot, socket, text, transform_node, base_node,
     args.picking_object = text
     rotation, translation, depth = capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT, top_down = top_down)
     
+    if rotation is None:
+        return False
+        
     #print("coordinates - ", print(hello_robot.robot.nav.get_base_pose()))
     if input('Do you want to do this manipulation? Y or N ') != 'N':
         pickup(hello_robot, rotation, translation, base_node, transform_node, top_down = top_down, gripper_depth = depth)
@@ -201,6 +204,7 @@ def run_manipulation(args, hello_robot, socket, text, transform_node, base_node,
     hello_robot.move_to_position(base_trans = -hello_robot.robot.manip.get_joint_positions()[0])
     
     #print("coordinates - ", print(hello_robot.robot.nav.get_base_pose()))
+    return True
 
 def run_place(args, hello_robot, socket, text, transform_node, base_node, move_range = [False, False], top_down = False):
 
@@ -210,6 +214,9 @@ def run_place(args, hello_robot, socket, text, transform_node, base_node, move_r
     args.placing_object = text
     time.sleep(2)
     rotation, translation, _ = capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT, top_down = top_down)
+
+    if rotation is None:
+        return False
     print(rotation)
     hello_robot.move_to_position(lift_pos=1.1)
     time.sleep(1)
@@ -242,6 +249,7 @@ def run_place(args, hello_robot, socket, text, transform_node, base_node, move_r
     hello_robot.move_to_position(wrist_pitch=-1.57)
     time.sleep(1)
     hello_robot.move_to_position(base_trans = -hello_robot.robot.manip.get_joint_positions()[0])
+    return True
 
 def compute_tilt(camera_xyz, target_xyz):
     vector = camera_xyz - target_xyz
@@ -290,7 +298,9 @@ def run():
         
             hello_robot.robot.switch_to_manipulation_mode()
             hello_robot.robot.head.look_at_ee()
-            run_manipulation(args, hello_robot, anygrasp_socket, A, transform_node, base_node)
+            perform_manip = run_manipulation(args, hello_robot, anygrasp_socket, A, transform_node, base_node)
+            if not perform_manip:
+                continue
 
         # clear picking object
         A, B = None, None
