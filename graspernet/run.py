@@ -194,7 +194,7 @@ def run_manipulation(args, hello_robot, socket, text, transform_node, base_node,
     
     if rotation is None:
         return False
-
+        
     #print("coordinates - ", print(hello_robot.robot.nav.get_base_pose()))
     if input('Do you want to do this manipulation? Y or N ') != 'N':
         pickup(hello_robot, rotation, translation, base_node, transform_node, top_down = top_down, gripper_depth = depth)

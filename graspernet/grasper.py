@@ -88,11 +88,6 @@ def capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT,
                                             head_tilt=head_tilt + head_tilt_angles[tilt_retries])
                     tilt_retries += 1
                     time.sleep(1)
-            
-            # elif side_retries == 3:
-            #     print("Tried in all angles but couldn't ")
-            #     time.sleep(2)
-            
 
         if args.mode == "place":
             translation = PyKDL.Vector(-translation[1], -translation[0], -translation[2])

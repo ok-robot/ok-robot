@@ -188,6 +188,6 @@ python demo.py --debug
 **Robot control:**
 More details can be found in graspernet [ReadME](./graspernet/README.md)
 ```
-python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]
+python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
 ```
 
