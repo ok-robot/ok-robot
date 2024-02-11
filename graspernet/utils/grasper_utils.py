@@ -2,28 +2,69 @@ import PyKDL
 import time
 import math
 
-# Returns a PyKDL.Tree generated from a urdf_parser_py.urdf.URDF object.
-def kdl_tree_from_urdf_model(urdf):
-    kdl = PyKDL
-    root = urdf.get_root()
-    print(f"root -> {root}")
-    tree = kdl.Tree(root)
-    def add_children_to_tree(parent):
-        if parent in urdf.child_map:
-            for joint, child_name in urdf.child_map[parent]:
-                child = urdf.link_map[child_name]
-                if child.inertial is not None:
-                    kdl_inert = urdf_inertial_to_kdl_rbi(child.inertial)
+from nodes import ImagePublisher
+from global_parameters import *
+
+def capture_and_process_image(camera, args, socket, hello_robot, top_down = False):
+    if args.mode == "pick":
+        obj = args.picking_object
+    else:
+        obj = args.placing_object
+    
+    print('Currently in ' + args.mode + ' mode and the robot is about to manipulate ' + obj + '.')
+
+    image_publisher = ImagePublisher(camera, socket)
+
+    # Centering the object
+    head_tilt_angles = [0, -0.1, 0.1]
+    tilt_retries, side_retries = 1, 0
+    retry_flag = True
+    head_tilt = INIT_HEAD_TILT
+    head_pan = INIT_HEAD_PAN
+
+    while(retry_flag):
+        translation, rotation, depth, cropped, retry_flag = image_publisher.publish_image(obj, args.mode, head_tilt=head_tilt, top_down = top_down)
+
+        print(f"retry flag : {retry_flag}")
+        if (retry_flag == 1):
+            base_trans = translation[0]
+            head_tilt += (rotation[0])
+
+            hello_robot.move_to_position(base_trans=base_trans,
+                                    head_pan=head_pan,
+                                    head_tilt=head_tilt)
+            time.sleep(4)
+        
+        elif (retry_flag !=0 and side_retries == 3):
+            print("Tried in all angles but couldn't succed")
+            time.sleep(2)
+            return None, None, None
+
+        elif (side_retries == 2 and tilt_retries == 3):
+            hello_robot.move_to_position(base_trans=0.1, head_tilt=head_tilt)
+            side_retries = 3
+
+        elif retry_flag == 2:
+            if (tilt_retries == 3):
+                if (side_retries == 0):
+                    hello_robot.move_to_position(base_trans=0.1, head_tilt=head_tilt)
+                    side_retries = 1
                 else:
-                    kdl_inert = kdl.RigidBodyInertia()
-                kdl_jnt = urdf_joint_to_kdl_joint(urdf.joint_map[joint])
-                kdl_origin = urdf_pose_to_kdl_frame(urdf.joint_map[joint].origin)
-                kdl_sgm = kdl.Segment(child_name, kdl_jnt,
-                                      kdl_origin, kdl_inert)
-                tree.addSegment(kdl_sgm, parent)
-                add_children_to_tree(child_name)
-    add_children_to_tree(root)
-    return tree
+                    hello_robot.move_to_position(base_trans=-0.2, head_tilt=head_tilt)
+                    side_retries = 2
+                tilt_retries = 1
+            else:
+                print(f"retrying with head tilt : {head_tilt + head_tilt_angles[tilt_retries]}")
+                hello_robot.move_to_position(head_pan=head_pan,
+                                        head_tilt=head_tilt + head_tilt_angles[tilt_retries])
+                tilt_retries += 1
+                time.sleep(1)
+
+    if args.mode == "place":
+        translation = PyKDL.Vector(-translation[1], -translation[0], -translation[2])
+
+    return rotation, translation, depth
+
 
 def move_to_point(robot, point, base_node, gripper_node, move_mode=1, pitch_rotation=0):
     rotation = PyKDL.Rotation(1, 0, 0, 0, 1, 0, 0, 0, 1)

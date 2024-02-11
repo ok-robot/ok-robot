@@ -1,4 +1,3 @@
-#import rospy
 import zmq
 import numpy as np
 from PIL import Image as PILImage
@@ -7,24 +6,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from std_msgs.msg import Float32MultiArray,MultiArrayDimension
 
-
-# use zmq to send a numpy array
-def send_array(socket, A, flags=0, copy=True, track=False):
-    """send a numpy array with metadata"""
-    md = dict(
-        dtype = str(A.dtype),
-        shape = A.shape,
-    )
-    socket.send_json(md, flags|zmq.SNDMORE)
-    return socket.send(np.ascontiguousarray(A), flags, copy=copy, track=track)
-
-# use zmq to receive a numpy array
-def recv_array(socket, flags=0, copy=True, track=False):
-    """recv a numpy array"""
-    md = socket.recv_json(flags=flags)
-    msg = socket.recv(flags=flags, copy=copy, track=track)
-    A = np.frombuffer(msg, dtype=md['dtype'])
-    return A.reshape(md['shape'])
+from utils.communication_utils import send_array, recv_array
 
 class ImagePublisher():
 
@@ -40,8 +22,8 @@ class ImagePublisher():
         rotated_image = np.rot90(image, k=-1)
         rotated_depth = np.rot90(depth, k=-1)
         rotated_point = np.rot90(points, k=-1)
-        # PILImage.fromarray(rotated_image).save("./images/peiqi_test_rgb22.png")
-        # PILImage.fromarray(rotated_depth).save("./images/peiqi_test_depth22.png")
+        PILImage.fromarray(rotated_image).save("./peiqi_test_rgb22.png")
+        np.save("./peiqi_test_depth22.png", rotated_depth)
 
         ## Send RGB, depth and camera intrinsics data
         send_array(self.socket, rotated_image)

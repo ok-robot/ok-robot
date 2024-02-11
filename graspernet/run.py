@@ -1,16 +1,10 @@
-import rospy
-from std_msgs.msg import Float64MultiArray
-import numpy as np
-
 from robot import HelloRobot
 import zmq
 import time
 
 from args import get_args
 from camera import RealSenseCamera
-from utils import potrait_to_landscape, segment_point_cloud, plane_detection, display_image_and_point
 
-import rospy
 import cv2
 import numpy as np
 import sys
@@ -19,22 +13,10 @@ from PIL import Image
 
 from multiprocessing import Process
 
-from utils.grasper_utils import pickup, move_to_point
-from grasper import capture_and_process_image
+from utils.grasper_utils import pickup, move_to_point, capture_and_process_image
+from utils.communication_utils import send_array, recv_array
 
-POS_TOL = 0.1
-YAW_TOL = 0.2
-
-GRIPPER_MID_NODE = "link_straight_gripper"
-TOP_CAMERA_NODE = "camera_depth_optical_frame"
-
-INIT_LIFT_POS = 0.33 
-INIT_WRIST_PITCH = -1.57 
-INIT_ARM_POS = 0
-INIT_WRIST_ROLL = 0
-INIT_WRIST_YAW = 0
-INIT_HEAD_PAN = -1.53
-INIT_HEAD_TILT = -0.65
+from global_parameters import *
 
 X_OFFSET, Y_OFFSET, THETA_OFFSET, r2n_matrix, n2r_matrix = None, None, None, None, None
 
@@ -84,34 +66,6 @@ def navigate(robot, xyt_goal):
                  or np.allclose(xyt_curr[2], xyt_goal[2] - np.pi * 2, atol=YAW_TOL)):
             print("The robot is finally at " + str(xyt_goal))
             break
-
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + 'I heard %s', data.data)
-    paths = data.data
-    i = 0
-    while i < len(paths):
-        x = -paths[i]
-        y = paths[i + 1]
-        navigate(robot, np.array([x, y, 0]))
-        i += 2
-
-def send_array(socket, A, flags=0, copy=True, track=False):
-    """send a numpy array with metadata"""
-    A = np.array(A)
-    md = dict(
-        dtype = str(A.dtype),
-        shape = A.shape,
-    )
-    socket.send_json(md, flags|zmq.SNDMORE)
-    return socket.send(np.ascontiguousarray(A), flags, copy=copy, track=track)
-
-# use zmq to receive a numpy array
-def recv_array(socket, flags=0, copy=True, track=False):
-    """recv a numpy array"""
-    md = socket.recv_json(flags=flags)
-    msg = socket.recv(flags=flags, copy=copy, track=track)
-    A = np.frombuffer(msg, dtype=md['dtype'])
-    return A.reshape(md['shape'])
 
 def read_input():
     A = str(input("Enter A: "))
@@ -175,7 +129,6 @@ def run_manipulation(args, hello_robot, socket, text, transform_node, base_node,
     time.sleep(1)
     #print("coordinates - ", print(hello_robot.robot.nav.get_base_pose()))
     hello_robot.move_to_position(lift_pos=INIT_LIFT_POS,
-                                #wrist_pitch = global_parameters.INIT_WRIST_PITCH,
                                 wrist_pitch = INIT_WRIST_PITCH,
                                 wrist_roll = INIT_WRIST_ROLL,
                                 wrist_yaw = INIT_WRIST_YAW)
@@ -186,7 +139,7 @@ def run_manipulation(args, hello_robot, socket, text, transform_node, base_node,
 
     args.mode = 'pick'
     args.picking_object = text
-    rotation, translation, depth = capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT, top_down = top_down)
+    rotation, translation, depth = capture_and_process_image(camera, args, socket, hello_robot, top_down = top_down)
     
     if rotation is None:
         return False
@@ -209,7 +162,7 @@ def run_place(args, hello_robot, socket, text, transform_node, base_node, move_r
     args.mode = 'place'
     args.placing_object = text
     time.sleep(2)
-    rotation, translation, _ = capture_and_process_image(camera, args, socket, hello_robot, INIT_HEAD_TILT, top_down = top_down)
+    rotation, translation, _ = capture_and_process_image(camera, args, socket, hello_robot, top_down = top_down)
 
     if rotation is None:
         return False
@@ -260,12 +213,6 @@ def run():
 
     transform_node = GRIPPER_MID_NODE
     hello_robot = HelloRobot(end_link = transform_node)
-
-
-    #INIT_WRIST_PITCH = -1.57
-    #global_parameters.INIT_WRIST_PITCH = -1.57
-    #camera = RealSenseCamera(hello_robot.robot)
-    #image_publisher = ImagePublisher(camera)
 
     context = zmq.Context()
     nav_socket = context.socket(zmq.REQ)

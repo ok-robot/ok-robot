@@ -14,7 +14,6 @@ import os
 
 from utils import kdl_tree_from_urdf_model
 from global_parameters import *
-import global_parameters
 
 
 OVERRIDE_STATES = {}
@@ -39,8 +38,6 @@ class HelloRobot:
         self.init_joint_list = ["joint_fake","joint_lift","3","2","1" ,"0","joint_wrist_yaw","joint_wrist_pitch","joint_wrist_roll", "joint_gripper_finger_left"]
 
         # end_link is the frame of reference node 
-        # Ex: link_raised_gripper -> camera frame of reference and
-        # link_gripper_finger_left -> left gripper finger tip frame of refernce
         self.end_link = end_link 
         self.set_end_link(end_link)
         
@@ -53,7 +50,7 @@ class HelloRobot:
 
         # Joint dictionary for Kinematics
         self.setup_kdl()
-        self.initialize_home_params()
+        # self.initialize_home_params()
 
 
     def setup_kdl(self):
@@ -77,20 +74,6 @@ class HelloRobot:
             self.joint_list = self.init_joint_list
         else:
             self.joint_list = self.init_joint_list[:-1]
-
-
-    # def initialize_home_params(self, home_lift = 0.43, home_arm = 0.02, home_base = 0.0, home_wrist_yaw = 0.0, home_wrist_pitch = 0.0, home_wrist_roll = 0.0, home_gripper = 1):
-    #     self.home_lift = home_lift
-    #     self.home_arm = home_arm
-    #     self.home_wrist_yaw = home_wrist_yaw
-    #     self.home_wrist_pitch = home_wrist_pitch
-    #     self.home_wrist_roll = home_wrist_roll
-    #     self.home_gripper = home_gripper
-    #     self.home_base = home_base
-
-
-    # def home(self):
-    #     self.move_to_position(self.home_lift, self.home_arm, self.home_base, self.home_wrist_yaw, self.home_wrist_pitch, self.home_wrist_roll, self.home_gripper)
 
 
     def get_joints(self):
@@ -139,26 +122,20 @@ class HelloRobot:
         self.robot.head.set_pan_tilt(tilt = target_head_tilt, pan = target_head_pan)
         time.sleep(0.7)
 
-    # def pickup(self, depth):
-    #     next_gripper_pos = 0.25
-    #     while True:
-    #         self.robot.manip.move_gripper(next_gripper_pos)
+    def pickup(self, depth):
+        next_gripper_pos = 0.25
+        while True:
+            self.robot.manip.move_gripper(next_gripper_pos)
 
-    #         curr_gripper_pose = self.robot.manip.get_gripper_position()
-    #         if next_gripper_pos == -0.2 or (curr_gripper_pose > next_gripper_pos + 0.01):
-    #             break
+            curr_gripper_pose = self.robot.manip.get_gripper_position()
+            if next_gripper_pos == -0.2 or (curr_gripper_pose > next_gripper_pos + 0.01):
+                break
             
-    #         # Open loop grippper closing 
-    #         if next_gripper_pos > 0:
-    #             next_gripper_pos -= 0.05
-    #         else: 
-    #             next_gripper_pos = -0.2
-
-    #     # move up
-    #     # target_state = self.robot.manip.get_joint_positions()
-    #     # target_state[1] = target_state[1] + 0.1
-    #     # self.robot.manip.goto_joint_positions(target_state)
-    #     # time.sleep(2)
+            # Open loop grippper closing 
+            if next_gripper_pos > 0:
+                next_gripper_pos -= 0.05
+            else: 
+                next_gripper_pos = -0.2
 
     def updateJoints(self):
         #Update the joint state values in 'self.joints' using hellorobot api calls
