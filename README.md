@@ -11,7 +11,7 @@ Ok-Robot is a framework that combines the state-of-art navigation and manipualti
   <summary>ok-robot.mp4</summary>
   
   <!-- Your embedded video code goes here -->
-  <iframe width="560" height="315" src="https://drive.google.com/file/d/1IC_wUHmnvq_Aon-fKdiNUNRawQC3patP/view?usp=sharing" frameborder="0" allowfullscreen></iframe>
+  <iframe src="https://drive.google.com/file/d/1IC_wUHmnvq_Aon-fKdiNUNRawQC3patP/view?usp=sharing" width="640" height="480"></iframe>
 </details>
 
 ## Hardware and software requirements
