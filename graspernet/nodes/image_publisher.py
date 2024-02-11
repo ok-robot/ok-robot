@@ -22,8 +22,8 @@ class ImagePublisher():
         rotated_image = np.rot90(image, k=-1)
         rotated_depth = np.rot90(depth, k=-1)
         rotated_point = np.rot90(points, k=-1)
-        PILImage.fromarray(rotated_image).save("./peiqi_test_rgb22.png")
-        np.save("./peiqi_test_depth22", rotated_depth)
+        PILImage.fromarray(rotated_image).save("./test_rgb22.png")
+        np.save("./test_depth22", rotated_depth)
 
         ## Send RGB, depth and camera intrinsics data
         send_array(self.socket, rotated_image)
