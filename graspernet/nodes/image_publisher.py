@@ -12,18 +12,17 @@ class ImagePublisher():
 
     def __init__(self, camera, socket):
         self.camera = camera
-        self.bridge = CvBridge()
         self.socket = socket
 
-    def publish_image(self, text, mode, head_tilt=-1, top_down = False):
+    def publish_image(self, text, mode, head_tilt=-1):
         image, depth, points = self.camera.capture_image()
         camera_pose = self.camera.robot.head.get_pose_in_base_coords()
 
         rotated_image = np.rot90(image, k=-1)
         rotated_depth = np.rot90(depth, k=-1)
         rotated_point = np.rot90(points, k=-1)
-        PILImage.fromarray(rotated_image).save("./test_rgb22.png")
-        np.save("./test_depth22", rotated_depth)
+        PILImage.fromarray(rotated_image).save("./test_rgb.png")
+        np.save("./test_depth", rotated_depth)
 
         ## Send RGB, depth and camera intrinsics data
         send_array(self.socket, rotated_image)
@@ -32,11 +31,6 @@ class ImagePublisher():
         print(self.socket.recv_string()) 
         send_array(self.socket, np.array([self.camera.fy, self.camera.fx, self.camera.cy, self.camera.cx, int(head_tilt*100)]))
         print(self.socket.recv_string())
-
-        ## Support for home-robot top-down grasping [not need for now]
-        if top_down:
-            send_array(self.socket, camera_pose)
-            print(self.socket.recv_string())
 
         ## Sending Object text and Manipulation mode
         self.socket.send_string(text)

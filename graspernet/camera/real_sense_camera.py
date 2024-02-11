@@ -5,15 +5,10 @@
 ##              Align Depth to Color               ##
 #####################################################
 
-# First import the library
 import pyrealsense2 as rs
-# Import Numpy for easy array manipulation
 import numpy as np
-# Import OpenCV for easy image rendering
 import cv2
-
 import open3d as o3d
-
 import matplotlib.pyplot as plt
 
 class RealSenseCamera:
@@ -34,8 +29,6 @@ class RealSenseCamera:
 
     def capture_image(self, visualize=False):
         self.rgb_image, self.depth_image, self.points = self.robot.head.get_images(compute_xyz=True)
-        #TODO: This is actually unecessary, we are rotating the images to make sure we can make 
-        # minimal changes to our older versions of codes
         self.rgb_image = np.rot90(self.rgb_image, k = 1)[:, :, [2, 1, 0]]
         self.depth_image = np.rot90(self.depth_image, k = 1)
         self.points = np.rot90(self.points, k = 1)
@@ -63,12 +56,6 @@ class RealSenseCamera:
 
     def pixel2d_to_point3d(self, ix, iy):
         return self.points[iy, ix][[1, 0, 2]]
-
-    def click_event(self, event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            self.ix = x
-            self.iy = y
-            print("Selected point: ({}, {})".format(self.ix, self.iy))
 
 if __name__ == "__main__":
     camera = RealSenseCamera()
