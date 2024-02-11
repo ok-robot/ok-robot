@@ -1,6 +1,18 @@
-# Ok-Robot
-Ok-Robot is a framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 ![Intro Figure](https://drive.google.com/uc?export=view&id=1IAyAMZS__gcZmsZevQyeETLU369a0n9X)
+# Ok-Robot
+
+[<u>Project Website</u>](https://ok-robot.github.io/) . [<u>Paper</u>](https://arxiv.org/abs/2401.12202)
+
+**Authors List**: [<u>Peiqi Liu</u>](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u>](https://mahis.life/), [<u>Lerrel Pinto</u>](https://www.lerrelpinto.com/) 
+
+Ok-Robot is a framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
+
+<details open>
+  <summary>ok-robot.mp4</summary>
+  
+  <!-- Your embedded video code goes here -->
+  <iframe width="560" height="315" src="https://drive.google.com/file/d/1IC_wUHmnvq_Aon-fKdiNUNRawQC3patP/view?usp=sharing" frameborder="0" allowfullscreen></iframe>
+</details>
 
 ## Hardware and software requirements
 Hardware required:
