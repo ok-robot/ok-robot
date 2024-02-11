@@ -198,10 +198,12 @@ def pickup(robot, rotation, translation, base_node, gripper_node, gripper_height
     
     # Now the gripper reached the grasping point and starts picking procedure
     robot.pickup(abs(0))
+
+    # Lifts the arm
     robot.move_to_position(lift_pos = 1.1)
     time.sleep(2)
 
-    # Shift back to the original point
+    # Tucks the gripper so that while moving to place it wont collide with any obstacles
     robot.move_to_position(arm_pos = 0)
     time.sleep(2)
     robot.move_to_position(wrist_pitch = 0.0, arm_pos = 0)
