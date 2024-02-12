@@ -37,7 +37,9 @@ Once the robot and workstation are complete. You are good to start the experimen
 
 ## Run Experiments
 First [set up the environment](./docs/environment-setup) with the tapes and position the robot properly and scan the environment and get a r3d file from Record3D and place it in `/navigation/r3d/` run following commands.
+
 **On Workstation**:
+
 In one terminal run the [Navigation Module](./navigation/).
 ```
 mamba activate ok-robot-env
@@ -46,7 +48,7 @@ cd navigation
 python path_planning.py debug=False dataset_path='/r3d/{your_r3d_filename}.r3d' cache_path={your_r3d_filename}.pt
 ```
 
-In another terminal run the [Manipualtion module](./anygrasp/README.md)
+In another terminal run the [Manipulation module](./anygrasp/README.md)
 ```
 mamba activate ok-robot-env
 
@@ -55,6 +57,7 @@ python dempy.py --open_communication --debug
 ```
 
 **On Robot**:
+
 In one terminal start the home-robot
 ```
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
