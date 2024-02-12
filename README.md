@@ -23,18 +23,9 @@ Hardware required:
   
 Software required:
 * Python 3.9
-* Record3D (installed on iPhone) [has to mention the version]
-
-## Clone this repository to your local machine
-```
-git clone https://github.com/NYU-robot-learning/home-engine
-cd home-engine
-git checkout peiqi
-```
+* Record3D (>1.18.0)
 
 ## Workspace Installation and Setup
-Install [Mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) if it is not present 
-
 ### CUDA 12.*
 ```
 # Environment creation
@@ -67,7 +58,7 @@ cd anygrasp/pointnet2/
 python setup.py install
 ```
 
-## Anygrasp Setup
+## Anygrasp License
 Please refer licence [readme](/anygrasp/license_registration/README.md) for detailed information on how to get the anygrasp license. After completing the necessary steps you will receive the license and checkpoint.tar through email.
 
 Once you receive these files
