@@ -30,6 +30,7 @@ class ObjectHandler():
 
     def receive_input(self, tries):
         if self.cfgs.open_communication:
+            print("\n\nWaiting for data from Robot")
             # Reading color array
             colors = self.socket.recv_array()
             self.socket.send_data("RGB received")
