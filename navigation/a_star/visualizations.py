@@ -66,14 +66,14 @@ def create_arrow_geometry(start_point, end_point, arrow_length=0.2, cylinder_rad
 def visualize_path(path, end_xyz, cfg):
 
     
-    if not os.path.exists('pointcloud.ply'):
-        print('\nNo pointcloud.ply found, creating a new one.\n')
+    if not os.path.exists(cfg.pointcloud_path):
+        print(f'\nNo {cfg.pointcloud_path} found, creating a new one.\n')
         from a_star.data_util import get_pointcloud, get_posed_rgbd_dataset
-        get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path))
-        print('\npointcloud.ply created.\n')
+        get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path), cfg.pointcloud_path)
+        print(f'\n{cfg.pointcloud_path} created.\n')
 
     # Example point cloud and path points (replace with your data)
-    point_cloud = o3d.io.read_point_cloud("pointcloud.ply")
+    point_cloud = o3d.io.read_point_cloud(cfg.pointcloud_path)
 
     if path is not None:
         path = np.array(np.array(path).tolist())
