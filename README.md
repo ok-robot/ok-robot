@@ -8,13 +8,9 @@
 
 Ok-Robot is a framework that combines the state-of-art navigation and manipualtion models in a intelligent way to design a modular system that can effectively perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 
-<details open>
-  <summary>ok-robot.mp4</summary>
-  
 
-  <!-- Your embedded video code goes here -->
-  <video src="https://drive.google.com/file/d/1IC_wUHmnvq_Aon-fKdiNUNRawQC3patP/view?usp=sharing" width="640" height="480"></video>
-</details>
+https://github.com/NYU-robot-learning/home-engine/assets/32452559/4849ba44-0461-491e-a872-3f362959b6b8
+
 
 ## Hardware and software requirements
 Hardware required:
