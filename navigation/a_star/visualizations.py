@@ -59,8 +59,7 @@ def visualize_path(path, end_xyz, cfg):
     
     if not os.path.exists('pointcloud.ply'):
         print('\nNo pointcloud.ply found, creating a new one.\n')
-        from a_star.map_util import get_posed_rgbd_dataset
-        from a_star.data_util import get_pointcloud
+        from a_star.data_util import get_pointcloud, get_posed_rgbd_dataset
         get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path))
         print('\npointcloud.ply created.\n')
 
