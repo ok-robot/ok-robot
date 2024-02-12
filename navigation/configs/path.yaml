@@ -17,7 +17,7 @@ port_number: 5555
 save_file: "./test"
 
 # min (floor) and max (ceil) height for building obstalce map
-min_height: -0.5
+min_height: -0.8
 max_height: 1
 
 
