@@ -25,7 +25,7 @@ Software required:
 * [Install](./docs/workspace-installation.md) the necessary environment on workstation to run the navigation and manipulation modules
 * [Install](./docs/robot-installation.md) the necessary packages on robot to abe able to properly communicate with backend workstation.
 * You might also need to get a [new calibrated URDF](./docs/robot-calibration.md) for accurate robot manipulation.
-* [verify the installation](./docs/installation-verification.md) once the above steps are completed (installation verification)
+* [Verify the installation](./docs/installation-verification.md) once the above steps are completed (installation verification)
 
 Once both the robot and workstation are complete. You are good to start the experiments.
 
@@ -39,7 +39,7 @@ In one terminal run the [Navigation Module](./navigation/).
 mamba activate ok-robot-env
 
 cd navigation
-python path_planning.py debug=False dataset_path='/r3d/{your_r3d_filename}.r3d' cache_path='{your_r3d_filename}.pt'
+python path_planning.py debug=False dataset_path='r3d/{your_r3d_filename}.r3d' cache_path='{your_r3d_filename}.pt' pointcloud_path='{your_r3d_filename}.ply'
 ```
 
 In another terminal run the [Manipulation module](./anygrasp/README.md)
