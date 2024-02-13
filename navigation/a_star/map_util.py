@@ -16,10 +16,6 @@ from torch.utils.data.dataset import Dataset
 from a_star.data_util import get_bounds, get_poses, iter_xyz
 from a_star.dataset_class import PosedRGBDItem
 
-# for testing purpose only
-from a_star.data_util import get_posed_rgbd_dataset
-from matplotlib import pyplot as plt
-
 import cv2
 
 
@@ -179,16 +175,3 @@ def get_ground_truth_map_from_dataset(
     ignore_cached = ignore_cached,
     conservative = False,
     occ_avoid = 0)
-
-if __name__ == "__main__":
-    is_occ = get_ground_truth_map_from_dataset(
-        get_posed_rgbd_dataset(key='r3d', path = '/data/peiqi/home-engine/LeoBedroom.r3d'),
-        0.1,
-        (-0.9, 0.5)
-    )
-    fig, axes = plt.subplots(1, 1, figsize=(8, 8))
-    minx, miny = is_occ.origin
-    (ycells, xcells), resolution = is_occ.grid.shape, is_occ.resolution
-    maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
-    axes.imshow(is_occ.grid[::-1], extent=(minx, maxx, miny, maxy))
-    fig.savefig('test.jpg')

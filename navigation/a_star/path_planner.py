@@ -21,9 +21,6 @@ from a_star.data_util import get_posed_rgbd_dataset
 
 import math
 
-# for testing purpose
-from matplotlib import pyplot as plt
-
 def compute_theta(cur_x, cur_y, end_x, end_y):
     theta = 0
     if end_x == cur_x and end_y >= cur_y:
@@ -121,25 +118,3 @@ class PathPlanner():
 
     def is_valid_starting_point(self, xy: tuple[float, float]) -> bool:
         return self.a_star_planner.is_valid_starting_point(xy)
-
-if __name__ == "__main__":
-    planner = PathPlanner(
-        dataset_path = '/data/peiqi/home-engine/LeoBedroom.r3d',
-        floor_height = -0.9,
-        ceil_height = 0.6
-    )
-    start_xy = (0, -0.5)
-    end_xy = (2, -0.5)
-    paths = planner.plan(start_xy = start_xy, end_xy = end_xy)
-    xs, ys, thetas = zip(*paths)
-    fig, axes = plt.subplots(1, 1, figsize=(8, 8))
-    is_occ = planner.occupancy_map
-    minx, miny = is_occ.origin
-    (ycells, xcells), resolution = is_occ.grid.shape, is_occ.resolution
-    maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
-    axes.imshow(is_occ.grid[::-1], extent=(minx, maxx, miny, maxy))
-    axes.plot(xs, ys, c='r')
-    axes.scatter(xs, ys, c = 'cyan', s = 10)
-    axes.scatter(start_xy[0], start_xy[1], s = 50, c = 'white')
-    axes.scatter(end_xy[0], end_xy[1], s = 50, c = 'g')
-    fig.savefig('test.jpg')

@@ -38,7 +38,7 @@ class R3DSemanticDataset(Dataset):
         else:
             self._classes = CLASS_LABELS_200
         self._classes = list(set(self._classes))
-        print(self._classes)
+        print("The labels you use for OWL-ViT is ", str(self._classes))
         
         self._subsample_freq = subsample_freq
         self._reshaped_depth = []

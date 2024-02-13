@@ -76,23 +76,3 @@ def kdl_tree_from_urdf_model(urdf):
     add_children_to_tree(root)
     # print("\n\n\n")
     return tree
-
-def cam_info_to_intrinsic_mat(cam_info):
-    return np.asarray(cam_info).reshape(3, 3)
-
-def pixel_to_pcd(ix, iy, depth_image, intrinsic_mat):
-    fx = intrinsic_mat[0, 0]
-    fy = intrinsic_mat[1, 1]
-    cx = intrinsic_mat[0, 2]
-    cy = intrinsic_mat[1, 2]
-
-    depth_image = np.asarray(depth_image)
-    print("depth iamge shape: ", depth_image.shape, np.max(depth_image), np.min(depth_image))
-    d = depth_image[iy, ix]
-    # d1 = np.asarray(depth_image)[ix, iy]
-    print(d)
-    z = d/1000
-    x = (ix - cx)*(abs(z))/fx
-    y = -(iy - cy)*(abs(z))/fy
-
-    return x, y, z

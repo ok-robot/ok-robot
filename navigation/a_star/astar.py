@@ -15,11 +15,6 @@ import torch
 
 from a_star.map_util import Map
 
-# For testing purpose only
-from a_star.data_util import get_posed_rgbd_dataset
-from a_star.map_util import get_occupancy_map_from_dataset
-from matplotlib import pyplot as plt
-
 Heuristic = Literal["manhattan", "euclidean", "octile", "chebyshev"]
 
 
@@ -288,27 +283,3 @@ class AStarPlanner():
 
     def is_valid_starting_point(self, xy: tuple[float, float]) -> bool:
         return not self.point_is_occupied(*self.to_pt(xy))
-
-if __name__ == "__main__":
-    is_occ = get_occupancy_map_from_dataset(
-        get_posed_rgbd_dataset(key='r3d', path = '/data/peiqi/home-engine/LeoBedroom.r3d'),
-        0.1,
-        (-0.9, 0.5),
-        occ_avoid = 2,
-        conservative = True
-    )
-    planner = AStarPlanner(
-        is_occ = np.expand_dims((is_occ.grid == -1), axis = -1),
-        origin = is_occ.origin,
-        resolution = is_occ.resolution
-    )
-    paths = planner.run_astar(start_xy = (0, -0.5), end_xy = (2.1, 0))
-    xs, ys = zip(*paths)
-    fig, axes = plt.subplots(1, 1, figsize=(8, 8))
-    minx, miny = is_occ.origin
-    (ycells, xcells), resolution = is_occ.grid.shape, is_occ.resolution
-    maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
-    axes.imshow(is_occ.grid[::-1], extent=(minx, maxx, miny, maxy))
-    axes.plot(xs, ys, c='r')
-    axes.scatter(xs, ys, c = 'cyan', s = 10)
-    fig.savefig('test.jpg')

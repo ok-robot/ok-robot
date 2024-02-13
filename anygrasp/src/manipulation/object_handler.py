@@ -26,12 +26,11 @@ class ObjectHandler():
         if self.cfgs.open_communication:
             self.socket = ZmqSocket(self.cfgs) 
 
-        # self.owl_vit = OwlVITProcessor()
-        # self.sam = SamProcessor()
         self.lang_sam = LangSAMProcessor()
 
     def receive_input(self, tries):
         if self.cfgs.open_communication:
+            print("\n\nWaiting for data from Robot")
             # Reading color array
             colors = self.socket.recv_array()
             self.socket.send_data("RGB received")

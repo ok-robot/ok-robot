@@ -68,25 +68,25 @@ class Bounds:
             zmax=bounds[2, 1].item(),
         )
 
-    @classmethod
-    def merge_bounds(cls, a: Tensor, b: Tensor) -> Tensor:
-        return torch.stack(
-            (
-                torch.minimum(a[:, 0], b[:, 0]),
-                torch.maximum(a[:, 1], b[:, 1]),
-            ),
-            dim=1,
-        )
+    # @classmethod
+    # def merge_bounds(cls, a: Tensor, b: Tensor) -> Tensor:
+    #     return torch.stack(
+    #         (
+    #             torch.minimum(a[:, 0], b[:, 0]),
+    #             torch.maximum(a[:, 1], b[:, 1]),
+    #         ),
+    #         dim=1,
+    #     )
 
-    @classmethod
-    def from_xyz(cls, xyz: Tensor) -> Tensor:
-        assert xyz.shape[-1] == 3
+    # @classmethod
+    # def from_xyz(cls, xyz: Tensor) -> Tensor:
+    #     assert xyz.shape[-1] == 3
 
-        xmin, xmax = aminmax(xyz[..., 0])
-        ymin, ymax = aminmax(xyz[..., 1])
-        zmin, zmax = aminmax(xyz[..., 2])
+    #     xmin, xmax = aminmax(xyz[..., 0])
+    #     ymin, ymax = aminmax(xyz[..., 1])
+    #     zmin, zmax = aminmax(xyz[..., 2])
 
-        return torch.tensor([[xmin, xmax], [ymin, ymax], [zmin, zmax]], device=xyz.device, dtype=xyz.dtype)
+    #     return torch.tensor([[xmin, xmax], [ymin, ymax], [zmin, zmax]], device=xyz.device, dtype=xyz.dtype)
 
 
 def get_xyz(depth: Tensor, mask: Tensor, pose: Tensor, intrinsics: Tensor) -> Tensor:
@@ -154,7 +154,7 @@ def iter_xyz(ds: Dataset[PosedRGBDItem], desc: str, chunk_size: int = 16) -> Ite
         xyz = get_xyz(depth, mask, pose, intrinsics)
         yield xyz, mask.squeeze(1)
 
-def get_pointcloud(ds: Dataset[PosedRGBDItem], chunk_size: int = 16, threshold:float = 0.9) -> Iterator[tuple[Tensor, Tensor]]:
+def get_pointcloud(ds: Dataset[PosedRGBDItem], file_name: str, chunk_size: int = 16, threshold:float = 0.9) -> Iterator[tuple[Tensor, Tensor]]:
     """Iterates XYZ points from the dataset.
 
     Args:
@@ -197,7 +197,7 @@ def get_pointcloud(ds: Dataset[PosedRGBDItem], chunk_size: int = 16, threshold:f
     merged_pcd.colors = o3d.utility.Vector3dVector(rgbs)
     merged_downpcd = merged_pcd.voxel_down_sample(voxel_size=0.03)
 
-    o3d.io.write_point_cloud(f"pointcloud.ply", merged_downpcd)
+    o3d.io.write_point_cloud(file_name, merged_downpcd)
 
 
 def get_poses(ds: Dataset[PosedRGBDItem], cache_dir = None) -> np.ndarray:

@@ -106,6 +106,7 @@ def main(cfg):
             end_xy = end_xyz[:2]
             visualize_path(None, end_xyz, cfg)
         else:
+            print("Waiting for the data from Robot")
             start_xyt = recv_array(socket)
             print(start_xyt)
             socket.send_string('xyt received')
