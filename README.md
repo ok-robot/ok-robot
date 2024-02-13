@@ -4,7 +4,8 @@
 
 [<u>Project Website</u>](https://ok-robot.github.io/) . [<u>Paper</u>](https://arxiv.org/abs/2401.12202)
 
-**Authors List**: [<u>Peiqi Liu</u>](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u>](https://mahis.life/), [<u>Lerrel Pinto</u>](https://www.lerrelpinto.com/) 
+**Authors List**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u><sup>†</sup>](https://mahis.life/), [<u>Lerrel Pinto</u><sup>†</sup>](https://www.lerrelpinto.com/)    
+* equal contribution, † equal advising.
 
 Ok-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipualtion models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 
