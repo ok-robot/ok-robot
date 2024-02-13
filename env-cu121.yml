@@ -9,85 +9,50 @@ dependencies:
   - ipython
   - cmake
   - pybind11
-  #- pytorch
-  #- pytorch-cuda
+  - pytorch
+  - pytorch-cuda=12.1
   - pytorch3d
-  #- torchvision
-  #- torchaudio
+  - torchvision
+  - torchaudio
   - pyg
-  # - pytorch-cluster
-  # - pytorch-scatter
-  # - exa # optional: nice ls
-  # - fzf # optional: fancy ctrl + R
   - pip
+  - ninja
   - pip:
     - numpy # certain deprecated operations were used in other deps
     - scipy == 1.10.1
-    # - scikit-learn==1.4.0
+    - scikit-learn==1.4.0
     #- sentencepiece==0.1.99 
     - pandas==2.0.3
-    - torch==2.1.0
-    - torchvision
-    - torchaudio
     - hydra-core
     # - torch-scatter -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
-    # - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
-    # - sophuspy
-    # - pybullet
-    # - trimesh
-    # - pytest
-    # - scikit-image
-    # - scikit-fmm
-    # - scikit-learn
-    # - numpy-quaternion
-    # - natsort
-    # - frozendict
+    - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
     # # Robots
     - opencv-python
-    # - pin>=2.6.17
-    # # Neural networks
     - openai-clip
     - timm
-    
-    # - mss
+  
     # # visualizations and debugging
     - matplotlib==3.7.2
-    # # Command line tools
-    # - click
-    # # data tools
-    # - yacs
-    # - h5py
     - imageio
-    # - pygifsicle
-    # - pynput
-    # - git+https://github.com/openai/CLIP.git
     - open3d
     - numpy-quaternion
-    # # For MiDaS
-    # - imutils
 
     # Navigation
     - more-itertools
     - pyliblzfse
     - einops
     - transformers
-    #- sentence-transformers
-    #- git+https://github.com/facebookresearch/detectron2.git
-    #- git+https://github.com/zhanghang1989/PyTorch-Encoding/
     - pytorch-lightning
     - wget
     - gdown
     - torch_geometric
     - tqdm
-    # - git+https://github.com/facebookresearch/segment-anything
-    - ninja
     - zmq
 
     # grasping
-    # - git+https://github.com/pccws/MinkowskiEngine
-    # - graspnetAPI
     - protobuf==3.19.0
-    # - git+https://github.com/luca-medeiros/lang-segment-anything.git
+    - git+https://github.com/pccws/MinkowskiEngine
+    - git+https://github.com/luca-medeiros/lang-segment-anything.git
 
 
 

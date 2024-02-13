@@ -12,9 +12,9 @@
 .DS_Store
 .TimeRecord
 license
-/src/checkpoints/*
-/src/example_data/*
+anygrasp/src/checkpoints/*
+anygrasp/src/example_data/*
 /src/sample_save_directory/*
 *.pth
-/anygrasp/pointnet2/*
-/graspernet/hab_stretch/*
+anygrasp/pointnet2/*
+graspernet/hab_stretch/*
