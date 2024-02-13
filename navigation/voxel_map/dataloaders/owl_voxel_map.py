@@ -1,3 +1,32 @@
+'''
+This file adapts from DeticDenseLabelledDataset 
+    in Clip-fields (https://github.com/notmahi/clip-fields) project
+ Most codes are adapted from:
+    1. https://github.com/notmahi/clip-fields/blob/main/dataloaders/real_dataset.py
+License:
+MIT License
+
+Copyright (c) 2024 Nur Muhammad "Mahi" Shafiullah
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import logging
 from typing import List, Optional, Union
 import clip
@@ -15,16 +44,10 @@ from torch.utils.data import Dataset, DataLoader, Subset
 from dataloaders.record3d import R3DSemanticDataset
 from dataloaders.scannet_200_classes import CLASS_LABELS_200
 
-
-# Setup detectron2 logger
-#from sentence_transformers import SentenceTransformer
 from torch.utils.data import Dataset
 
 # import some common libraries
 import sys
-
-# import some common detectron2 utilities
-#from detectron2.data import MetadataCatalog
 
 import torchvision.transforms as transforms
 from transformers import AutoProcessor, OwlViTForObjectDetection
@@ -249,16 +272,6 @@ class OWLViTLabelledDataset(Dataset):
         self._label_rgb = torch.cat(self._label_rgb).float()
         self._label_weight = torch.cat(self._label_weight).float()
         self._image_features = torch.cat(self._image_features).float()
-
-    # def _resample(self):
-    #     resampled_indices = torch.rand(len(self._label_xyz)) < self._subsample_prob
-    #     logging.info(
-    #         f"Resampling dataset down from {len(self._label_xyz)} points to {resampled_indices.long().sum().item()} points."
-    #     )
-    #     self._label_xyz = self._label_xyz[resampled_indices]
-    #     self._label_rgb = self._label_rgb[resampled_indices]
-    #     self._label_weight = self._label_weight[resampled_indices]
-    #     self._image_features = self._image_features[resampled_indices]
 
     def _reshape_coordinates_and_get_valid(self, coordinates, data_dict):
         if "conf" in data_dict:
