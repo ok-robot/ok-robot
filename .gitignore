@@ -1,7 +1,11 @@
 *.tar
 *.pyc
 /navigation/outputs/*
+/navigation/sample_debug/*
+/navigation/test/*
 /outputs/*
+*.pt
+*.ply
 **/*.egg-info/
 *.o
 *.egg

@@ -42,7 +42,6 @@ class ImageProcessor(ABC):
     ) -> None:
         if (max_box_ind != -1):
             max_score = np.max(scores.detach().numpy())
-            print(f"max_score: {max_score}")
             max_ind = np.argmax(scores.detach().numpy())
         max_box = bboxes.detach().numpy()[max_ind].astype(int)
 

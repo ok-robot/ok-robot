@@ -1,8 +1,10 @@
+import math
+
 import open3d as o3d
 import numpy as np
 import os
 
-def create_dashed_cylinder_line(points, radius=0.03, dash_length=0.06, gap_length=0.04, color=[1, 0, 0]):  # Default color red
+def create_dashed_cylinder_line(points, radius=0.03, dash_length=0.07, gap_length=0.03, color=[0, 0, 1]):  # Default color red
     geometries = []
     for i in range(len(points) - 1):
         start_point = points[i]
@@ -10,15 +12,22 @@ def create_dashed_cylinder_line(points, radius=0.03, dash_length=0.06, gap_lengt
         vec = end_point - start_point
         seg_length = np.linalg.norm(vec)
         vec_normalized = vec / seg_length
-        n_dashes = int(seg_length / (dash_length + gap_length))
+        n_dashes = math.ceil(seg_length / (dash_length + gap_length))
 
         for j in range(n_dashes):
-            dash_start = start_point + vec_normalized * j * (dash_length + gap_length)
-            dash_end = dash_start + vec_normalized * dash_length
-            print(f"dash_start - {dash_start}, dash_end - {dash_end}, vec - {vec}")
-            cylinder = o3d.geometry.TriangleMesh.create_cylinder(radius=radius, height=dash_length)
+            new_dash_length = min(dash_length, seg_length - (j)*(dash_length + gap_length))
+            dash_start = start_point + vec_normalized * j * (new_dash_length + gap_length)
+            dash_end = dash_start + vec_normalized * new_dash_length
+            cylinder = o3d.geometry.TriangleMesh.create_cylinder(radius=radius, height=new_dash_length)
             cylinder.translate((dash_start + dash_end)/2)
-            cylinder.rotate(cylinder.get_rotation_matrix_from_xyz([0, np.arctan2(vec[2], np.linalg.norm(vec[:2])), np.arctan2(vec[1], vec[0])]), center=dash_start)
+
+            z_axis = np.array([0, 0, 1])
+            rotation_axis = np.cross(z_axis, vec)
+            rotation_axis = rotation_axis / np.linalg.norm(rotation_axis)
+            rotation_angle = np.pi/2
+            rotation_matrix = cylinder.get_rotation_matrix_from_axis_angle(rotation_axis*rotation_angle)
+            cylinder.rotate(rotation_matrix, center=dash_start)
+
             cylinder.paint_uniform_color(color)
             geometries.append(cylinder)
     
@@ -57,15 +66,14 @@ def create_arrow_geometry(start_point, end_point, arrow_length=0.2, cylinder_rad
 def visualize_path(path, end_xyz, cfg):
 
     
-    if not os.path.exists('pointcloud.ply'):
-        print('\nNo pointcloud.ply found, creating a new one.\n')
-        from a_star.map_util import get_posed_rgbd_dataset
-        from a_star.data_util import get_pointcloud
-        get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path))
-        print('\npointcloud.ply created.\n')
+    if not os.path.exists(cfg.pointcloud_path):
+        print(f'\nNo {cfg.pointcloud_path} found, creating a new one.\n')
+        from a_star.data_util import get_pointcloud, get_posed_rgbd_dataset
+        get_pointcloud(get_posed_rgbd_dataset(key = 'r3d', path = cfg.dataset_path), cfg.pointcloud_path)
+        print(f'\n{cfg.pointcloud_path} created.\n')
 
     # Example point cloud and path points (replace with your data)
-    point_cloud = o3d.io.read_point_cloud("pointcloud.ply")
+    point_cloud = o3d.io.read_point_cloud(cfg.pointcloud_path)
 
     if path is not None:
         path = np.array(np.array(path).tolist())
@@ -78,17 +86,10 @@ def visualize_path(path, end_xyz, cfg):
         lines = create_dashed_cylinder_line(path)
     end_point[2] = (cfg.min_height + cfg.max_height)/2
 
-    # arrows = add_arrows_to_line(lines)
-
-    # Create the line set for the path
-    # lines = [[i, i+1] for i in range(len(path)-1)]
-    # line_set = o3d.geometry.LineSet(points=o3d.utility.Vector3dVector(path),
-    #                                 lines=o3d.utility.Vector2iVector(lines))
-
     # Create spheres for start and end points
     if path is not None:
         start_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
-    end_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
+    end_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.1)
 
     # Set the position of the spheres
     if path is not None:
@@ -99,7 +100,7 @@ def visualize_path(path, end_xyz, cfg):
     # lines.paint_uniform_color([1, 0, 0])  # Red path
     if path is not None:
         start_sphere.paint_uniform_color([0, 1, 0])  # Green start
-    end_sphere.paint_uniform_color([0, 0, 1])  # Blue end
+    end_sphere.paint_uniform_color([1, 0, 0])  # Blue end
 
     # Visualize
     visualizer = o3d.visualization.Visualizer()
