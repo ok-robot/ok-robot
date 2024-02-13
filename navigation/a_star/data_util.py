@@ -4,6 +4,30 @@
  Most codes are adapted from:
     1. https://github.com/codekansas/usa/blob/master/usa/planners/base.py
     2. https://github.com/codekansas/usa/blob/master/usa/tasks/datasets/posed_rgbd.py
+
+ 
+ License:
+ MIT License
+
+ Copyright (c) 2023 Ben Bolte
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
 """
 
 import os
@@ -67,26 +91,6 @@ class Bounds:
             zmin=bounds[2, 0].item(),
             zmax=bounds[2, 1].item(),
         )
-
-    # @classmethod
-    # def merge_bounds(cls, a: Tensor, b: Tensor) -> Tensor:
-    #     return torch.stack(
-    #         (
-    #             torch.minimum(a[:, 0], b[:, 0]),
-    #             torch.maximum(a[:, 1], b[:, 1]),
-    #         ),
-    #         dim=1,
-    #     )
-
-    # @classmethod
-    # def from_xyz(cls, xyz: Tensor) -> Tensor:
-    #     assert xyz.shape[-1] == 3
-
-    #     xmin, xmax = aminmax(xyz[..., 0])
-    #     ymin, ymax = aminmax(xyz[..., 1])
-    #     zmin, zmax = aminmax(xyz[..., 2])
-
-    #     return torch.tensor([[xmin, xmax], [ymin, ymax], [zmin, zmax]], device=xyz.device, dtype=xyz.dtype)
 
 
 def get_xyz(depth: Tensor, mask: Tensor, pose: Tensor, intrinsics: Tensor) -> Tensor:
