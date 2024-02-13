@@ -23,7 +23,7 @@ dependencies:
     - scikit-learn==1.4.0
     - pandas==2.0.3
     - hydra-core
-    - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
+    # - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
     # # Robots
     - opencv-python
     - openai-clip
