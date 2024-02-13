@@ -26,4 +26,5 @@ pip install graspnetAPI
 # Setup poincept
 cd anygrasp/pointnet2/
 python setup.py install
+cd ../../
 ```
