@@ -21,10 +21,8 @@ dependencies:
     - numpy # certain deprecated operations were used in other deps
     - scipy == 1.10.1
     - scikit-learn==1.4.0
-    #- sentencepiece==0.1.99 
     - pandas==2.0.3
     - hydra-core
-    # - torch-scatter -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
     - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
     # # Robots
     - opencv-python

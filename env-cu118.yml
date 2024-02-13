@@ -14,49 +14,27 @@ dependencies:
   - torchvision
   - torchaudio
   - pyg
+  - ninja
   - pytorch-cluster
   - pytorch-scatter
-  # - exa # optional: nice ls
-  # - fzf # optional: fancy ctrl + R
   - pip
   - pip:
     - numpy # certain deprecated operations were used in other deps
-    - scipy == 1.10.1
+    - scipy==1.10.1
     - sentencepiece==0.1.99 
     - pandas==2.0.3
-    # - sophuspy
-    # - pybullet
-    # - trimesh
-    # - pytest
-    # - scikit-image
-    # - scikit-fmm
-    # - scikit-learn
-    # - numpy-quaternion
-    # - natsort
-    # - frozendict
-    # # Robots
+    # Robots
     - opencv-python
-    # - pin>=2.6.17
-    # # Neural networks
+    # Neural networks
     - openai-clip
     - timm
 
-    # - mss
-    # # visualizations and debugging
+    # Visualizations and debugging
     - matplotlib==3.7.2
-    # # Command line tools
-    # - click
-    # # data tools
-    # - yacs
-    # - h5py
+    # Command line tools
     - imageio
-    # - pygifsicle
-    # - pynput
-    # - git+https://github.com/openai/CLIP.git
     - open3d
     - numpy-quaternion
-    # # For MiDaS
-    # - imutils
 
     # Navigation
     - more-itertools
@@ -64,17 +42,12 @@ dependencies:
     - einops
     - transformers
     - sentence-transformers
-    - git+https://github.com/facebookresearch/detectron2.git
-    - git+https://github.com/zhanghang1989/PyTorch-Encoding/
     - pytorch-lightning
     - wget
     - gdown
     - torch_geometric
     - tqdm
-    # - git+https://github.com/facebookresearch/segment-anything
-    - ninja
     - zmq
-
 
     # grasping
     - git+https://github.com/NVIDIA/MinkowskiEngine
