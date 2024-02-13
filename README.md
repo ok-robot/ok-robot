@@ -30,7 +30,7 @@ Software required:
 Once both the robot and workstation are complete. You are good to start the experiments.
 
 ## Run Experiments
-First [set up the environment](./docs/environment-setup) with the tapes, position the robot properly and scan the environment to get a r3d file from Record3D. Place it in `/navigation/r3d/` run following commands.
+First [set up the environment](./docs/environment-setup.md) with the tapes, position the robot properly and scan the environment to get a r3d file from Record3D. Place it in `/navigation/r3d/` run following commands.
 
 **On Workstation**:
 
