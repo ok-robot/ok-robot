@@ -6,7 +6,13 @@
 * Two tapes in the scene which will serve as a orgin for the robot.
 
 <!--**Tape Placement:** This [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) has illustrations on how to place tapes on the ground and scan the environment properly.-->
-**Tape Placement:** ![This image](docs_image/How%20you%20should%20place%20tapes1.png) and ![this image](docs_image/How%20you%20should%20place%20tapes2.png) illustrate how you should put tapes on the ground. After properly putting tapes on the ground, you should start scan the environment before moving the robot into the environment.
+<!--**Tape Placement:** ![This image](docs_image/How%20you%20should%20place%20tapes1.png) and ![this image](docs_image/How%20you%20should%20place%20tapes2.png) illustrate how you should put tapes on the ground. After properly putting tapes on the ground, you should start scan the environment before moving the robot into the environment.-->
+
+**Tape Placement:** Follow images below to put tapes on the ground. After properly putting tapes on the ground, you should start scan the environment before moving the robot into the environment.
+<p align="center">
+  <img src="docs_image/How%20you%20should%20place%20tapes1.png" width="auto" height="100" style="margin-right: 10px;"/>
+  <img src="docs_image/How%20you%20should%20place%20tapes2.png" width="auto" height="100"/>
+</p>
 
 **Scan the Environment:** After positioning the objects and tapes, proceed to scan the environment and save the Record3D r3d file in the `navigation/r3d/` folder. If you just want to try out a sample r3d file, you can use `navigation/r3d/sample.r3d`.
 
