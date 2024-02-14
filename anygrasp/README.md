@@ -22,7 +22,7 @@ python demo.py --debug
 ## Visualizations
 Once you run the program it will save the following visualizations in the `save_directory` option in `src/demo.py` file
 * **clean_*.jpg -** Image taken by the robot for processing
-* **lseg_segmentation_*.jpg -** Segemented object mask of the query
+* **semantic_segmentation_*.jpg -** Segemented object mask of the query
 * **poses.jpg -** Screen shot of 3d scene with all the predicted poses
 * **grasp_projections.jpg -** Green dots indicate grasps inside the object mask and red dots indicate grasps outside the object mask.
 * **best pose.jpg -** Final executed pose
