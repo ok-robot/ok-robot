@@ -116,9 +116,9 @@ class ObjectHandler():
             seg_mask, bbox = self.lang_sam.detect_obj(self.cam.image, self.query, 
                                                       visualize_box = True, visualize_mask = True,
                                                       box_filename = self.cfgs.environment + "/" + self.query + \
-                                                            "/anygrasp/lseg_detection_" + str(tries) + ".jpg",
+                                                            "/anygrasp/object_detection_" + str(tries) + ".jpg",
                                                       mask_filename = self.cfgs.environment + "/" + self.query + \
-                                                            "/anygrasp/lseg_segmentation_" + str(tries) + ".jpg")
+                                                            "/anygrasp/semantic_segmentation_" + str(tries) + ".jpg")
 
             if bbox is None:
                 if self.cfgs.open_communication:
