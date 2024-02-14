@@ -5,8 +5,8 @@
 mamba env create -n ok-robot-env -f ./env-cu121.yml
 mamba activate ok-robot-env
 
-# Pointnet setup for anygrasp
-cd anygrasp/pointnet2/
+# Pointnet setup for Manipulation
+cd ok-robot-manipulation/pointnet2/
 python setup.py install
 cd ../../
 
@@ -25,8 +25,8 @@ mamba activate ok-robot-env
 pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0
 pip install graspnetAPI
 
-# Setup poincept
-cd anygrasp/pointnet2/
+# Setup pointnet
+cd ok-robot-manipulation/pointnet2/
 python setup.py install
 cd ../../
 ```

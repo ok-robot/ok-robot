@@ -1,8 +1,8 @@
 *.tar
 *.pyc
-/navigation/outputs/*
-/navigation/sample_debug/*
-/navigation/test/*
+/ok-robot-navigation/outputs/*
+/ok-robot-navigation/sample_debug/*
+/ok-robot-navigation/test/*
 /outputs/*
 *.pt
 *.ply
@@ -12,9 +12,9 @@
 .DS_Store
 .TimeRecord
 license
-anygrasp/src/checkpoints/*
-anygrasp/src/example_data/*
+ok-robot-manipulation/src/checkpoints/*
+ok-robot-manipulation/src/example_data/*
 /src/sample_save_directory/*
 *.pth
-anygrasp/pointnet2/*
-graspernet/hab_stretch/*
+ok-robot-manipulation/pointnet2/*
+ok-robot-hw/hab_stretch/*

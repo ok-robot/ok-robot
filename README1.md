@@ -32,8 +32,8 @@ Software required:
 mamba env create -n ok-robot-env -f ./env-cu121.yml
 mamba activate ok-robot-env
 
-# Pointnet setup for anygrasp
-cd anygrasp/pointnet2/
+# Pointnet setup for ok-robot-manipulation
+cd ok-robot-manipulation/pointnet2/
 python setup.py install
 cd ../../
 
@@ -54,16 +54,16 @@ pip install --upgrade --no-deps --force-reinstall scikit-learn==1.4.0
 pip install graspnetAPI
 
 # Setup poincept
-cd anygrasp/pointnet2/
+cd ok-robot-manipulation/pointnet2/
 python setup.py install
 ```
 
 ## Anygrasp License
-Please refer licence [readme](/anygrasp/license_registration/README.md) for detailed information on how to get the anygrasp license. After completing the necessary steps you will receive the license and checkpoint.tar through email.
+Please refer licence [readme](/ok-robot-manipulation/license_registration/README.md) for detailed information on how to get the anygrasp license. After completing the necessary steps you will receive the license and checkpoint.tar through email.
 
 Once you receive these files
-* Received license folder should be renamed to `license` and place in anygrasp/src/ directory.
-* Move the checkpoint.tar into the anygrasp/src/checkpoints/ directory.
+* Received license folder should be renamed to `license` and place in ok-robot-manipulation/src/ directory.
+* Move the checkpoint.tar into the ok-robot-manipulation/src/checkpoints/ directory.
 
 ## Installation Verification
 ### Navigation module Testing
@@ -75,9 +75,9 @@ cd ../
 ```
 
 ### Manipulation Module Testing
-Run demo.py. It should ask for action [pick/place] and object name from `/anygrasp/src/example_data/ptest_rgb.png` file. Then you should see visualisation related to all the predicted grasps in the scene and a final grasp related to object. More about this in manipulation [README](./manipulation/README.md). [If you face any memory issues try reducing the sampling rate to 0.2 in `anygrasp/src/demo.py`]
+Run demo.py. It should ask for action [pick/place] and object name from `/ok-robot-manipulation/src/example_data/ptest_rgb.png` file. Then you should see visualisation related to all the predicted grasps in the scene and a final grasp related to object. More about this in manipulation [README](./manipulation/README.md). [If you face any memory issues try reducing the sampling rate to 0.2 in `ok-robot-manipulation/src/demo.py`]
 ```
-cd anygrasp/src
+cd ok-robot-manipulation/src
 python demo.py --debug 
 # run in debug mode to see 3D Manipulation Visualisations. If you are running remotely its better to avoid this option
 ```
@@ -88,7 +88,7 @@ If you are able to see the visualizations then workstation setup is complete. Yo
 **Copy Hab Stretch Folder:** Copy hab stretch folder from [home robot repo](https://github.com/facebookresearch/home-robot/tree/main/assets/hab_stretch) 
 ```
 cd $OK-Robot/
-cp home-robot/assets/hab_stretch/ grasperNet
+cp home-robot/assets/hab_stretch/ ok-robot-hw
 ```
 
 **New calibrated URDF:** If you already have a calibrated urdf these steps can be skipped. Otherwise, follow these steps
@@ -125,7 +125,7 @@ cp home-robot/assets/hab_stretch/ grasperNet
   </joint>
 ```
 
-**URDF Location:** After that replace the strech_manip_mode.urdf in `graspernet/hab_stretch/urdf/` directory with this new calibrated urdf.
+**URDF Location:** After that replace the strech_manip_mode.urdf in `ok-robot-hw/hab_stretch/urdf/` directory with this new calibrated urdf.
 
 ## Experiment Setup
 **Environment Setup:** Use Record3D to scan the environments. Recording should include: 
@@ -183,16 +183,16 @@ python path_planning.py debug=False
 ```
 
 **Pose estimation:**
-More details can be found in Manipulation [ReadME](./anygrasp/README.md)
+More details can be found in Manipulation [ReadME](./ok-robot-manipulation/README.md)
 ```
 mamba activate ok-robot-env
 
-cd anygrasp/src/
+cd ok-robot-manipulation/src/
 python demo.py --debug
 ```
 
 **Robot control:**
-More details can be found in graspernet [ReadME](./graspernet/README.md)
+More details can be found in ok-robot-hw [ReadME](./ok-robot-hw/README.md)
 ```
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
 ```

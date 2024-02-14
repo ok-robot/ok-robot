@@ -22,7 +22,7 @@ Software required:
 * Record3D (>1.18.0)
 
 ## Installation
-* You need to get the [license and checkpoint](./anygrasp/license_registration/README.md) for anygrasp.
+* You need to get the [license and checkpoint](./ok-robot-manipulation/license_registration/README.md) for anygrasp.
 * [Install](./docs/workspace-installation.md) the necessary environment on workstation to run the navigation and manipulation modules
 * [Install](./docs/robot-installation.md) the necessary packages on robot to abe able to properly communicate with backend workstation.
 * You might also need to get a [new calibrated URDF](./docs/robot-calibration.md) for accurate robot manipulation.
@@ -31,23 +31,23 @@ Software required:
 Once both the robot and workstation are complete. You are good to start the experiments.
 
 ## Run Experiments
-First [set up the environment](./docs/environment-setup) with the tapes, position the robot properly and scan the environment to get a r3d file from Record3D. Place it in `/navigation/r3d/` run following commands.
+First [set up the environment](./docs/environment-setup) with the tapes, position the robot properly and scan the environment to get a r3d file from Record3D. Place it in `/ok-robot-navigation/r3d/` run following commands.
 
 **On Workstation**:
 
-In one terminal run the [Navigation Module](./navigation/).
+In one terminal run the [Navigation Module](./ok-robot-navigation/).
 ```
 mamba activate ok-robot-env
 
-cd navigation
+cd ok-robot-navigation
 python path_planning.py debug=False dataset_path='r3d/{your_r3d_filename}.r3d' cache_path='{your_r3d_filename}.pt' pointcloud_path='{your_r3d_filename}.ply'
 ```
 
-In another terminal run the [Manipulation module](./anygrasp/README.md)
+In another terminal run the [Manipulation module](./ok-robot-manipulation/README.md)
 ```
 mamba activate ok-robot-env
 
-cd anygrasp
+cd ok-robot-manipulation
 python dempy.py --open_communication --debug
 ```
 
@@ -58,7 +58,7 @@ In one terminal start the home-robot
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-In another terminal run the robot control. More details in [graspernet](./graspernet/README.md)
+In another terminal run the robot control. More details in [ok-robot-hw](./ok-robot-hw/README.md)
 ```
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
 

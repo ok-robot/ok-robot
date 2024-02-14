@@ -17,6 +17,6 @@
 ```base
     ./license_checker -c license/licenseCfg.json
 ```
-* Name this license folder as `license` and place this inside the `/anygrasp/src/` directory.
+* Name this license folder as `license` and place this inside the `/ok-robot-manipulation/src/` directory.
 
-* Along with the license you will receive the `checkpoint.tar`. Place this in `/anygrasp/src/checkpoints/`
+* Along with the license you will receive the `checkpoint.tar`. Place this in `/ok-robot-manipulation/src/checkpoints/`
