@@ -60,6 +60,8 @@ roslaunch home_robot_hw startup_stretch_hector_slam.launch
 
 In another terminal run the robot control. More details in [ok-robot-hw](./ok-robot-hw/README.md)
 ```
+cd ok-robot-hw
+
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
 
 ```
