@@ -21,8 +21,8 @@ python get_point_cloud.py --input_file=[your r3d file]
 
 We recommend using CloudCompare to localize coordinates of tapes. See these images for instruction 
 <p align="center">
-  <img src="docs_image/CloudCompare step1.png" width="40%" height="auto" style="margin-right: 10px;"/>
-  <img src="docs_image/CloudCompare step2.png" width="40%" height="auto"/>
+  <img src="docs_image/CloudCompare step1.png" width="40%" height="200" style="margin-right: 10px;"/>
+  <img src="docs_image/CloudCompare step2.png" width="40%" height="200"/>
 </p>
 <p align="center">
   <img src="docs_image/CloudCompare step3.png" width="40%" height="auto" style="margin-right: 10px;"/>
