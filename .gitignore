@@ -18,3 +18,5 @@ ok-robot-manipulation/src/example_data/*
 *.pth
 ok-robot-manipulation/pointnet2/*
 ok-robot-hw/hab_stretch/*
+ok-robot-hw/*.npy
+ok-robot-hw/*.png

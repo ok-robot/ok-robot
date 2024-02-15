@@ -2,7 +2,7 @@ import PyKDL
 import time
 import math
 
-from nodes import ImagePublisher
+from image_publisher import ImagePublisher
 from global_parameters import *
 
 def capture_and_process_image(camera, mode, obj, socket, hello_robot):
