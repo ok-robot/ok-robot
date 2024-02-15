@@ -23,7 +23,7 @@ max_height: 1
 
 # Parameters needed for loading semantic memory
 cache_path: 'sample.pt'
-pointcloud_path: 'sample.ply'
+pointcloud_path: 'pointcloud.ply'
 dataset_path: "r3d/sample.r3d"
 
 # devices for loading semantic memory, we have a device for fetching semantic memory 
