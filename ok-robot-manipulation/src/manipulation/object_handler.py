@@ -1,3 +1,12 @@
+'''
+ * Codes cited from AnyGrasp: Robust and Efficient Grasp Perception in Spatial and Temporal Domains
+ * Author: Fang, Hao-Shu and Wang, Chenxi and Fang, Hongjie and Gou, Minghao and Liu, Jirong and Yan, Hengxu and Liu, Wenhai and Xie, Yichen and Lu, Cewu
+ * GitHub: https://github.com/graspnet/anygrasp_sdk
+ * All rights reserved by Fang, Hao-Shu.
+ *
+ * Modifications were made for integration purposes.
+'''
+
 import os 
 import math
 import copy
