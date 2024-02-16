@@ -20,3 +20,8 @@ ok-robot-manipulation/pointnet2/*
 ok-robot-hw/hab_stretch/*
 ok-robot-hw/*.npy
 ok-robot-hw/*.png
+
+# Ignore python build files.
+build
+dist
+example_data
