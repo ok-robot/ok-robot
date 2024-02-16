@@ -33,4 +33,4 @@ If you already have a calibrated urdf you can skip the following steps for getti
   </joint>
 ```
 
-**URDF Location:** After that replace the `strech_manip_mode.urdf` in `graspernet/hab_stretch/urdf/` directory with this new calibrated urdf.
+**URDF Location:** After that replace the `strech_manip_mode.urdf` in `ok-robot-hw/hab_stretch/urdf/` directory with this new calibrated urdf.

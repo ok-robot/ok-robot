@@ -4,5 +4,5 @@
 **Copy Hab Stretch Folder:** Copy hab stretch folder from [home robot repo](https://github.com/facebookresearch/home-robot/tree/main/assets/hab_stretch) 
 ```
 cd $OK-Robot/
-cp home-robot/assets/hab_stretch/ grasperNet
+cp home-robot/assets/hab_stretch/ ok-robot-hw
 ```

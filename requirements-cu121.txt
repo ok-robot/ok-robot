@@ -1,2 +1,0 @@
-git+https://github.com/pccws/MinkowskiEngine
-git+https://github.com/luca-medeiros/lang-segment-anything.git
