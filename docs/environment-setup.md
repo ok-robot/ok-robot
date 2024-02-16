@@ -32,7 +32,7 @@ We recommend using CloudCompare to localize coordinates of tapes. See these imag
 **Robot Base Placement** Position the robot's base on tape1 (pass its coordinates as x1 and y1 when running codes on robot side) and orient it towards tape2 (pass its coordinates as x2 and y2 when running codes on robot side) as shown in bewlow images. Make sure the position and rotation of the robot as accurate as possible as it is crucial for the experiments to run properly. We encourage you to manually finetune the robot's positions or tapes' coordinates if you find the tape coordinates are not accurate enough (You can try to run one navigation query check navigation path planning visualization to see the robot's target position, if the robot is obviously off from the target position in visualization, then you are encouraged to tune robot's initial positions)
 
 <p align="center">
-  <img src="docs_image/How you should use tape to localize robot1.png" width="40%" height="auto" style="margin-right: 10px;"/>
-  <img src="docs_image/How you should use tape to localize robot2.png" width="40%" height="auto"/>
+  <img src="docs_image/How you should use tape to localize robot1.png" width="25%" height="380" style="margin-right: 10px;"/>
+  <img src="docs_image/How you should use tape to localize robot2.png" width="25%" height="380"/>
 </p>
 
