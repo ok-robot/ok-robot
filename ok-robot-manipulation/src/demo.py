@@ -1,4 +1,6 @@
 import argparse
+import sys
+import os
 
 from manipulation import ObjectHandler
 parser = argparse.ArgumentParser()
@@ -16,8 +18,17 @@ parser.add_argument('--environment', default = './example_data', help='Environme
 cfgs = parser.parse_args()
 cfgs.max_gripper_width = max(0, min(0.2, cfgs.max_gripper_width))
 
+def check_license_folder():
+    license_path = "./license"
+    if (not os.path.exists(license_path)) or (len(os.listdir(license_path)) != 4):
+        print("Couldn't find the license folder in the /src directory.")
+        print("Group the license related .json, .lic, .public_key, .signature files into a license folder and place it inside the /src directory")
+        sys.exit(1)
+
 def demo():
-    # print()
+    # Checking the proper license folder placement.
+    check_license_folder()
+
     object_handler = ObjectHandler(cfgs)
     while True:
         object_handler.manipulate()
