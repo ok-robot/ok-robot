@@ -9,8 +9,10 @@ This section contains Manipulation related code. Below figure describes high lev
 
 ![Manipulation Pipeline](https://drive.google.com/uc?export=view&id=1H7ddROUyjqFDhEMOOyr_-vcOqFwm203o)
 
+## License Registration
+There is no open source code currently available  for anygrasp. So, you need to get a anygrasp sdk. To do that get the feature id of the machine and fill this [form](https://forms.gle/XVV3Eip8njTYJEBo6) to apply for the license. 
 ## Code
-Once you have installed the environment following [this](../README.md#workspace-installation-and-setup)
+Once you have installed the environment following [these](../README.md#workspace-installation-and-setup) instructions. Run the following code
 ```
 mamba activate ok-robot-env
 
@@ -18,6 +20,8 @@ cd /src/
 python demo.py --debug
 ```
 **debug flag -** Is for visualizing 3d plots of grasping.
+
+**open_communication -** When you are operating with robot
 
 ## Visualizations
 Once you run the program it will save the following visualizations in the `save_directory` option in `src/demo.py` file
