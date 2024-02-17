@@ -5,9 +5,9 @@
 [<u>Project Website</u>](https://ok-robot.github.io/) . [<u>Paper</u>](https://arxiv.org/abs/2401.12202)
 
 **Authors List**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u><sup>†</sup>](https://mahis.life/), [<u>Lerrel Pinto</u><sup>†</sup>](https://www.lerrelpinto.com/)    
-* equal contribution, † equal advising.
+* *equal contribution, † equal advising.
 
-Ok-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipualtion models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
+Ok-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipulation models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 
 https://github.com/NYU-robot-learning/home-engine/assets/32452559/4849ba44-0461-491e-a872-3f362959b6b8
 
@@ -22,9 +22,9 @@ Software required:
 * Record3D (>1.18.0)
 
 ## Installation
-* You need to get the [license and checkpoint](./ok-robot-manipulation/anygrasp_license_registration/README.md) for anygrasp.
+* You need to get anygrasp [license and checkpoint](./ok-robot-manipulation/anygrasp_license_registration/README.md).
 * [Install](./docs/workspace-installation.md) the necessary environment on workstation to run the navigation and manipulation modules
-* [Install](./docs/robot-installation.md) the necessary packages on robot to abe able to properly communicate with backend workstation.
+* [Install](./docs/robot-installation.md) the necessary packages on robot to be able to properly communicate with backend workstation.
 * You might also need to get a [new calibrated URDF](./docs/robot-calibration.md) for accurate robot manipulation.
 * [Verify the installation](./docs/installation-verification.md) once the above steps are completed (installation verification)
 
