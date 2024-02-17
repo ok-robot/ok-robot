@@ -2,7 +2,7 @@ import argparse
 import sys
 import os
 
-from manipulation import ObjectHandler
+from anygrasp_manipulation import ObjectHandler
 parser = argparse.ArgumentParser()
 parser.add_argument('--checkpoint_path', default='./checkpoints/checkpoint_detection.tar', help='Model checkpoint path')
 parser.add_argument('--max_gripper_width', type=float, default=0.07, help='Maximum gripper width (<=0.1m)')
