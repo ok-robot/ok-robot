@@ -10,7 +10,8 @@ This section contains Manipulation related code. Below figure describes high lev
 ![Manipulation Pipeline](https://drive.google.com/uc?export=view&id=1H7ddROUyjqFDhEMOOyr_-vcOqFwm203o)
 
 ## License Registration
-There is no open source code currently available  for anygrasp. So, you need to get a anygrasp sdk. To do that get the feature id of the machine and fill this [form](https://forms.gle/XVV3Eip8njTYJEBo6) to apply for the license. 
+There isn't any open-source code available for anygrasp at the moment. Therefore, you'll need to obtain an anygrasp SDK. To do that, retrieve the feature ID of your machine and fill the [form](https://forms.gle/XVV3Eip8njTYJEBo6) to apply for the license.
+
 ## Code
 Once you have installed the environment following [these](../README.md#workspace-installation-and-setup) instructions. Run the following code
 ```
@@ -31,4 +32,4 @@ Once you run the program it will save the following visualizations in the `save_
 * **grasp_projections.jpg -** Green dots indicate grasps inside the object mask and red dots indicate grasps outside the object mask.
 * **best pose.jpg -** Final executed pose
 
-These visualizations help in understanding the output behaviour and in case of errors it helps in debugging.
+These visualizations help in understanding the output behaviour and also helps in debugging in case of errors.
