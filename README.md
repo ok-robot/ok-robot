@@ -22,7 +22,7 @@ Software required:
 * Record3D (>1.18.0)
 
 ## Installation
-* You need to get the [license and checkpoint](./ok-robot-manipulation/license_registration/README.md) for anygrasp.
+* You need to get the [license and checkpoint](./ok-robot-manipulation/anygrasp_license_registration/README.md) for anygrasp.
 * [Install](./docs/workspace-installation.md) the necessary environment on workstation to run the navigation and manipulation modules
 * [Install](./docs/robot-installation.md) the necessary packages on robot to abe able to properly communicate with backend workstation.
 * You might also need to get a [new calibrated URDF](./docs/robot-calibration.md) for accurate robot manipulation.
