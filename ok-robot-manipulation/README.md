@@ -18,6 +18,7 @@ cd /src/
 python demo.py --debug
 ```
 **debug flag -** Is for visualizing 3d plots of grasping.
+**open_communication flag -** Is for selection from dry run and robot running (here we only want to dry run to test environment installation).
 
 ## Visualizations
 Once you run the program it will save the following visualizations in the `save_directory` option in `src/demo.py` file
