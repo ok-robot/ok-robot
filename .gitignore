@@ -1,0 +1,27 @@
+*.tar
+*.pyc
+/ok-robot-navigation/outputs/*
+/ok-robot-navigation/sample_debug/*
+/ok-robot-navigation/test/*
+/outputs/*
+*.pt
+*.ply
+**/*.egg-info/
+*.o
+*.egg
+.DS_Store
+.TimeRecord
+license
+ok-robot-manipulation/src/checkpoints/*
+ok-robot-manipulation/src/example_data/*
+/src/sample_save_directory/*
+*.pth
+ok-robot-manipulation/pointnet2/*
+ok-robot-hw/hab_stretch/*
+ok-robot-hw/*.npy
+ok-robot-hw/*.png
+
+# Ignore python build files.
+build
+dist
+example_data

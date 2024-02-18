@@ -1,0 +1,57 @@
+channels:
+  - pytorch
+  - pytorch3d
+  - nvidia
+  - conda-forge
+  - pyg
+dependencies:
+  - python==3.9.*
+  - ipython
+  - cmake
+  - pybind11
+  - pytorch
+  - pytorch-cuda=12.1
+  - pytorch3d
+  - torchvision
+  - torchaudio
+  - pyg
+  - pip
+  - ninja
+  - pip:
+    - numpy # certain deprecated operations were used in other deps
+    - scipy == 1.10.1
+    - scikit-learn==1.4.0
+    - pandas==2.0.3
+    - hydra-core
+    # - torch-cluster -f https://data.pyg.org/whl/torch-2.1.0+cu121.html
+    # # Robots
+    - opencv-python
+    - openai-clip
+    - timm
+  
+    # # visualizations and debugging
+    - matplotlib==3.7.2
+    - imageio
+    - open3d
+    - numpy-quaternion
+
+    # Navigation
+    - more-itertools
+    - pyliblzfse
+    - einops
+    - transformers
+    - pytorch-lightning
+    - wget
+    - gdown
+    - torch_geometric
+    - tqdm
+    - zmq
+
+    # grasping
+    - protobuf==3.19.0
+    - git+https://github.com/pccws/MinkowskiEngine
+    - git+https://github.com/luca-medeiros/lang-segment-anything.git
+
+
+
+

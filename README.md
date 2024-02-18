@@ -1,117 +1,70 @@
-# Home_engine
-## Installation
-Clone repo
-```
-git clone https://github.com/NYU-robot-learning/home-engine
-cd home-engine
-git submodule update --init --recursive
-```
-To install navigation, run these scripts
-```
-mamba create -n home_engine python=3.10
-mamba activate home_engine
-mamba install cudatoolkit pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-python -m pip install -r requirements.txt
-cd clip-fields/gridencoder/
-python setup.py install
+![Intro image](https://github.com/NYU-robot-learning/ok-robot/assets/3000253/efde3577-4540-4abb-a5f4-a1baa9844b4d)
+# `OK-Robot`
 
-# install required USA-Net packages
-#cd ../..
-cd usa
-pip install -e .
+[![arXiv](https://img.shields.io/badge/arXiv-2401.12202-163144.svg?style=for-the-badge)](https://arxiv.org/abs/2401.12202)
+![License](https://img.shields.io/github/license/notmahi/bet?color=873a7e&style=for-the-badge)
+[![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-262626?style=for-the-badge)](https://github.com/psf/black)
+[![PyTorch](https://img.shields.io/badge/Videos-Website-db6a4b.svg?style=for-the-badge&logo=airplayvideo)](https://ok-robot.github.io/)
 
-# install required home-robot packages
-# make sure home-robot is on demo-refactor branch
-cd ..
-cd home-robot/src/home-robot
-pip install -e .
-cd ../../..
-```
+**Authors**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u>](https://mahis.life/)<sup>†</sup>, [<u>Lerrel Pinto</u>](https://www.lerrelpinto.com/)<sup>†</sup>    
+\* equal contribution, † equal advising.
 
-You should also follow these [instructions](https://github.com/NYU-robot-learning/anygrasp/blob/Code-Cleaning/README.md) to install a conda environment for AnyGrasp.
+OK-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipulation models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58.5%. 
+
+https://github.com/NYU-robot-learning/home-engine/assets/32452559/4849ba44-0461-491e-a872-3f362959b6b8
 
 ## Hardware and software requirements
 Hardware required:
-* iPhone with Lidar sensors
-* Stretch robot
-* A workstation machine that can use to run pretrained models
-  
+* An iPhone Pro with Lidar sensors
+* [Hello Robot Stretch](https://hello-robot.com/) with Dex Wrist installed
+* A workstation with GPU to run pretrained models 
+
 Software required:
-* [CloudCompare](https://www.danielgm.net/cc/release/) (a pointcloud processing software)
-* Record3D (installed on iPhone)
-* Other software packages needed for running pretrained models (e.g. Python)
-  
-## Running experiments
-After setting up environments and putting testing objects in the environments, you can start running experiments.
-### Scan the environments
-To align the robot coordinate system (the one robot uses to localizes itself) and navigation coordinate system (the one provided by Record3D and used by navigation stack), we generally put two tapes on the ground.
+* Python 3.9
+* Record3D (>1.18.0)
 
-Use Record3D to scan the environments. Recording should include: 
-* all obstacles in environments
-* the floor where the robots can navigate onto
-* all testing objects.
+## Installation
+* You need to get anygrasp [license and checkpoint](./ok-robot-manipulation/anygrasp_license_registration/README.md).
+* [Install](./docs/workspace-installation.md) the necessary environment on workstation to run the navigation and manipulation modules
+* [Verify the workspace installation](./docs/installation-verification.md) once the above steps are completed.
+* [Install](./docs/robot-installation.md) the necessary packages on robot to be able to properly communicate with backend workstation.
+* You might also need to get a [new calibrated URDF](./docs/robot-calibration.md) for accurate robot manipulation.
 
-Take a look at this [drive folder](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) and gain insights on how you should place tapes on the ground, how you should scan the environment.
+Once both the robot and workstation are complete. You are good to start the experiments.
 
-After you obstain a .r3d file from Record3D, you should localize the coordinates of two tapes and save it in a notepad for using them in later steps.
+## Run Experiments
 
-Use the [get_point_cloud](utils/get_point_cloud.py) script to extract this PLY file.
-Extract `pointcloud.ply` pointcloud from .r3d file with following python script (after running scripts, you will have a ply file named `pointcloud.ply` in your folder that represents this environment).
+First [set up the environment](./docs/environment-setup.md) with the tapes, position the robot properly and scan the environment to get a r3d file from Record3D. Place it in `/navigation/r3d/` run following commands.
 
-After this, you can load and visualize the point cloud.
 
-We recommend using CloudCompare to localize coordinates of tapes. See the [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing) to see how to use CloudCompare.
-### Load navigation stack
-#### "Train" voxel map
-Once you have the dependencies installed, you can run the training script `train.py` with any [.r3d](https://record3d.app/) files that you have! If you just want to try out a sample, download the [sample data](https://osf.io/famgv) `nyu.r3d` and run the following command.
+### On Workstation:
 
+In one terminal run the [Navigation Module](./ok-robot-navigation/).
 ```
-cd clip-fields
-python train.py dataset_path=nyu.r3d
-```
-You can check out the `config/train.yaml` for a list of possible configuration options. In particular, if you want to train with any particular set of labels, you can specify them in the `custom_labels` field in `config/train.yaml`.
+mamba activate ok-robot-env
 
-Change the location in `clip-fields/config.train.yaml`; for example:
-```
-cache_path: ChrisHome.pt
-saved_dataset_path: ChrisHome.pt
+cd ok-robot-navigation
+python path_planning.py debug=False dataset_path='r3d/{your_r3d_filename}.r3d' cache_path='{your_r3d_filename}.pt' pointcloud_path='{your_r3d_filename}.ply'
 ```
 
-This is where data will be stored.
+In another terminal run the [Manipulation module](./ok-robot-manipulation/README.md)
+```
+mamba activate ok-robot-env
 
-#### Update other necessary config files
-You should also edit those config files:
-* In `usa/configs/train.yaml`, modify field `task/dataset_path` to .r3d file you used for "training" voxel map.
-* In `path.yaml` you should modify `min_height` and `max_height` fields as they are floor heights and ceil heights we used for loading navigation obstacle map. Generally you should set `min_height` slightly higher (10cm) than z coordinates of orange tapes.
-* Next you might run `python path_planning.py` to start navigation planning.
+cd ok-robot-manipulation
+python dempy.py --open_communication --debug
+```
 
-### Load manipulation stack
-* In `anygrasp` folder you should run `bash demo.sh` to start grasping pose estimation
-* You should follow [home-robot instructions](https://github.com/leo20021210/home-robot) to install home-robot packages either on workstation or on robots.
-* Place your robot following [google drive folder above](https://drive.google.com/drive/folders/1qbY5OJDktrD27bDZpar9xECoh-gsP-Rw?usp=sharing).
-* Given the coordinates of tape robot stands on `(x1, y1)` and coordinates of tape robot faces to `(x2, y2)` you should run robot controller in `GrasperNet` folder by run `python run.py -bf top_camera -t -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2]`.
-* When running the experiments, three processes should run simultaneously, `python path_planning.py` for navigation path planning, `bash demo.sh` for pose estimation, and `python run.py` for robot controlling
+### On Robot:
 
-### Running experiments
-
-Start home-robot on the Stretch:
+In one terminal start the home-robot
 ```
 roslaunch home_robot_hw startup_stretch_hector_slam.launch
 ```
 
-Navigation planning:
+In another terminal run the robot control. More details in [ok-robot-hw](./ok-robot-hw/README.md)
 ```
-python path_planning.py
+cd ok-robot-hw
 
+python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
 ```
-
-Pose estimation:
-```
-bash demo.sh
-```
-
-Robot control:
-```
-python run.py
-```
-
