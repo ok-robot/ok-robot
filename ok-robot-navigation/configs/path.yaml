@@ -20,6 +20,11 @@ save_file: "./test"
 min_height: -0.8
 max_height: 1
 
+# We provide very-easy-to-understand navigation visualization in a pointcloud opened in open3d, nevertheless
+# many machines, especially headless machines might not be compatible with this visualization, for them the only
+# visualization they can see is a blue-and-yellow obstacle map with path drawn on it, set pointcloud_visualization to 
+# False if you do not want to check pointcloud visualization and only want to see the 2D obstacle map
+pointcloud_visualization: True
 
 # Parameters needed for loading semantic memory
 cache_path: 'sample.pt'

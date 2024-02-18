@@ -137,7 +137,8 @@ def main(cfg):
             B = input("B: ")
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
-            visualize_path(None, end_xyz, cfg)
+            if cfg.pointcloud_visualization:
+                visualize_path(None, end_xyz, cfg)
         else:
             print("Waiting for the data from Robot")
             start_xyt = recv_array(socket)
@@ -155,7 +156,8 @@ def main(cfg):
             paths = planner.plan(
                 start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points=True
             )
-            visualize_path(paths, end_xyz, cfg)
+            if cfg.pointcloud_visualization:
+                visualize_path(paths, end_xyz, cfg)
             end_pt = planner.a_star_planner.to_pt(paths[-1][:2])
             theta = paths[-1][2] if paths[-1][2] > 0 else paths[-1][2] + 2 * np.pi
 

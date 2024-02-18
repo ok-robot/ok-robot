@@ -21,6 +21,7 @@ cd /src/
 python demo.py --debug
 ```
 **debug flag -** Is for visualizing 3d plots of grasping.
+**open_communication flag -** Is for selection from dry run and robot running (here we only want to dry run to test environment installation).
 
 **open_communication -** When you are operating with robot
 
