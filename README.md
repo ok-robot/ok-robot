@@ -1,13 +1,15 @@
+![Intro image](https://github.com/NYU-robot-learning/ok-robot/assets/3000253/efde3577-4540-4abb-a5f4-a1baa9844b4d)
+# `OK-Robot`
 
-![Intro Figure](https://drive.google.com/uc?export=view&id=1IAyAMZS__gcZmsZevQyeETLU369a0n9X)
-# Ok-Robot
+[![arXiv](https://img.shields.io/badge/arXiv-2401.12202-163144.svg?style=for-the-badge)](https://arxiv.org/abs/2401.12202)
+![License](https://img.shields.io/github/license/notmahi/bet?color=873a7e&style=for-the-badge)
+[![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-262626?style=for-the-badge)](https://github.com/psf/black)
+[![PyTorch](https://img.shields.io/badge/Videos-Website-db6a4b.svg?style=for-the-badge&logo=airplayvideo)](https://ok-robot.github.io/)
 
-[<u>Project Website</u>](https://ok-robot.github.io/) . [<u>Paper</u>](https://arxiv.org/abs/2401.12202)
-
-**Authors List**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u><sup>†</sup>](https://mahis.life/), [<u>Lerrel Pinto</u><sup>†</sup>](https://www.lerrelpinto.com/)    
+**Authors**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u>](https://mahis.life/)<sup>†</sup>, [<u>Lerrel Pinto</u>](https://www.lerrelpinto.com/)<sup>†</sup>    
 \* equal contribution, † equal advising.
 
-Ok-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipulation models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
+OK-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipulation models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58.5%. 
 
 https://github.com/NYU-robot-learning/home-engine/assets/32452559/4849ba44-0461-491e-a872-3f362959b6b8
 
@@ -65,5 +67,4 @@ In another terminal run the robot control. More details in [ok-robot-hw](./ok-ro
 cd ok-robot-hw
 
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
-
 ```
