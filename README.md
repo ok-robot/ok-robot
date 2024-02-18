@@ -5,7 +5,7 @@
 [<u>Project Website</u>](https://ok-robot.github.io/) . [<u>Paper</u>](https://arxiv.org/abs/2401.12202)
 
 **Authors List**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u><sup>†</sup>](https://mahis.life/), [<u>Lerrel Pinto</u><sup>†</sup>](https://www.lerrelpinto.com/)    
-* *equal contribution, † equal advising.
+\* equal contribution, † equal advising.
 
 Ok-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipulation models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58%. 
 
@@ -13,10 +13,10 @@ https://github.com/NYU-robot-learning/home-engine/assets/32452559/4849ba44-0461-
 
 ## Hardware and software requirements
 Hardware required:
-* iPhone with Lidar sensors
-* Stretch robot with Dex Wrist installed
-* A workstation machine to run pretrained models 
-  
+* An iPhone Pro with Lidar sensors
+* [Hello Robot Stretch](https://hello-robot.com/) with Dex Wrist installed
+* A workstation with GPU to run pretrained models 
+
 Software required:
 * Python 3.9
 * Record3D (>1.18.0)
@@ -35,7 +35,7 @@ Once both the robot and workstation are complete. You are good to start the expe
 First [set up the environment](./docs/environment-setup.md) with the tapes, position the robot properly and scan the environment to get a r3d file from Record3D. Place it in `/navigation/r3d/` run following commands.
 
 
-**On Workstation**:
+### On Workstation:
 
 In one terminal run the [Navigation Module](./ok-robot-navigation/).
 ```
@@ -53,7 +53,7 @@ cd ok-robot-manipulation
 python dempy.py --open_communication --debug
 ```
 
-**On Robot**:
+### On Robot:
 
 In one terminal start the home-robot
 ```
