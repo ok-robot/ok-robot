@@ -6,6 +6,8 @@ Run `path_planning.py`. It should ask for Object Name [A:] and a near by object 
 cd ok-robot-navigation
 
 python path_planning.py debug=True
+# run in debug mode to see 3D Manipulation Visualisations. If you are running in a headless mode (e.g. remotely, or on a machine not connected with monitors) its better to avoid this option. 
+# In the headless mode, the command you should run would be python path_planning.py debug=True pointcloud_visualization=False
 cd ../
 ```
 
@@ -15,7 +17,8 @@ Run demo.py. It should ask for action [pick/place] and object name from `/ok-rob
 cd ok-robot-manipulation/src
 
 python demo.py --debug 
-# run in debug mode to see 3D Manipulation Visualisations. If you are running remotely its better to avoid this option
+# run in debug mode to see 3D Manipulation Visualisations. If you are running in a headless mode (e.g. remotely, or on a machine not connected with monitors) its better to avoid this option. 
+# In the headless mode, the command you should run would be python demo.py
 ```
 
 If you are able to see the visualizations then workstation setup is complete. You can move onto setting up on robot.
