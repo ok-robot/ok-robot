@@ -24,9 +24,9 @@ Software required:
 ## Installation
 * You need to get anygrasp [license and checkpoint](./ok-robot-manipulation/anygrasp_license_registration/README.md).
 * [Install](./docs/workspace-installation.md) the necessary environment on workstation to run the navigation and manipulation modules
+* [Verify the workspace installation](./docs/installation-verification.md) once the above steps are completed.
 * [Install](./docs/robot-installation.md) the necessary packages on robot to be able to properly communicate with backend workstation.
 * You might also need to get a [new calibrated URDF](./docs/robot-calibration.md) for accurate robot manipulation.
-* [Verify the installation](./docs/installation-verification.md) once the above steps are completed (installation verification)
 
 Once both the robot and workstation are complete. You are good to start the experiments.
 
