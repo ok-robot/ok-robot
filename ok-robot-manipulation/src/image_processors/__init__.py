@@ -1,2 +1,2 @@
-from .image_processor import *
-from .lang_sam_processor import *
+from .image_processor import ImageProcessor
+from .lang_sam_processor import LangSAMProcessor
