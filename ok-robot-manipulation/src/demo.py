@@ -32,6 +32,7 @@ parser.add_argument(
     "--top_down_grasp", action="store_true", help="Output top-down grasps"
 )
 parser.add_argument("--debug", action="store_true", help="Enable visualization")
+parser.add_argument("--headless", action="store_true", help="Enable headless mode")
 parser.add_argument(
     "--open_communication",
     action="store_true",
@@ -53,7 +54,7 @@ cfgs.max_gripper_width = max(0, min(0.2, cfgs.max_gripper_width))
 
 def check_license_folder():
     license_path = "./license"
-    if (not os.path.exists(license_path)) or (len(os.listdir(license_path)) != 4):
+    if (not os.path.exists(license_path)) or (len(os.listdir(license_path)) < 4):
         print(NO_LICENSE_MSG)
         sys.exit(1)
 

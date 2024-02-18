@@ -34,3 +34,20 @@ Once you run the program it will save the following visualizations in the `save_
 * **best pose.jpg -** Final executed pose
 
 These visualizations help in understanding the output behaviour and also helps in debugging in case of errors.
+
+## Debugging
+
+### GLFW Error
+If you encounter an error that looks something like this:
+```
+libGL error: No matching fbConfigs or visuals found
+libGL error: failed to load driver: swrast
+[Open3D WARNING] GLFW Error: ...
+```
+
+You are probably trying to run the code on a remote server. Unfortunately, the support for headless rendering for Open3D isn't great, and the easiest solution is to follow one of the two approaches:
+* (Easier) Try to run this code on a machine with a display.
+* (Harder) Install `xvfb` (`sudo apt install xvfb`) and run the code with `xvfb-run` with headless mode enabled:
+```
+xvfb-run -a python demo.py --debug --headless
+```
