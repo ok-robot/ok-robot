@@ -140,23 +140,8 @@ def main(cfg):
             B = input("B: ")
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
-            start_xyt = [1, -1, 1]
-            cfg.debug=False
-            try:
-                paths = planner.plan(
-                    start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points=True
-                )
-            except:
-                # Sometimes, start_xyt might be an occupied obstacle point, in this case, A* is going to throw an error
-                # In this case, we will throw an error and still visualize
-                print(
-                    'A* planner said that your robot stands on an occupied point,\n'
-                    'it might be either your hector slam is not tracking robot current position,\n'
-                    'or your min_height or max_height is set to incorrect value so obstacle map is not accurate!'
-                )
-                paths = None
             if cfg.pointcloud_visualization:
-                visualize_path(paths, end_xyz, cfg)
+                visualize_path(None, end_xyz, cfg)
         else:
             print("Waiting for the data from Robot")
             start_xyt = recv_array(socket)
