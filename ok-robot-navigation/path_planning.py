@@ -131,7 +131,7 @@ def main(cfg):
     maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
     dataset = planner.dataset
     ground_truth_map = get_ground_truth_map_from_dataset(
-        dataset, cfg.resolution, (cfg.min_height, cfg.max_height + 1.5)
+        dataset, cfg.resolution, (cfg.min_height, cfg.max_height)
     )
 
     while True:
