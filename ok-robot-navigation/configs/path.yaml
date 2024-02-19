@@ -18,6 +18,7 @@ save_file: "./test"
 
 # min (floor) and max (ceil) height for building obstalce map
 min_height: -0.8
+# max_height = min_height + 1.5 (check path_planning.py for more details)
 
 # We provide very-easy-to-understand navigation visualization in a pointcloud opened in open3d, nevertheless
 # many machines, especially headless machines might not be compatible with this visualization, for them the only
