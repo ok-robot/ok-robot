@@ -1,7 +1,11 @@
 # Robot Side Code
 Most of the heavy code will be runnning in the workstation and will communicate with the robot through sockets
 
-Once you have installed the home-robot on stretch robot run the following codes on robot 
+Our hardware codes heavily rely on robot controller provided by [home-robot](https://github.com/facebookresearch/home-robot).
+
+Once you have installed the home-robot on stretch robot following intructions provided by [home-robot-hw](https://github.com/facebookresearch/home-robot/blob/main/docs/install_robot.md) run the following codes on robot.
+
+To check whether home-robot is installed properly and got familiar with running home-robot based codes, we recommend you try to run [these test scripts](https://github.com/facebookresearch/home-robot/blob/main/tests/hw_manual_test.py)
 ## Start home-robot
 ```
 roslaunch home_robot_hw startup_stretch_hector_slam.launch

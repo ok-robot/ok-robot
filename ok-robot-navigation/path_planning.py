@@ -104,10 +104,13 @@ def load_dataset(cfg):
 
 @hydra.main(version_base="1.2", config_path="configs", config_name="path.yaml")
 def main(cfg):
+    cfg = OmegaConf.structured(OmegaConf.to_yaml(cfg))
     semantic_memory = load_dataset(cfg)
     if not cfg.debug:
         socket = load_socket(cfg.port_number)
     conservative = cfg.map_type == "conservative_vlmap"
+    # ceil height is set to floor height+1.5, as objects higher than that will not obstruct robots anymore 
+    cfg.max_height = cfg.min_height + 1.5
     planner = PathPlanner(
         cfg.dataset_path,
         cfg.min_height,
@@ -128,7 +131,7 @@ def main(cfg):
     maxx, maxy = minx + xcells * resolution, miny + ycells * resolution
     dataset = planner.dataset
     ground_truth_map = get_ground_truth_map_from_dataset(
-        dataset, cfg.resolution, (cfg.min_height, cfg.max_height)
+        dataset, cfg.resolution, (cfg.min_height, cfg.max_height + 1.5)
     )
 
     while True:
@@ -137,8 +140,23 @@ def main(cfg):
             B = input("B: ")
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
+            start_xyt = [1, -1, 1]
+            cfg.debug=False
+            try:
+                paths = planner.plan(
+                    start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points=True
+                )
+            except:
+                # Sometimes, start_xyt might be an occupied obstacle point, in this case, A* is going to throw an error
+                # In this case, we will throw an error and still visualize
+                print(
+                    'A* planner said that your robot stands on an occupied point,\n'
+                    'it might be either your hector slam is not tracking robot current position,\n'
+                    'or your min_height or max_height is set to incorrect value so obstacle map is not accurate!'
+                )
+                paths = None
             if cfg.pointcloud_visualization:
-                visualize_path(None, end_xyz, cfg)
+                visualize_path(paths, end_xyz, cfg)
         else:
             print("Waiting for the data from Robot")
             start_xyt = recv_array(socket)
@@ -153,9 +171,19 @@ def main(cfg):
             socket.send_string("B received")
             end_xyz = localizer.localize_AonB(A, B)
             end_xy = end_xyz[:2]
-            paths = planner.plan(
-                start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points=True
-            )
+            try:
+                paths = planner.plan(
+                    start_xy=start_xyt[:2], end_xy=end_xy, remove_line_of_sight_points=True
+                )
+            except:
+                # Sometimes, start_xyt might be an occupied obstacle point, in this case, A* is going to throw an error
+                # In this case, we will throw an error and still visualize
+                print(
+                    'A* planner said that your robot stands on an occupied point,\n\
+                    it might be either your hector slam is not tracking robot current position,\n\
+                    or your min_height or max_height is set to incorrect value so obstacle map is not accurate!'
+                )
+                paths = None
             if cfg.pointcloud_visualization:
                 visualize_path(paths, end_xyz, cfg)
             end_pt = planner.a_star_planner.to_pt(paths[-1][:2])
@@ -168,20 +196,38 @@ def main(cfg):
             print(paths)
         fig, axes = plt.subplots(2, 1, figsize=(8, 8))
 
-        if not cfg.debug:
+        # Draw paths only when path planning is done successfully
+        if not cfg.debug and paths:
             xs, ys, thetas = zip(*paths)
+
+        # Draw on obstacle map used for path planning
         axes[0].imshow(obstacle_map.grid[::-1], extent=(minx, maxx, miny, maxy))
-        if not cfg.debug:
+        if not cfg.debug and paths:
             axes[0].plot(xs, ys, c="r")
             axes[0].scatter(start_xyt[0], start_xyt[1], s=50, c="white")
             axes[0].scatter(xs, ys, c="cyan", s=10)
-        axes[0].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+            axes[0].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+        elif not cfg.debug:
+            # This means that we have start_xyt and tried path planning, yet path planning failed.
+            # For debugging purpose, we will draw start_xyt and end_xyt
+            axes[0].scatter(start_xyt[0], start_xyt[1], s=50, c="white")
+            axes[0].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+        else:
+            axes[0].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+
+        # Draw on ground truth obstacle map
         axes[1].imshow(ground_truth_map.grid[::-1], extent=(minx, maxx, miny, maxy))
-        if not cfg.debug:
+        if not cfg.debug and paths:
             axes[1].plot(xs, ys, c="r")
             axes[1].scatter(start_xyt[0], start_xyt[1], s=50, c="white")
             axes[1].scatter(xs, ys, c="cyan", s=10)
-        axes[1].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+            axes[1].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+        elif not cfg.debug:
+            axes[0].scatter(start_xyt[0], start_xyt[1], s=50, c="white")
+            axes[0].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+        else:
+            axes[0].scatter(end_xyz[0], end_xyz[1], s=50, c="g")
+
         if not os.path.exists(cfg.save_file + "/" + A):
             os.makedirs(cfg.save_file + "/" + A)
         print(cfg.save_file + "/" + A + "/navigation_vis.jpg")

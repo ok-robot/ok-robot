@@ -44,7 +44,7 @@ In one terminal run the [Navigation Module](./ok-robot-navigation/).
 mamba activate ok-robot-env
 
 cd ok-robot-navigation
-python path_planning.py debug=False dataset_path='r3d/{your_r3d_filename}.r3d' cache_path='{your_r3d_filename}.pt' pointcloud_path='{your_r3d_filename}.ply'
+python path_planning.py debug=False min_height={z coordinates of the ground tapes + 0.1} dataset_path='r3d/{your_r3d_filename}.r3d' cache_path='{your_r3d_filename}.pt' pointcloud_path='{your_r3d_filename}.ply'
 ```
 
 In another terminal run the [Manipulation module](./ok-robot-manipulation/README.md)
@@ -52,10 +52,12 @@ In another terminal run the [Manipulation module](./ok-robot-manipulation/README
 mamba activate ok-robot-env
 
 cd ok-robot-manipulation
-python dempy.py --open_communication --debug
+python demo.py --open_communication --debug
 ```
 
 ### On Robot:
+
+Our robot codes rely on robot controllers provided by [home-robot](https://github.com/facebookresearch/home-robot). Just like running other home-robot based codes, you need to run two processes synchronously in two terminals.
 
 In one terminal start the home-robot
 ```
