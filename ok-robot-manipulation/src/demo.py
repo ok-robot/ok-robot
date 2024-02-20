@@ -44,9 +44,8 @@ parser.add_argument(
 parser.add_argument(
     "--min_depth", type=float, default=0, help="Maximum depth of point cloud"
 )
-# Set this to 0.1 in case your machine does not have enough memory, set this value as large as possible when running real time
 parser.add_argument(
-    "--sampling_rate", type=float, default=0.1, help="Sampling rate of points [<= 1]"
+    "--sampling_rate", type=float, default=1, help="Sampling rate of points [<= 1]"
 )
 parser.add_argument("--environment", default="./example_data", help="Environment name")
 cfgs = parser.parse_args()
