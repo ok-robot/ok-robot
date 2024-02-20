@@ -19,7 +19,7 @@ python get_point_cloud.py --input_file=[your r3d file]
 ```
 **Identify Tape Co-ordinates** Use a 3D Visualizer to determine the coordinates of the two orange tapes in the environment. Let the co-ordinates of these tapes are (x1, y1) for the first tape(tape1) and (x2, y2) for the second tape(tape2).
 
-We recommend using CloudCompare to localize coordinates of tapes. See these images for instruction 
+We recommend using CloudCompare to localize coordinates of tapes. See these images for instruction. You can download CloudCompare from [here](https://www.danielgm.net/cc/release/)
 <p align="center">
   <img src="docs_image/CloudCompare step1.png" width="40%" height="200" style="margin-right: 10px;"/>
   <img src="docs_image/CloudCompare step2.png" width="40%" height="200"/>
@@ -29,7 +29,7 @@ We recommend using CloudCompare to localize coordinates of tapes. See these imag
   <img src="docs_image/CloudCompare step4.png" width="40%" height="auto"/>
 </p>
 
-**Robot Base Placement** Position the robot's base on tape1 (pass its coordinates as x1 and y1 when running codes on robot side) and orient it towards tape2 (pass its coordinates as x2 and y2 when running codes on robot side) as shown in bewlow images. Make sure the position and rotation of the robot as accurate as possible as it is crucial for the experiments to run properly. We encourage you to manually finetune the robot's positions or tapes' coordinates if you find the tape coordinates are not accurate enough (You can try to run one navigation query check navigation path planning visualization to see the robot's target position, if the robot is obviously off from the target position in visualization, then you are encouraged to tune robot's initial positions)
+**Robot Base Placement** Position the robot's base on tape1 (pass its coordinates as x1 and y1 when running codes on robot side) and orient it towards tape2 (pass its coordinates as x2 and y2 when running codes on robot side) as shown in below images. Make sure the position and rotation of the robot are as accurate as possible as it is crucial for the experiments to run properly. We encourage you to manually finetune the robot's positions or tapes' coordinates if you find the tape coordinates are not accurate enough (You can try to run one navigation query check navigation path planning visualization to see the robot's target position, if the robot is obviously off from the target position in visualization, then you are encouraged to tune robot's initial positions)
 
 <p align="center">
   <img src="docs_image/How you should use tape to localize robot1.png" width="25%" height="380" style="margin-right: 10px;"/>

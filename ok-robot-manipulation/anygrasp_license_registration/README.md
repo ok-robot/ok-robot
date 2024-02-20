@@ -2,6 +2,7 @@
 
 * Get the feature id of your working machine.
 ```base
+    cd ok-robot-manipulation/anygrasp_license_registration
     ./license_checker -f
 ```
 * Fill in the [form](https://forms.gle/XVV3Eip8njTYJEBo6) to apply for license, which requires the machine feature id.
