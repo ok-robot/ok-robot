@@ -6,3 +6,10 @@
 cd $OK-Robot/
 cp -r home-robot/assets/hab_stretch/ ok-robot-hw
 ```
+
+## OpenAI installation
+
+Run this command to install the OpenAI APIs if you want to use GPT:
+```
+pip install openai
+```
