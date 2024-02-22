@@ -25,3 +25,12 @@ ok-robot-hw/*.png
 build
 dist
 example_data
+
+# vim files
+*.swp
+*.swo
+*.swn
+
+# Data files
+*.r3d
+*.npy
