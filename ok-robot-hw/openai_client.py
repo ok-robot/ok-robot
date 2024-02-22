@@ -133,7 +133,8 @@ if __name__ == "__main__":
     client = OpenaiClient()
     plan = client(
         # "this room is a mess, could you put away the dirty towel?", verbose=True
-        "move the green and white plush cactus from the table to the baby carrier and mobile", verbose=True
+        "move the green and white plush cactus from the table to the baby carrier and mobile",
+        verbose=True,
     )
     print("\n\n")
     print("OpenAI client returned this plan:", plan)
