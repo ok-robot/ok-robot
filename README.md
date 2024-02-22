@@ -7,6 +7,7 @@
 ![License](https://img.shields.io/github/license/notmahi/bet?color=873a7e&style=for-the-badge)
 [![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-262626?style=for-the-badge)](https://github.com/psf/black)
 [![PyTorch](https://img.shields.io/badge/Videos-Website-db6a4b.svg?style=for-the-badge&logo=airplayvideo)](https://ok-robot.github.io/)
+[![Discord](https://img.shields.io/discord/1210368035324436551?style=for-the-badge&logo=discord&color=5865F2&label=discord)](https://discord.gg/KEv5GJPT3a)
 
 **Authors**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u>](https://mahis.life/)<sup>†</sup>, [<u>Lerrel Pinto</u>](https://www.lerrelpinto.com/)<sup>†</sup>    
 \* equal contribution, † equal advising.
@@ -94,7 +95,6 @@ If you find this work useful, please consider citing:
 
 Our work is reliant on a lot of other publications and open source projects, if you find a particular component useful, please consider citing the original authors as well.
 
-<!-- Collapse -->
 <details>
 <summary>List of citations</summary>
 
@@ -123,3 +123,16 @@ Our work is reliant on a lot of other publications and open source projects, if 
 }
 ```
 </details>
+
+## Roadmap
+
+While OK-Robot can do quite a bit by itself, we think there are plenty of room for improvement for a zero-shot, home-dwelling robot. That's why we consider OK-Robot a living release, and will try to occassionally add new features to this. We also encourage you to take a look at the list below, and if you are interested, share your improvements with the community by contributing to this project.
+
+- [x] Create OK-Robot, a shared platform for a zero-shot, open-vocab pick-and-place robot.
+- [x] Integrate grasping primitive with AnyGrasp.
+- [x] Integrate open-vocabulary navigation with VoxelMap.
+- [x] Integrate heuristic based dropping.
+- [ ] Improve documentation.
+- [ ] Add error detection/recovery from failure while manipulating.
+- [ ] Figure out interactive navigation: if an object is not found or a query is ambiguous, ask the end-user.
+- [ ] Integrate with an open-source grasp perception model so that we can MIT-license all the dependencies.
