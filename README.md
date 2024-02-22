@@ -1,4 +1,6 @@
-![Intro image](https://github.com/NYU-robot-learning/ok-robot/assets/3000253/efde3577-4540-4abb-a5f4-a1baa9844b4d)
+![Intro image](https://github.com/ok-robot/ok-robot/assets/156981262/5634372e-9820-4681-bb1a-1c14541c229c)
+
+
 # `OK-Robot`
 
 [![arXiv](https://img.shields.io/badge/arXiv-2401.12202-163144.svg?style=for-the-badge)](https://arxiv.org/abs/2401.12202)
@@ -11,7 +13,7 @@
 
 OK-Robot is a zero-shot modular framework that effectively combines the state-of-art navigation and manipulation models to perform pick and place tasks in real homes. It has been tested in 10 real homes on 170+ objects and achieved a total success rate of 58.5%. 
 
-https://github.com/NYU-robot-learning/home-engine/assets/32452559/4849ba44-0461-491e-a872-3f362959b6b8
+https://github.com/ok-robot/ok-robot/assets/156981262/7221264b-2fa3-4008-a757-0604cdc04e2b
 
 ## Hardware and software requirements
 Hardware required:
