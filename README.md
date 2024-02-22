@@ -78,3 +78,48 @@ cd ok-robot-hw
 
 python run.py -x1 [x1] -y1 [y1] -x2 [x2] -y2 [y2] -ip [your workstation ip]
 ```
+
+## Citation
+
+If you find this work useful, please consider citing:
+
+```bibtex
+@article{liu2024okrobot,
+  title={OK-Robot: What Really Matters in Integrating Open-Knowledge Models for Robotics},
+  author={Liu, Peiqi and Orru, Yaswanth and Paxton, Chris and Shafiullah, Nur Muhammad Mahi and Pinto, Lerrel},
+  journal={arXiv preprint arXiv:2401.12202},
+  year={2024}
+}
+```
+
+Our work is reliant on a lot of other publications and open source projects, if you find a particular component useful, please consider citing the original authors as well.
+
+<!-- Collapse -->
+<details>
+<summary>List of citations</summary>
+
+```bibtex
+@article{fang2023anygrasp,
+  title={Anygrasp: Robust and efficient grasp perception in spatial and temporal domains},
+  author={Fang, Hao-Shu and Wang, Chenxi and Fang, Hongjie and Gou, Minghao and Liu, Jirong and Yan, Hengxu and Liu, Wenhai and Xie, Yichen and Lu, Cewu},
+  journal={IEEE Transactions on Robotics},
+  year={2023},
+  publisher={IEEE}
+}
+
+@article{minderer2024scaling,
+  title={Scaling open-vocabulary object detection},
+  author={Minderer, Matthias and Gritsenko, Alexey and Houlsby, Neil},
+  journal={Advances in Neural Information Processing Systems},
+  volume={36},
+  year={2024}
+}
+
+@article{yenamandra2023homerobot,
+  title={HomeRobot: Open-Vocabulary Mobile Manipulation},
+  author={Yenamandra, Sriram and Ramachandran, Arun and Yadav, Karmesh and Wang, Austin and Khanna, Mukul and Gervet, Theophile and Yang, Tsung-Yen and Jain, Vidhi and Clegg, Alexander William and Turner, John and others},
+  journal={arXiv preprint arXiv:2306.11565},
+  year={2023}
+}
+```
+</details>
