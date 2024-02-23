@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/github/license/notmahi/bet?color=873a7e&style=for-the-badge)
 [![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-262626?style=for-the-badge)](https://github.com/psf/black)
 [![PyTorch](https://img.shields.io/badge/Videos-Website-db6a4b.svg?style=for-the-badge&logo=airplayvideo)](https://ok-robot.github.io/)
-[![Discord](https://img.shields.io/discord/1210368035324436551?style=for-the-badge&logo=discord&color=5865F2&label=discord&logoColor=white)](https://discord.gg/KEv5GJPT3a)
+[![Discord](https://img.shields.io/discord/1210368035324436551?style=for-the-badge&logo=discord&color=5865F2&label=discord&logoColor=white)](https://discord.gg/wzzZJxqKYC)
 
 **Authors**: [<u>Peiqi Liu</u>*](https://leo20021210.github.io/), [<u>Yaswanth Orru</u>*](https://www.linkedin.com/in/yaswanth-orru/), [<u>Jay Vakil</u>](https://www.linkedin.com/in/jdvakil/), [<u>Chris Paxton</u>](https://cpaxton.github.io/), [<u>Mahi Shafiuallah</u>](https://mahis.life/)<sup>†</sup>, [<u>Lerrel Pinto</u>](https://www.lerrelpinto.com/)<sup>†</sup>    
 \* equal contribution, † equal advising.
