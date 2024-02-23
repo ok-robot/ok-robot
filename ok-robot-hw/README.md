@@ -2,9 +2,9 @@
 Most of the heavy code will be runnning in the workstation and will communicate with the robot through sockets
 
 ## Preparation to run robot side codes
-Once you finised installing home-robot, follow [these steps](../docs/robot-installation.md) to enable OK-Robot use home-robot contollers.
-
 The success of OK-Robot system also depends on robot calibration and accurate urdf file, so make sure you follow [these calibration steps](../docs/robot-calibration.md) to obtain an accurate urdf file for your robot.
+
+Once you have finised setting up the robot following these [instructions](../docs/robot-installation.md) run the following code on robot 
 
 ## Start home-robot
 ```
