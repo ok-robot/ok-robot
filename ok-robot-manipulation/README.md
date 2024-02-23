@@ -51,3 +51,10 @@ You are probably trying to run the code on a remote server. Unfortunately, the s
 ```
 xvfb-run -a python demo.py --debug --headless
 ```
+
+### GPU Out of Memory
+
+Try reducing the `max_depth` and `sampling_rate` in `src/demo.py` file. If the problem persists, try running the code on a machine with a higher VRAM GPU.
+```
+python demo.py --debug --max_depth 1.5 --sampling_rate 0.5
+```
