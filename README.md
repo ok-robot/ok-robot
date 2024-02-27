@@ -25,7 +25,7 @@ Hardware required:
 Software required:
 * Python 3.9
 * Record3D (>1.18.0)
-* [CloudComapre](https://www.danielgm.net/cc/release/)
+* [CloudCompare](https://www.danielgm.net/cc/release/)
 
 ## Installation
 * You need to get anygrasp [license and checkpoint](./ok-robot-manipulation/anygrasp_license_registration/README.md).
