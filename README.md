@@ -126,7 +126,7 @@ Our work is reliant on a lot of other publications and open source projects, if 
 
 ## Roadmap
 
-While OK-Robot can do quite a bit by itself, we think there are plenty of room for improvement for a zero-shot, home-dwelling robot. That's why we consider OK-Robot a living release, and will try to occassionally add new features to this. We also encourage you to take a look at the list below, and if you are interested, share your improvements with the community by contributing to this project.
+While OK-Robot can do quite a bit by itself, we think there are plenty of room for improvement for a zero-shot, home-dwelling robot. That's why we consider OK-Robot a living release, and will try to occasionally add new features to this. We also encourage you to take a look at the list below, and if you are interested, share your improvements with the community by contributing to this project.
 
 - [x] Create OK-Robot, a shared platform for a zero-shot, open-vocab pick-and-place robot.
 - [x] Integrate grasping primitive with AnyGrasp.
